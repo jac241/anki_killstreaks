@@ -1,5 +1,13 @@
+"""
+Anki Killstreaks add-on
+
+Copyright: (c) jac241 2019-2020 <https://github.com/jac241>
+License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
+"""
+
 from datetime import datetime, timedelta
 from os.path import join, dirname
+
 
 class MultikillMixin:
     def requirements_met(

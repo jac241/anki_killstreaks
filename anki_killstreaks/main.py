@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 """
+Original Copyright/License statement
+------
 Anki Add-on: Puppy Reinforcement
 
 Uses intermittent reinforcement to encourage card review streaks
 
 Copyright: (c) Glutanimate 2016-2018 <https://glutanimate.com/>
 License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
+------
+
+Modifications by jac241 <https://github.com/jac241> for Anki Killstreaks addon
 """
 
 import os
