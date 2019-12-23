@@ -1,7 +1,7 @@
 {
     "duration": 3000,
     "image_height": 128,
-    "tooltip_color": "#AFFFC5",
+    "tooltip_color": "#323633",
     "encourage_every": 10,
     "max_spread": 5,
     "limit_max": 100,

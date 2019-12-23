@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from os.path import join, dirname
 
 class MultikillMixin:
     def requirements_met(
@@ -154,18 +155,52 @@ class PausedStreakStateMachine:
     def current_medal_state(self):
         return self._states[self._current_streak_index]
 
+images_dir = join(dirname(__file__), 'images')
+
+
+def image_path(filename):
+    return join(images_dir, filename)
+
+
 HALO_MULTIKILL_STATES = [
     MultikillStartingState(),
     MultikillFirstAnswerState(),
-    MultikillMedalState(medal_image=None, name='Double Kill'),
-    MultikillMedalState(medal_image=None, name='Triple Kill'),
-    MultikillMedalState(medal_image=None, name='Overkill'),
-    MultikillMedalState(medal_image=None, name='Killtacular'),
-    MultikillMedalState(medal_image=None, name='Killtrocity'),
-    MultikillMedalState(medal_image=None, name='Killimanjaro'),
-    MultikillMedalState(medal_image=None, name='Killtastrophe'),
-    MultikillMedalState(medal_image=None, name='Killpocalypse'),
-    MultikillMedalState(medal_image=None, name='Killionaire'),
+    MultikillMedalState(
+        medal_image=image_path('Doublekill_Medal.webp.png'),
+        name='Double Kill'
+    ),
+    MultikillMedalState(
+        medal_image=image_path('Triplekill_Medal.webp.png'),
+        name='Triple Kill'
+    ),
+    MultikillMedalState(
+        medal_image=image_path('Overkill_Medal.png'),
+        name='Overkill'
+    ),
+    MultikillMedalState(
+        medal_image=image_path('Killtacular_Medal.webp.png'),
+        name='Killtacular'
+    ),
+    MultikillMedalState(
+        medal_image=image_path('Killtrocity_Medal.webp.png'),
+        name='Killtrocity'
+    ),
+    MultikillMedalState(
+        medal_image=image_path('Killimanjaro_Medal.webp.png'),
+        name='Killimanjaro'
+    ),
+    MultikillMedalState(
+        medal_image=image_path('Killtastrophe_Medal.webp.png'),
+        name='Killtastrophe'
+    ),
+    MultikillMedalState(
+        medal_image=image_path('Killpocalypse_Medal.webp.png'),
+        name='Killpocalypse'
+    ),
+    MultikillMedalState(
+        medal_image=image_path('Killionaire_Medal.webp.png'),
+        name='Killionaire'
+    ),
     EndState(),
 ]
 
@@ -174,31 +209,49 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
-    KillingSpreeMedalState(medal_image=None, name='Killing Spree'),
+    KillingSpreeMedalState(
+        medal_image=image_path('Killing_Spree_Medal.png'),
+        name='Killing Spree'
+    ),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
-    KillingSpreeMedalState(medal_image=None, name='Killing Frenzy'),
+    KillingSpreeMedalState(
+        medal_image=image_path('Killing_Frenzy_Medal.webp.png'),
+        name='Killing Frenzy'
+    ),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
-    KillingSpreeMedalState(medal_image=None, name='Running Riot'),
+    KillingSpreeMedalState(
+        medal_image=image_path('Running_Riot_Medal.webp.png'),
+        name='Running Riot'
+    ),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
-    KillingSpreeMedalState(medal_image=None, name='Rampage'),
+    KillingSpreeMedalState(
+        medal_image=image_path('Rampage_Medal.webp.png'),
+        name='Rampage'
+    ),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
-    KillingSpreeMedalState(medal_image=None, name='Untouchable'),
+    KillingSpreeMedalState(
+        medal_image=image_path('Untouchable_Medal.webp.png'),
+        name='Untouchable'
+    ),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
-    KillingSpreeMedalState(medal_image=None, name='Invincible'),
+    KillingSpreeMedalState(
+        medal_image=image_path('Invincible_Medal.webp.png'),
+        name='Invincible'
+    ),
     KillingSpreeEndState(),
 ]

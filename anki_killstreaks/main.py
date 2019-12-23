@@ -57,7 +57,7 @@ def showToolTip(medals, period=local_conf["duration"]):
     lab.setWindowFlags(Qt.ToolTip)
     p = QPalette()
     p.setColor(QPalette.Window, QColor(local_conf["tooltip_color"]))
-    p.setColor(QPalette.WindowText, QColor("#000000"))
+    p.setColor(QPalette.WindowText, QColor("#f7f7f7"))
     lab.setPalette(p)
     vdiff = (local_conf["image_height"] - 128) / 2
     lab.move(
@@ -84,10 +84,14 @@ def closeTooltip():
 
 def medal_html(medal):
     return """
-        <td valign="middle">
-            <center><b>{}!</b><br></center>
+        <td valign="middle" style="text-align:center">
+            <img src="{img_src}">
+            <center><b>{name}!</b><br></center>
         </td>
-    """.format(medal.name)
+    """.format(
+        img_src=medal.medal_image,
+        name=medal.name,
+    )
 
 
 # def getEncouragement(cards):
