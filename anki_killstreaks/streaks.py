@@ -16,10 +16,24 @@ class MultikillMixin:
         )
 
 
-class MultikillStartingState(MultikillMixin):
+class KillingSpreeMixin:
+    def requirements_met(
+        self,
+        question_shown_at,
+        question_answered_at,
+        interval_s,
+        min_interval_s=0
+    ):
+        delta = question_answered_at - question_shown_at
+        return delta >= timedelta(seconds=min_interval_s)
+
+
+# first just needs to be after minimum time
+class MultikillStartingState(KillingSpreeMixin):
     def __init__(self):
         self.is_displayable_medal = False
         self.num_states_to_advance_if_on_streak = 1
+
 
 class MultikillFirstAnswerState(MultikillMixin):
     def __init__(self):
@@ -39,18 +53,6 @@ class EndState(MultikillMixin):
     def __init__(self):
         self.is_displayable_medal = False
         self.num_states_to_advance_if_on_streak = 0
-
-
-class KillingSpreeMixin:
-    def requirements_met(
-        self,
-        question_shown_at,
-        question_answered_at,
-        interval_s,
-        min_interval_s=0
-    ):
-        delta = question_answered_at - question_shown_at
-        return delta >= timedelta(seconds=min_interval_s)
 
 
 class KillingSpreeNoMedalState(KillingSpreeMixin):

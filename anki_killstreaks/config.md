@@ -1,6 +1,7 @@
-### Puppy Reinforcement: Configuration
+### Anki Killstreaks: Configuration
 
 These settings do not sync and require a restart to apply.
+TODO: CONFIG NOT FUNCITONAL YET, PLACEHOLDER ONLY
 
 - `duration` [int]: duration in msec; default: `3000`
 - `encourage_every` [int]: show encouragement about every n cards; default: `10`
