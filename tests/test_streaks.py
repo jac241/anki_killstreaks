@@ -48,6 +48,29 @@ def test_QuestionShownState_on_show_question_should_return_a_new_machine_with_qu
 
     assert machine._question_shown_at < result._question_shown_at
 
+
+def test_QuestionShownState_on_answer_should_advance():
+    """
+    This state occurs when pressing 3 or 4 when question shown,
+    want to display medal if eligible
+    """
+    states = [
+        MultikillStartingState(),
+        MultikillFirstAnswerState(),
+        MultikillMedalState(name='test', medal_image=None),
+        EndState()
+    ]
+
+    machine = QuestionShownState(
+        states=states,
+        interval_s=10,
+        current_streak_index=0,
+        question_shown_at=datetime.now()
+    )
+
+    result = machine.on_answer(answer_was_good_or_easy=True)
+    return result.current_medal_state == states[1]
+
 def test_multikill_flow_should_work():
     states = [
         MultikillStartingState(),

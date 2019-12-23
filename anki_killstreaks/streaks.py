@@ -115,6 +115,13 @@ class QuestionShownState:
         self._interval_s = interval_s
         self._current_streak_index = current_streak_index
 
+    def on_show_question(self):
+        return QuestionShownState(
+            states=self._states,
+            question_shown_at=datetime.now(),
+            interval_s=self._interval_s,
+            current_streak_index=self._current_streak_index
+        )
 
     def on_show_answer(self):
         return AnswerShownState(
@@ -125,13 +132,17 @@ class QuestionShownState:
             current_streak_index=self._current_streak_index
         )
 
-    def on_show_question(self):
-        return QuestionShownState(
+    def on_answer(self, answer_was_good_or_easy):
+        answer_state = AnswerShownState(
             states=self._states,
-            question_shown_at=datetime.now(),
+            question_shown_at=self._question_shown_at,
+            answer_shown_at=datetime.now(),
             interval_s=self._interval_s,
             current_streak_index=self._current_streak_index
         )
+
+        return answer_state.on_answer(answer_was_good_or_easy)
+
 
     @property
     def current_medal_state(self):
