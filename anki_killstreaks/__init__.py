@@ -6,4 +6,9 @@
 # Copyright: (c) 2017 Glutanimate <https://glutanimate.com/>
 # License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 
-from . import main
+import os
+
+try:
+    os.environ['IN_TEST_SUITE']
+except KeyError:
+    from . import main

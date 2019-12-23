@@ -10,46 +10,80 @@ License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 
 import os
 import random
+from datetime import datetime, timedelta
 
 from aqt import mw
 from aqt.qt import *
-from anki.hooks import addHook
+from aqt.reviewer import Reviewer
+from anki.hooks import addHook, wrap
 
 from .config import local_conf
+from .streaks import PausedStreakStateMachine, HALO_STATES
 
-mw.dogs = {
-    "cnt": 0,
-    "last": 0,
-    "enc": None,
-    "ivl": local_conf["encourage_every"]
-}
+# mw.dogs = {
+    # "cnt": 0,
+    # "last": 0,
+    # "enc": None,
+    # "ivl": local_conf["encourage_every"]
+# }
 
-addon_path = os.path.dirname(__file__)
-dogs_dir = os.path.join(addon_path, 'images')
-dogs_imgs = [i for i in os.listdir(dogs_dir)
-             if i.endswith((".jpg", ".jpeg", ".png"))]
+# addon_path = os.path.dirname(__file__)
+# dogs_dir = os.path.join(addon_path, 'images')
+# dogs_imgs = [i for i in os.listdir(dogs_dir)
+             # if i.endswith((".jpg", ".jpeg", ".png"))]
 
 _tooltipTimer = None
 _tooltipLabel = None
 
-def dogTooltip(msg, image=":/icons/help-hint.png",
-               period=local_conf["duration"], parent=None):
+# def dogTooltip(msg, image=":/icons/help-hint.png",
+               # period=local_conf["duration"], parent=None):
+    # global _tooltipTimer, _tooltipLabel
+    # class CustomLabel(QLabel):
+        # def mousePressEvent(self, evt):
+            # evt.accept()
+            # self.hide()
+    # closeTooltip()
+    # aw = parent or mw.app.activeWindow() or mw
+    # lab = CustomLabel("""\
+# <table cellpadding=10>
+# <tr>
+# <td><img height=%d src="%s"></td>
+# <td valign="middle">
+    # <center><b>%i cards done so far!</b><br>%s</center>
+# </td>
+# </tr>
+# </table>""" % (local_conf["image_height"], image, mw.dogs["cnt"], msg), aw)
+    # lab.setFrameStyle(QFrame.Panel)
+    # lab.setLineWidth(2)
+    # lab.setWindowFlags(Qt.ToolTip)
+    # p = QPalette()
+    # p.setColor(QPalette.Window, QColor(local_conf["tooltip_color"]))
+    # p.setColor(QPalette.WindowText, QColor("#000000"))
+    # lab.setPalette(p)
+    # vdiff = (local_conf["image_height"] - 128) / 2
+    # lab.move(
+        # aw.mapToGlobal(QPoint(0, -260-vdiff + aw.height())))
+    # lab.show()
+    # _tooltipTimer = mw.progress.timer(
+        # period, closeTooltip, False)
+    # _tooltipLabel = lab
+
+def showToolTip(ease, medal, period=local_conf["duration"]):
     global _tooltipTimer, _tooltipLabel
     class CustomLabel(QLabel):
         def mousePressEvent(self, evt):
             evt.accept()
             self.hide()
     closeTooltip()
-    aw = parent or mw.app.activeWindow() or mw
+    aw = mw.app.activeWindow() or mw
     lab = CustomLabel("""\
 <table cellpadding=10>
 <tr>
-<td><img height=%d src="%s"></td>
 <td valign="middle">
-    <center><b>%i cards done so far!</b><br>%s</center>
+    <center><b>%i pressed, on streak %r</b><br></center>
 </td>
 </tr>
-</table>""" % (local_conf["image_height"], image, mw.dogs["cnt"], msg), aw)
+</table>""" % (ease, medal.name), aw)
     lab.setFrameStyle(QFrame.Panel)
     lab.setLineWidth(2)
     lab.setWindowFlags(Qt.ToolTip)
@@ -78,34 +112,64 @@ def closeTooltip():
         _tooltipTimer.stop()
         _tooltipTimer = None
 
-def getEncouragement(cards):
-    last = mw.dogs["enc"]
-    if cards >= local_conf["limit_max"]:
-        lst = list(local_conf["encouragements"]["max"])
-    elif cards >= local_conf["limit_high"]:
-        lst = list(local_conf["encouragements"]["high"])
-    elif cards >= local_conf["limit_middle"]:
-        lst = list(local_conf["encouragements"]["middle"])
-    else:
-        lst = list(local_conf["encouragements"]["low"])
-    if last and last in lst:
-        # skip identical encouragement
-        lst.remove(last)
-    idx = random.randrange(len(lst))
-    mw.dogs["enc"] = lst[idx]
-    return lst[idx]
+# def getEncouragement(cards):
+    # last = mw.dogs["enc"]
+    # if cards >= local_conf["limit_max"]:
+        # lst = list(local_conf["encouragements"]["max"])
+    # elif cards >= local_conf["limit_high"]:
+        # lst = list(local_conf["encouragements"]["high"])
+    # elif cards >= local_conf["limit_middle"]:
+        # lst = list(local_conf["encouragements"]["middle"])
+    # else:
+        # lst = list(local_conf["encouragements"]["low"])
+    # if last and last in lst:
+        # # skip identical encouragement
+        # lst.remove(last)
+    # idx = random.randrange(len(lst))
+    # mw.dogs["enc"] = lst[idx]
+    # return lst[idx]
 
-def showDog():
-    mw.dogs["cnt"] += 1
-    if mw.dogs["cnt"] != mw.dogs["last"] + mw.dogs["ivl"]:
-        return
-    image_path = os.path.join(dogs_dir, random.choice(dogs_imgs))
-    msg = getEncouragement(mw.dogs["cnt"])
-    dogTooltip(msg, image=image_path)
-    # intermittent reinforcement:
-    mw.dogs["ivl"] = max(1, local_conf["encourage_every"] +
-                         random.randint(-local_conf["max_spread"],
-                                        local_conf["max_spread"]))
-    mw.dogs["last"] = mw.dogs["cnt"]
+# def showDog():
+    # mw.dogs["cnt"] += 1
+    # if mw.dogs["cnt"] != mw.dogs["last"] + mw.dogs["ivl"]:
+        # return
+    # image_path = os.path.join(dogs_dir, random.choice(dogs_imgs))
+    # msg = getEncouragement(mw.dogs["cnt"])
+    # dogTooltip(msg, image=image_path)
+    # # intermittent reinforcement:
+    # mw.dogs["ivl"] = max(1, local_conf["encourage_every"] +
+                         # random.randint(-local_conf["max_spread"],
+                                        # local_conf["max_spread"]))
+    # mw.dogs["last"] = mw.dogs["cnt"]
 
-addHook("showQuestion", showDog)
+# addHook("showQuestion", showDog)
+
+_streak_state_machine = PausedStreakStateMachine(states=HALO_STATES)
+
+
+def onCardAnswered(self, ease):
+    global _streak_state_machine
+    _streak_state_machine = _streak_state_machine.on_answer(
+        answer_was_good_or_easy=wasAnswerGoodOrEasy(
+            defaultEase=self._defaultEase(),
+            answer=ease
+        ),
+        question_answered_at=datetime.now()
+    )
+
+    if _streak_state_machine.current_medal_state.is_displayable_medal:
+        showToolTip(ease, _streak_state_machine.current_medal_state)
+
+
+def wasAnswerGoodOrEasy(defaultEase, answer):
+    return answer >= defaultEase
+
+
+def on_show_question():
+    global _streak_state_machine
+    _streak_state_machine = _streak_state_machine.on_show_question()
+
+
+# before required b/c Reviewer._answerCard triggers the showQuestion hook.
+Reviewer._answerCard = wrap(Reviewer._answerCard, onCardAnswered, 'before')
+addHook("showQuestion", on_show_question)

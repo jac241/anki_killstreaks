@@ -24,4 +24,4 @@ License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 # Please use NotePad++ or another text editor that supports python
 # source code files to edit it
 
-import puppy_reinforcer
+import anki_killstreaks
