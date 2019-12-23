@@ -18,19 +18,8 @@ from aqt.reviewer import Reviewer
 from anki.hooks import addHook, wrap
 
 from .config import local_conf
-from .streaks import PausedStreakStateMachine, HALO_MULTIKILL_STATES, HALO_KILLING_SPREE_STATES
+from .streaks import InitialStreakState, HALO_MULTIKILL_STATES, HALO_KILLING_SPREE_STATES
 
-# mw.dogs = {
-    # "cnt": 0,
-    # "last": 0,
-    # "enc": None,
-    # "ivl": local_conf["encourage_every"]
-# }
-
-# addon_path = os.path.dirname(__file__)
-# dogs_dir = os.path.join(addon_path, 'images')
-# dogs_imgs = [i for i in os.listdir(dogs_dir)
-             # if i.endswith((".jpg", ".jpeg", ".png"))]
 
 _tooltipTimer = None
 _tooltipLabel = None
@@ -94,26 +83,8 @@ def medal_html(medal):
     )
 
 
-# def getEncouragement(cards):
-    # last = mw.dogs["enc"]
-    # if cards >= local_conf["limit_max"]:
-        # lst = list(local_conf["encouragements"]["max"])
-    # elif cards >= local_conf["limit_high"]:
-        # lst = list(local_conf["encouragements"]["high"])
-    # elif cards >= local_conf["limit_middle"]:
-        # lst = list(local_conf["encouragements"]["middle"])
-    # else:
-        # lst = list(local_conf["encouragements"]["low"])
-    # if last and last in lst:
-        # # skip identical encouragement
-        # lst.remove(last)
-    # idx = random.randrange(len(lst))
-    # mw.dogs["enc"] = lst[idx]
-    # return lst[idx]
-
-
-_multikill_state_machine = PausedStreakStateMachine(states=HALO_MULTIKILL_STATES)
-_killing_spree_state_machine = PausedStreakStateMachine(states=HALO_KILLING_SPREE_STATES)
+_multikill_state_machine = InitialStreakState(states=HALO_MULTIKILL_STATES)
+_killing_spree_state_machine = InitialStreakState(states=HALO_KILLING_SPREE_STATES)
 
 
 def onCardAnswered(self, ease):
@@ -126,13 +97,11 @@ def onCardAnswered(self, ease):
     )
 
     _multikill_state_machine = _multikill_state_machine.on_answer(
-        answer_was_good_or_easy=answer_was_good_or_easy,
-        question_answered_at=datetime.now()
+        answer_was_good_or_easy=answer_was_good_or_easy
     )
 
     _killing_spree_state_machine = _killing_spree_state_machine.on_answer(
-        answer_was_good_or_easy=answer_was_good_or_easy,
-        question_answered_at=datetime.now()
+        answer_was_good_or_easy=answer_was_good_or_easy
     )
 
     displayable_medals = []
@@ -162,6 +131,14 @@ def on_show_question():
     _killing_spree_state_machine = _killing_spree_state_machine.on_show_question()
 
 
+def on_show_answer():
+    global _multikill_state_machine
+    global _killing_spree_state_machine
+    _multikill_state_machine = _multikill_state_machine.on_show_answer()
+    _killing_spree_state_machine = _killing_spree_state_machine.on_show_answer()
+
+
 # before required b/c Reviewer._answerCard triggers the showQuestion hook.
 Reviewer._answerCard = wrap(Reviewer._answerCard, onCardAnswered, 'before')
 addHook("showQuestion", on_show_question)
+addHook("showAnswer", on_show_answer)

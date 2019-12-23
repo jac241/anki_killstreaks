@@ -75,37 +75,86 @@ class KillingSpreeEndState(KillingSpreeMixin):
         self.num_states_to_advance_if_on_streak = 0
 
 
-class StreakStateMachine:
+class InitialStreakState:
+    def __init__(self, states, interval_s=8, current_streak_index=0):
+        self._states = states
+        self._interval_s = interval_s
+        self._current_streak_index = current_streak_index
+
+    def on_show_question(self):
+        return QuestionShownState(
+            states=self._states,
+            interval_s=self._interval_s,
+            current_streak_index=self._current_streak_index,
+            question_shown_at=datetime.now()
+        )
+
+    @property
+    def current_medal_state(self):
+        return self._states[self._current_streak_index]
+
+
+class QuestionShownState:
     def __init__(
         self,
         states,
         question_shown_at,
-        interval_s,
-        current_streak_index
+        interval_s=8,
+        current_streak_index=0
     ):
         self._states = states
         self._question_shown_at = question_shown_at
         self._interval_s = interval_s
         self._current_streak_index = current_streak_index
 
-    def on_answer(self, answer_was_good_or_easy, question_answered_at):
-        if (
-            self._advancement_requirements_met(
-                answer_was_good_or_easy,
-                question_answered_at
-            )
-        ):
-            return self._advanced_state_machine()
-        else:
-            return self._reset_state_machine()
+
+    def on_show_answer(self):
+        return AnswerShownState(
+            states=self._states,
+            question_shown_at=self._question_shown_at,
+            answer_shown_at=datetime.now(),
+            interval_s=self._interval_s,
+            current_streak_index=self._current_streak_index
+        )
 
     def on_show_question(self):
-        return StreakStateMachine(
+        return QuestionShownState(
             states=self._states,
             question_shown_at=datetime.now(),
             interval_s=self._interval_s,
             current_streak_index=self._current_streak_index
         )
+
+    @property
+    def current_medal_state(self):
+        return self._states[self._current_streak_index]
+
+
+class AnswerShownState:
+    def __init__(
+        self,
+        states,
+        question_shown_at,
+        answer_shown_at,
+        interval_s,
+        current_streak_index
+    ):
+        self._states = states
+        self._question_shown_at=question_shown_at
+        self._answer_shown_at=answer_shown_at
+        self._interval_s=interval_s
+        self._current_streak_index=current_streak_index
+
+    def on_answer(self, answer_was_good_or_easy):
+        if (
+            self._advancement_requirements_met(
+                answer_was_good_or_easy,
+                self._answer_shown_at
+            )
+        ):
+            return self._advanced_state_machine()
+        else:
+            return self._reset_state_machine()
 
     def _advancement_requirements_met(
         self,
@@ -120,42 +169,26 @@ class StreakStateMachine:
 
         return answer_was_good_or_easy and requirements_for_current_state_met
 
-
-    @property
-    def current_medal_state(self):
-        return self._states[self._current_streak_index]
-
     def _advanced_state_machine(self):
-        return PausedStreakStateMachine(
+        return QuestionShownState(
             states=self._states,
+            question_shown_at=datetime.now(),
             interval_s=self._interval_s,
             current_streak_index=self._current_streak_index + self.current_medal_state.num_states_to_advance_if_on_streak
         )
 
     def _reset_state_machine(self):
-        return PausedStreakStateMachine(
+        return QuestionShownState(
             states=self._states,
+            question_shown_at=datetime.now(),
             interval_s=self._interval_s,
             current_streak_index=0
-        )
-
-class PausedStreakStateMachine:
-    def __init__(self, states, interval_s=8, current_streak_index=0):
-        self._states = states
-        self._interval_s = interval_s
-        self._current_streak_index = current_streak_index
-
-    def on_show_question(self):
-        return StreakStateMachine(
-            states=self._states,
-            interval_s=self._interval_s,
-            current_streak_index=self._current_streak_index,
-            question_shown_at=datetime.now()
         )
 
     @property
     def current_medal_state(self):
         return self._states[self._current_streak_index]
+
 
 images_dir = join(dirname(__file__), 'images')
 
