@@ -156,6 +156,14 @@ class AnswerShownState:
         else:
             return self._reset_state_machine()
 
+    def on_show_question(self):
+        return QuestionShownState(
+            states=self._states,
+            question_shown_at=datetime.now(),
+            interval_s=self._interval_s,
+            current_streak_index=self._current_streak_index
+        )
+
     def _advancement_requirements_met(
         self,
         answer_was_good_or_easy,

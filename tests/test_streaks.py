@@ -82,3 +82,22 @@ def test_multikill_should_reset_when_again_pressed():
     assert new_q_state.current_medal_state == states[0]
 
 
+def test_AnswerShownState_should_reset_to_QuestionShownState_when_recieves_on_show_question():
+    """This can happen when card is buried with answer shown"""
+    states = [
+        MultikillStartingState(),
+        MultikillMedalState(name='test', medal_image=None),
+        EndState()
+    ]
+
+    answer_shown_state = AnswerShownState(
+        states=states,
+        question_shown_at=datetime.now(),
+        answer_shown_at=datetime.now(),
+        interval_s=8,
+        current_streak_index=0
+    )
+
+    question_shown_state = answer_shown_state.on_show_question()
+
+    assert question_shown_state._question_shown_at > answer_shown_state._question_shown_at
