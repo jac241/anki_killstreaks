@@ -18,7 +18,7 @@ from aqt.reviewer import Reviewer
 from anki.hooks import addHook, wrap
 
 from .config import local_conf
-from .streaks import PausedStreakStateMachine, HALO_STATES
+from .streaks import PausedStreakStateMachine, HALO_MULTIKILL_STATES, HALO_KILLING_SPREE_STATES
 
 # mw.dogs = {
     # "cnt": 0,
@@ -35,55 +35,23 @@ from .streaks import PausedStreakStateMachine, HALO_STATES
 _tooltipTimer = None
 _tooltipLabel = None
 
-# def dogTooltip(msg, image=":/icons/help-hint.png",
-               # period=local_conf["duration"], parent=None):
-    # global _tooltipTimer, _tooltipLabel
-    # class CustomLabel(QLabel):
-        # def mousePressEvent(self, evt):
-            # evt.accept()
-            # self.hide()
-    # closeTooltip()
-    # aw = parent or mw.app.activeWindow() or mw
-    # lab = CustomLabel("""\
-# <table cellpadding=10>
-# <tr>
-# <td><img height=%d src="%s"></td>
-# <td valign="middle">
-    # <center><b>%i cards done so far!</b><br>%s</center>
-# </td>
-# </tr>
-# </table>""" % (local_conf["image_height"], image, mw.dogs["cnt"], msg), aw)
-    # lab.setFrameStyle(QFrame.Panel)
-    # lab.setLineWidth(2)
-    # lab.setWindowFlags(Qt.ToolTip)
-    # p = QPalette()
-    # p.setColor(QPalette.Window, QColor(local_conf["tooltip_color"]))
-    # p.setColor(QPalette.WindowText, QColor("#000000"))
-    # lab.setPalette(p)
-    # vdiff = (local_conf["image_height"] - 128) / 2
-    # lab.move(
-        # aw.mapToGlobal(QPoint(0, -260-vdiff + aw.height())))
-    # lab.show()
-    # _tooltipTimer = mw.progress.timer(
-        # period, closeTooltip, False)
-    # _tooltipLabel = lab
 
-def showToolTip(ease, medal, period=local_conf["duration"]):
+def showToolTip(medals, period=local_conf["duration"]):
     global _tooltipTimer, _tooltipLabel
     class CustomLabel(QLabel):
         def mousePressEvent(self, evt):
             evt.accept()
             self.hide()
     closeTooltip()
+    medals_html = '\n'.join(medal_html(m) for m in medals)
+
     aw = mw.app.activeWindow() or mw
     lab = CustomLabel("""\
 <table cellpadding=10>
 <tr>
-<td valign="middle">
-    <center><b>%i pressed, on streak %r</b><br></center>
-</td>
+%s
 </tr>
-</table>""" % (ease, medal.name), aw)
+</table>""" % (medals_html), aw)
     lab.setFrameStyle(QFrame.Panel)
     lab.setLineWidth(2)
     lab.setWindowFlags(Qt.ToolTip)
@@ -99,6 +67,7 @@ def showToolTip(ease, medal, period=local_conf["duration"]):
         period, closeTooltip, False)
     _tooltipLabel = lab
 
+
 def closeTooltip():
     global _tooltipLabel, _tooltipTimer
     if _tooltipLabel:
@@ -111,6 +80,15 @@ def closeTooltip():
     if _tooltipTimer:
         _tooltipTimer.stop()
         _tooltipTimer = None
+
+
+def medal_html(medal):
+    return """
+        <td valign="middle">
+            <center><b>{}!</b><br></center>
+        </td>
+    """.format(medal.name)
+
 
 # def getEncouragement(cards):
     # last = mw.dogs["enc"]
@@ -129,36 +107,44 @@ def closeTooltip():
     # mw.dogs["enc"] = lst[idx]
     # return lst[idx]
 
-# def showDog():
-    # mw.dogs["cnt"] += 1
-    # if mw.dogs["cnt"] != mw.dogs["last"] + mw.dogs["ivl"]:
-        # return
-    # image_path = os.path.join(dogs_dir, random.choice(dogs_imgs))
-    # msg = getEncouragement(mw.dogs["cnt"])
-    # dogTooltip(msg, image=image_path)
-    # # intermittent reinforcement:
-    # mw.dogs["ivl"] = max(1, local_conf["encourage_every"] +
-                         # random.randint(-local_conf["max_spread"],
-                                        # local_conf["max_spread"]))
-    # mw.dogs["last"] = mw.dogs["cnt"]
 
-# addHook("showQuestion", showDog)
-
-_streak_state_machine = PausedStreakStateMachine(states=HALO_STATES)
+_multikill_state_machine = PausedStreakStateMachine(states=HALO_MULTIKILL_STATES)
+_killing_spree_state_machine = PausedStreakStateMachine(states=HALO_KILLING_SPREE_STATES)
 
 
 def onCardAnswered(self, ease):
-    global _streak_state_machine
-    _streak_state_machine = _streak_state_machine.on_answer(
-        answer_was_good_or_easy=wasAnswerGoodOrEasy(
-            defaultEase=self._defaultEase(),
-            answer=ease
-        ),
+    global _multikill_state_machine
+    global _killing_spree_state_machine
+
+    answer_was_good_or_easy = wasAnswerGoodOrEasy(
+        defaultEase=self._defaultEase(),
+        answer=ease
+    )
+
+    _multikill_state_machine = _multikill_state_machine.on_answer(
+        answer_was_good_or_easy=answer_was_good_or_easy,
         question_answered_at=datetime.now()
     )
 
-    if _streak_state_machine.current_medal_state.is_displayable_medal:
-        showToolTip(ease, _streak_state_machine.current_medal_state)
+    _killing_spree_state_machine = _killing_spree_state_machine.on_answer(
+        answer_was_good_or_easy=answer_was_good_or_easy,
+        question_answered_at=datetime.now()
+    )
+
+    displayable_medals = []
+
+    if _multikill_state_machine.current_medal_state.is_displayable_medal:
+        displayable_medals.append(_multikill_state_machine.current_medal_state)
+
+    if _killing_spree_state_machine.current_medal_state.is_displayable_medal:
+        displayable_medals.append(_killing_spree_state_machine.current_medal_state)
+
+    showToolTipIfMedals(displayable_medals)
+
+
+def showToolTipIfMedals(displayable_medals):
+    if len(displayable_medals) > 0:
+        showToolTip(displayable_medals)
 
 
 def wasAnswerGoodOrEasy(defaultEase, answer):
@@ -166,8 +152,10 @@ def wasAnswerGoodOrEasy(defaultEase, answer):
 
 
 def on_show_question():
-    global _streak_state_machine
-    _streak_state_machine = _streak_state_machine.on_show_question()
+    global _multikill_state_machine
+    global _killing_spree_state_machine
+    _multikill_state_machine = _multikill_state_machine.on_show_question()
+    _killing_spree_state_machine = _killing_spree_state_machine.on_show_question()
 
 
 # before required b/c Reviewer._answerCard triggers the showQuestion hook.
