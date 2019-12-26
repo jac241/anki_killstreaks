@@ -89,7 +89,10 @@ def medal_html(medal):
 
 
 _multikill_state_machine = InitialStreakState(states=HALO_MULTIKILL_STATES)
-_killing_spree_state_machine = InitialStreakState(states=HALO_KILLING_SPREE_STATES)
+_killing_spree_state_machine = InitialStreakState(
+    states=HALO_KILLING_SPREE_STATES,
+    interval_s=60
+)
 
 
 def onCardAnswered(self, ease):

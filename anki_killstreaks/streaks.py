@@ -172,6 +172,9 @@ class AnswerShownState:
             )
         ):
             return self._advanced_state_machine()
+        elif answer_was_good_or_easy:
+            # want this one to count for first kill in new streak
+            return self._reset_state_machine(new_index=1)
         else:
             return self._reset_state_machine()
 
@@ -204,12 +207,12 @@ class AnswerShownState:
             current_streak_index=self._current_streak_index + self.current_medal_state.num_states_to_advance_if_on_streak
         )
 
-    def _reset_state_machine(self):
+    def _reset_state_machine(self, new_index=0):
         return QuestionShownState(
             states=self._states,
             question_shown_at=datetime.now(),
             interval_s=self._interval_s,
-            current_streak_index=0
+            current_streak_index=new_index
         )
 
     @property
