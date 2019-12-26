@@ -46,7 +46,7 @@ def test_QuestionShownState_on_show_question_should_return_a_new_machine_with_qu
 
     result = machine.on_show_question()
 
-    assert machine._question_shown_at < result._question_shown_at
+    assert machine._question_shown_at <= result._question_shown_at
 
 
 def test_QuestionShownState_on_answer_should_advance():
@@ -130,4 +130,25 @@ def test_AnswerShownState_should_reset_to_QuestionShownState_when_recieves_on_sh
 
     question_shown_state = answer_shown_state.on_show_question()
 
-    assert question_shown_state._question_shown_at > answer_shown_state._question_shown_at
+    assert question_shown_state._question_shown_at >= answer_shown_state._question_shown_at
+
+
+def test_AnswerShownState_should_go_to_index_1_if_answer_was_correct_but_out_of_time_window():
+    """This answer should still be eligible for a double kill"""
+    states = [
+        MultikillStartingState(),
+        MultikillFirstAnswerState(),
+        MultikillMedalState(name='test', medal_image=None),
+        EndState()
+    ]
+
+    answer_shown_state = AnswerShownState(
+        states=states,
+        question_shown_at=datetime.now(),
+        answer_shown_at=datetime.now() + timedelta(seconds=10),
+        interval_s=8,
+        current_streak_index=2
+    )
+
+    question_shown_state = answer_shown_state.on_answer(answer_was_good_or_easy=True)
+    assert question_shown_state.current_medal_state == states[1]
