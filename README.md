@@ -38,6 +38,6 @@ License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 
 -----
 
-Review Heatmap is free and open-source software. The add-on code that runs within Anki is released under the GNU AGPLv3 license, extended by a number of additional terms. For more information please see the [LICENSE](https://github.com/jac241/anki_killstreaks/blob/master/LICENSE) file that accompanied this program.
+Anki Killstreaks is free and open-source software. The add-on code that runs within Anki is released under the GNU AGPLv3 license, extended by a number of additional terms. For more information please see the [LICENSE](https://github.com/jac241/anki_killstreaks/blob/master/LICENSE) file that accompanied this program.
 
 Distributed WITHOUT ANY WARRANTY.
