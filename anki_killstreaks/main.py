@@ -88,18 +88,21 @@ def medal_html(medal):
     )
 
 
-_multikill_state_machine = InitialStreakState(states=HALO_MULTIKILL_STATES)
+_multikill_state_machine = InitialStreakState(
+    states=HALO_MULTIKILL_STATES,
+    interval_s=local_conf["multikill_interval_s"]
+)
 _killing_spree_state_machine = InitialStreakState(
     states=HALO_KILLING_SPREE_STATES,
-    interval_s=60
+    interval_s=local_conf["killing_spree_interval_s"]
 )
 
 
-def onCardAnswered(self, ease):
+def on_card_answered(self, ease):
     global _multikill_state_machine
     global _killing_spree_state_machine
 
-    answer_was_good_or_easy = wasAnswerGoodOrEasy(
+    answer_was_good_or_easy = was_answer_good_or_easy(
         defaultEase=self._defaultEase(),
         answer=ease
     )
@@ -120,15 +123,15 @@ def onCardAnswered(self, ease):
     if _killing_spree_state_machine.current_medal_state.is_displayable_medal:
         displayable_medals.append(_killing_spree_state_machine.current_medal_state)
 
-    showToolTipIfMedals(displayable_medals)
+    show_tool_tip_if_medals(displayable_medals)
 
 
-def showToolTipIfMedals(displayable_medals):
+def show_tool_tip_if_medals(displayable_medals):
     if len(displayable_medals) > 0:
         showToolTip(displayable_medals)
 
 
-def wasAnswerGoodOrEasy(defaultEase, answer):
+def was_answer_good_or_easy(defaultEase, answer):
     return answer >= defaultEase
 
 
@@ -147,6 +150,6 @@ def on_show_answer():
 
 
 # before required b/c Reviewer._answerCard triggers the showQuestion hook.
-Reviewer._answerCard = wrap(Reviewer._answerCard, onCardAnswered, 'before')
+Reviewer._answerCard = wrap(Reviewer._answerCard, on_card_answered, 'before')
 addHook("showQuestion", on_show_question)
 addHook("showAnswer", on_show_answer)

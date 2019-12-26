@@ -1,5 +1,7 @@
 {
     "duration": 1500,
     "image_height": 128,
-    "tooltip_color": "#323633"
+    "tooltip_color": "#323633",
+    "multikill_interval_s": 8,
+    "killing_spree_interval_s": 60
 }
