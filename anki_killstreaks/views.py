@@ -3,8 +3,13 @@ from collections import Counter
 import attr
 import base64
 
-def render_medals_overview(self, _old, acheivements):
-    return _old(self) + MedalsOverview(medal_types(acheivements))
+
+def MedalsOverviewJS(acheivements):
+    return AppendingInjector(html=MedalsOverview(medal_types(acheivements)))
+
+
+def AppendingInjector(html):
+    return f"$('body center').append(String.raw`{html}`);".replace("\n", " ")
 
 
 def medal_types(acheivements):
@@ -52,10 +57,16 @@ def Head():
                 margin-top: 2em;
             }
             .medal-type {
-                width: 7em;
+                width: 7.4em;
+                margin-bottom: 0.75em;
+            }
+            .medal-type h4 {
+                margin-top: 0.25em;
+                margin-bottom: 0.25em;
             }
             .medal-type p {
                 margin-top: 0.25em;
+                margin-bottom: 0.25em;
             }
         </style>
     """
@@ -65,7 +76,6 @@ def MedalsOverview(medal_types):
     medals = ""
     for medal_type in medal_types:
         medals += f"{Medal(medal_type)}"
-
 
     return f"""
         {Head()}
@@ -78,6 +88,8 @@ def Medal(medal_type):
     return f"""
         <div class="medal-type">
             <img src="{medal_type.img_base64}">
-            <p>{medal_type.name}: {medal_type.count}<p>
+            <h4>{medal_type.name}</h4>
+            <p>{medal_type.count}</p>
         </div>
     """
+

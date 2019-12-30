@@ -22,12 +22,13 @@ from aqt import mw
 from aqt.qt import *
 from aqt.deckbrowser import DeckBrowser
 from aqt.reviewer import Reviewer
+from aqt.overview import Overview
 from anki.hooks import addHook, wrap
 
 from .config import local_conf
 from .streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
     HALO_KILLING_SPREE_STATES, Acheivement
-from .views import render_medals_overview
+from .views import MedalsOverviewJS
 
 
 _tooltipTimer = None
@@ -161,12 +162,26 @@ def on_show_answer():
     _killing_spree_state_machine = _killing_spree_state_machine.on_show_answer()
 
 
+def inject_medals_with_js(self: Overview, acheivements):
+    self.mw.web.eval(MedalsOverviewJS(acheivements=acheivements))
+
+
 # before required b/c Reviewer._answerCard triggers the showQuestion hook.
 Reviewer._answerCard = wrap(Reviewer._answerCard, onCardAnswered, 'before')
 addHook("showQuestion", on_show_question)
 addHook("showAnswer", on_show_answer)
-DeckBrowser._renderStats = wrap(
-    old=DeckBrowser._renderStats,
-    new=partial(render_medals_overview, acheivements=acheivements),
-    pos="around"
+DeckBrowser.refresh = wrap(
+    old=DeckBrowser.refresh,
+    new=partial(inject_medals_with_js, acheivements=acheivements),
+    pos="after"
+)
+DeckBrowser.show = wrap(
+    old=DeckBrowser.show,
+    new=partial(inject_medals_with_js, acheivements=acheivements),
+    pos="after"
+)
+Overview.refresh = wrap(
+    old=Overview.refresh,
+    new=partial(inject_medals_with_js, acheivements=acheivements),
+    pos="after"
 )
