@@ -16,14 +16,18 @@ Modifications by jac241 <https://github.com/jac241> for Anki Killstreaks addon
 import os
 import random
 from datetime import datetime, timedelta
+from functools import partial
 
 from aqt import mw
 from aqt.qt import *
+from aqt.deckbrowser import DeckBrowser
 from aqt.reviewer import Reviewer
 from anki.hooks import addHook, wrap
 
 from .config import local_conf
-from .streaks import InitialStreakState, HALO_MULTIKILL_STATES, HALO_KILLING_SPREE_STATES
+from .streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
+    HALO_KILLING_SPREE_STATES, Acheivement
+from .views import render_medals_overview
 
 
 _tooltipTimer = None
@@ -93,6 +97,7 @@ _killing_spree_state_machine = InitialStreakState(
     states=HALO_KILLING_SPREE_STATES,
     interval_s=60
 )
+acheivements=[]
 
 
 def onCardAnswered(self, ease):
@@ -116,9 +121,19 @@ def onCardAnswered(self, ease):
 
     if _multikill_state_machine.current_medal_state.is_displayable_medal:
         displayable_medals.append(_multikill_state_machine.current_medal_state)
+        acheivements.append(
+            Acheivement(
+                medal=_multikill_state_machine.current_medal_state
+            )
+        )
 
     if _killing_spree_state_machine.current_medal_state.is_displayable_medal:
         displayable_medals.append(_killing_spree_state_machine.current_medal_state)
+        acheivements.append(
+            Acheivement(
+                medal=_killing_spree_state_machine.current_medal_state
+            )
+        )
 
     showToolTipIfMedals(displayable_medals)
 
@@ -150,3 +165,8 @@ def on_show_answer():
 Reviewer._answerCard = wrap(Reviewer._answerCard, onCardAnswered, 'before')
 addHook("showQuestion", on_show_question)
 addHook("showAnswer", on_show_answer)
+DeckBrowser._renderStats = wrap(
+    old=DeckBrowser._renderStats,
+    new=partial(render_medals_overview, acheivements=acheivements),
+    pos="around"
+)
