@@ -16,14 +16,19 @@ Modifications by jac241 <https://github.com/jac241> for Anki Killstreaks addon
 import os
 import random
 from datetime import datetime, timedelta
+from functools import partial
 
 from aqt import mw
 from aqt.qt import *
+from aqt.deckbrowser import DeckBrowser
 from aqt.reviewer import Reviewer
+from aqt.overview import Overview
 from anki.hooks import addHook, wrap
 
 from .config import local_conf
-from .streaks import InitialStreakState, HALO_MULTIKILL_STATES, HALO_KILLING_SPREE_STATES
+from .streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
+    HALO_KILLING_SPREE_STATES, Acheivement
+from .views import MedalsOverviewJS
 
 
 _tooltipTimer = None
@@ -96,6 +101,7 @@ _killing_spree_state_machine = InitialStreakState(
     states=HALO_KILLING_SPREE_STATES,
     interval_s=local_conf["killing_spree_interval_s"]
 )
+acheivements=[]
 
 
 def on_card_answered(self, ease):
@@ -119,9 +125,19 @@ def on_card_answered(self, ease):
 
     if _multikill_state_machine.current_medal_state.is_displayable_medal:
         displayable_medals.append(_multikill_state_machine.current_medal_state)
+        acheivements.append(
+            Acheivement(
+                medal=_multikill_state_machine.current_medal_state
+            )
+        )
 
     if _killing_spree_state_machine.current_medal_state.is_displayable_medal:
         displayable_medals.append(_killing_spree_state_machine.current_medal_state)
+        acheivements.append(
+            Acheivement(
+                medal=_killing_spree_state_machine.current_medal_state
+            )
+        )
 
     show_tool_tip_if_medals(displayable_medals)
 
@@ -149,7 +165,26 @@ def on_show_answer():
     _killing_spree_state_machine = _killing_spree_state_machine.on_show_answer()
 
 
+def inject_medals_with_js(self: Overview, acheivements):
+    self.mw.web.eval(MedalsOverviewJS(acheivements=acheivements))
+
+
 # before required b/c Reviewer._answerCard triggers the showQuestion hook.
 Reviewer._answerCard = wrap(Reviewer._answerCard, on_card_answered, 'before')
 addHook("showQuestion", on_show_question)
 addHook("showAnswer", on_show_answer)
+DeckBrowser.refresh = wrap(
+    old=DeckBrowser.refresh,
+    new=partial(inject_medals_with_js, acheivements=acheivements),
+    pos="after"
+)
+DeckBrowser.show = wrap(
+    old=DeckBrowser.show,
+    new=partial(inject_medals_with_js, acheivements=acheivements),
+    pos="after"
+)
+Overview.refresh = wrap(
+    old=Overview.refresh,
+    new=partial(inject_medals_with_js, acheivements=acheivements),
+    pos="after"
+)

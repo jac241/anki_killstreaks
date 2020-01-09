@@ -8,6 +8,8 @@ License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 from datetime import datetime, timedelta
 from os.path import join, dirname
 
+import attr
+
 
 class MultikillMixin:
     def requirements_met(
@@ -225,6 +227,19 @@ images_dir = join(dirname(__file__), 'images')
 
 def image_path(filename):
     return join(images_dir, filename)
+
+
+@attr.s(frozen=True)
+class Acheivement:
+    medal = attr.ib()
+
+    @property
+    def medal_name(self):
+        return self.medal.name
+
+    @property
+    def medal_img_src(self):
+        return self.medal.medal_image
 
 
 HALO_MULTIKILL_STATES = [
