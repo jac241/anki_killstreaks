@@ -55,6 +55,7 @@ def Head():
                 flex-wrap: wrap;
                 max-width: 750px;
                 margin-top: 2em;
+                justify-content: center;
             }
             .medal-type {
                 width: 7.4em;
