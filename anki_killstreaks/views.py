@@ -9,7 +9,7 @@ def MedalsOverviewJS(acheivements):
 
 
 def AppendingInjector(html):
-    return f"$('body center').append(String.raw`{html}`);".replace("\n", " ")
+    return f"$('body').append(String.raw`{html}`);".replace("\n", " ")
 
 
 def medal_types(acheivements):
@@ -56,6 +56,7 @@ def Head():
                 max-width: 750px;
                 margin-top: 2em;
                 justify-content: center;
+                text-align: center;
             }
             .medal-type {
                 width: 7.4em;
@@ -80,9 +81,11 @@ def MedalsOverview(medal_types):
 
     return f"""
         {Head()}
-        <div class="medals-overview">
-            {medals}
-        </div>
+        <center>
+            <div class="medals-overview">
+                    {medals}
+            </div>
+        </center>
     """
 
 def Medal(medal_type):
