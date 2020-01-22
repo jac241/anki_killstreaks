@@ -333,5 +333,28 @@ HALO_KILLING_SPREE_STATES = [
         medal_image=image_path('Invincible_Medal.webp.png'),
         name='Invincible'
     ),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
+    KillingSpreeMedalState(
+        medal_image=image_path('Perfection_Medal.webp'),
+        name='Perfection'
+    ),
     KillingSpreeEndState(),
 ]

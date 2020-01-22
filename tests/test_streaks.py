@@ -152,3 +152,15 @@ def test_AnswerShownState_should_go_to_index_1_if_answer_was_correct_but_out_of_
 
     question_shown_state = answer_shown_state.on_answer(answer_was_good_or_easy=True)
     assert question_shown_state.current_medal_state == states[1]
+
+def test_should_be_able_to_get_perfection_medal_after_50_kills():
+    state = QuestionShownState(
+        states=HALO_KILLING_SPREE_STATES,
+        question_shown_at=datetime.now(),
+        interval_s=8,
+        current_streak_index=0,
+    )
+
+    for i in range(49):
+        state = state.on_answer(answer_was_good_or_easy=True)
+    assert state.current_medal_state.name == 'Perfection'
