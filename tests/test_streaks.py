@@ -161,6 +161,6 @@ def test_should_be_able_to_get_perfection_medal_after_50_kills():
         current_streak_index=0,
     )
 
-    for i in range(49):
+    for _ in range(50):
         state = state.on_answer(answer_was_good_or_easy=True)
     assert state.current_medal_state.name == 'Perfection'

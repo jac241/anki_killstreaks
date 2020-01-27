@@ -78,12 +78,19 @@ def MedalsOverview(medal_types):
     medals = ""
     for medal_type in medal_types:
         medals += f"{Medal(medal_type)}"
+    
+    medal_header = (
+        r"<h3>Medals earned this session:</h3>"
+        if len(medals) > 0
+        else ""
+    )
 
     return f"""
         {Head()}
         <center>
+            {medal_header} 
             <div class="medals-overview">
-                    {medals}
+                {medals}
             </div>
         </center>
     """
