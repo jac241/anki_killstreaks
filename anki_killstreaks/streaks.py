@@ -353,7 +353,7 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeMedalState(
-        medal_image=image_path('Perfection_Medal.webp'),
+        medal_image=image_path('Perfection_Medal.webp.png'),
         name='Perfection'
     ),
     KillingSpreeEndState(),
