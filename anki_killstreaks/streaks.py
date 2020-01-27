@@ -289,6 +289,7 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
     KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(),
     KillingSpreeMedalState(
         medal_image=image_path('Killing_Spree_Medal.png'),
         name='Killing Spree'
