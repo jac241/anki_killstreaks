@@ -108,17 +108,16 @@ def on_card_answered(self, ease):
     global _multikill_state_machine
     global _killing_spree_state_machine
 
-    answer_was_good_or_easy = was_answer_good_or_easy(
-        defaultEase=self._defaultEase(),
+    card_did_pass = did_card_pass(
         answer=ease
     )
 
     _multikill_state_machine = _multikill_state_machine.on_answer(
-        answer_was_good_or_easy=answer_was_good_or_easy
+        card_did_pass=card_did_pass
     )
 
     _killing_spree_state_machine = _killing_spree_state_machine.on_answer(
-        answer_was_good_or_easy=answer_was_good_or_easy
+        card_did_pass=card_did_pass
     )
 
     displayable_medals = []
@@ -147,8 +146,8 @@ def show_tool_tip_if_medals(displayable_medals):
         showToolTip(displayable_medals)
 
 
-def was_answer_good_or_easy(defaultEase, answer):
-    return answer >= defaultEase
+def did_card_pass(answer, again_answer=1):
+    return answer > again_answer
 
 
 def on_show_question():

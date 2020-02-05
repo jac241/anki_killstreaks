@@ -134,7 +134,7 @@ class QuestionShownState:
             current_streak_index=self._current_streak_index
         )
 
-    def on_answer(self, answer_was_good_or_easy):
+    def on_answer(self, card_did_pass):
         answer_state = AnswerShownState(
             states=self._states,
             question_shown_at=self._question_shown_at,
@@ -143,7 +143,7 @@ class QuestionShownState:
             current_streak_index=self._current_streak_index
         )
 
-        return answer_state.on_answer(answer_was_good_or_easy)
+        return answer_state.on_answer(card_did_pass)
 
 
     @property
@@ -166,15 +166,15 @@ class AnswerShownState:
         self._interval_s=interval_s
         self._current_streak_index=current_streak_index
 
-    def on_answer(self, answer_was_good_or_easy):
+    def on_answer(self, card_did_pass):
         if (
             self._advancement_requirements_met(
-                answer_was_good_or_easy,
+                card_did_pass,
                 self._answer_shown_at
             )
         ):
             return self._advanced_state_machine()
-        elif answer_was_good_or_easy:
+        elif card_did_pass:
             # want this one to count for first kill in new streak
             return self._reset_state_machine(new_index=1)
         else:
@@ -190,7 +190,7 @@ class AnswerShownState:
 
     def _advancement_requirements_met(
         self,
-        answer_was_good_or_easy,
+        card_did_pass,
         question_answered_at
     ):
         requirements_for_current_state_met = self.current_medal_state.requirements_met(
@@ -199,7 +199,7 @@ class AnswerShownState:
             interval_s=self._interval_s
         )
 
-        return answer_was_good_or_easy and requirements_for_current_state_met
+        return card_did_pass and requirements_for_current_state_met
 
     def _advanced_state_machine(self):
         return QuestionShownState(

@@ -68,7 +68,7 @@ def test_QuestionShownState_on_answer_should_advance():
         question_shown_at=datetime.now()
     )
 
-    result = machine.on_answer(answer_was_good_or_easy=True)
+    result = machine.on_answer(card_did_pass=True)
     return result.current_medal_state == states[1]
 
 def test_multikill_flow_should_work():
@@ -87,7 +87,7 @@ def test_multikill_flow_should_work():
 
     question_shown_machine = machine.on_show_question()
     answer_shown_machine = question_shown_machine.on_show_answer()
-    new_q_machine = answer_shown_machine.on_answer(answer_was_good_or_easy=True)
+    new_q_machine = answer_shown_machine.on_answer(card_did_pass=True)
 
     assert new_q_machine.current_medal_state == states[1]
 
@@ -107,7 +107,7 @@ def test_multikill_should_reset_when_again_pressed():
     )
 
     answer_shown_state = question_shown_state.on_show_answer()
-    new_q_state = answer_shown_state.on_answer(answer_was_good_or_easy=False)
+    new_q_state = answer_shown_state.on_answer(card_did_pass=False)
 
     assert new_q_state.current_medal_state == states[0]
 
@@ -150,7 +150,7 @@ def test_AnswerShownState_should_go_to_index_1_if_answer_was_correct_but_out_of_
         current_streak_index=2
     )
 
-    question_shown_state = answer_shown_state.on_answer(answer_was_good_or_easy=True)
+    question_shown_state = answer_shown_state.on_answer(card_did_pass=True)
     assert question_shown_state.current_medal_state == states[1]
 
 def test_should_be_able_to_get_perfection_medal_after_50_kills():
@@ -161,6 +161,6 @@ def test_should_be_able_to_get_perfection_medal_after_50_kills():
         current_streak_index=0,
     )
 
-    for _ in range(50):
-        state = state.on_answer(answer_was_good_or_easy=True)
+    for i in range(50):
+        state = state.on_answer(card_did_pass=True)
     assert state.current_medal_state.name == 'Perfection'
