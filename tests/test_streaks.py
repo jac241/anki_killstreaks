@@ -171,21 +171,76 @@ def question_shown_state():
     return QuestionShownState(
         states=[
             MultikillStartingState(),
+            KillingSpreeMedalState(name='test', medal_image=None),
             KillingSpreeEndState()
         ],
         question_shown_at=datetime.now(),
     )
+
+
+@pytest.fixture
+def answer_shown_state():
+    return AnswerShownState(
+        states=[
+            MultikillStartingState(),
+            KillingSpreeMedalState(name='test', medal_image=None),
+            KillingSpreeEndState()
+        ],
+        question_shown_at=datetime.now(),
+        answer_shown_at=datetime.now() + timedelta(seconds=1),
+        interval_s=8,
+        current_streak_index=0
+    )
         
 
-def test_Store_on_show_question_should_delegate_to_composing_states(question_shown_state: QuestionShownState):
-    initial_state = question_shown_state.current_medal_state
+def test_Store_on_show_question_should_delegate_to_composing_states(answer_shown_state):
+    store = Store(
+        state_machines=[
+            answer_shown_state
+        ]
+    )
 
+    store.on_show_question()
+
+    assert store.state_machines[0] is not answer_shown_state
+
+
+def test_Store_on_show_answer_should_delegate_to_composing_states(question_shown_state):
     store = Store(
         state_machines=[
             question_shown_state
         ]
     )
 
-    store.on_show_question()
+    store.on_show_answer()
 
-    assert store.state_machines[0].current_medal_state == initial_state
+    assert store.state_machines[0] is not question_shown_state
+
+
+def test_Store_on_answer_should_delegate_to_composing_states(answer_shown_state):
+    initial_state = answer_shown_state.current_medal_state
+
+    store = Store(
+        state_machines=[
+            answer_shown_state
+        ]
+    )
+
+    store.on_answer(card_did_pass=True)
+    assert store.state_machines[0].current_medal_state is not initial_state
+
+
+def test_Store_displayable_medals_should_return_any_displayable_medals_earned(answer_shown_state):
+    machine_with_medal = answer_shown_state.on_answer(card_did_pass=True)
+    machine_without_medal = answer_shown_state
+
+    store = Store(
+        state_machines=[
+            machine_with_medal,
+            machine_without_medal
+        ]
+    )
+
+    medals = store.displayable_medals
+    assert len(medals) == 1
+    assert medals[0] == machine_with_medal.current_medal_state

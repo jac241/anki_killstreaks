@@ -114,6 +114,30 @@ class Store:
             in self.state_machines
         ]
 
+    def on_show_answer(self):
+        self.state_machines = [
+            m.on_show_answer()
+            for m
+            in self.state_machines
+        ]
+
+    def on_answer(self, card_did_pass):
+        self.state_machines = [
+            m.on_answer(card_did_pass=card_did_pass)
+            for m
+            in self.state_machines
+        ]
+
+    @property
+    def displayable_medals(self):
+        return [
+            m.current_medal_state
+            for m
+            in self.state_machines
+            if m.current_medal_state.is_displayable_medal
+        ]
+
+
 
 class QuestionShownState:
     def __init__(

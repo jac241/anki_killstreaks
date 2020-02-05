@@ -27,7 +27,7 @@ from anki.hooks import addHook, wrap
 
 from .config import local_conf
 from .streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
-    HALO_KILLING_SPREE_STATES, Acheivement
+    HALO_KILLING_SPREE_STATES, Acheivement, Store
 from .views import MedalsOverviewJS
 
 
@@ -92,53 +92,32 @@ def medal_html(medal):
         name=medal.name,
     )
 
-
-_multikill_state_machine = InitialStreakState(
-    states=HALO_MULTIKILL_STATES,
-    interval_s=local_conf["multikill_interval_s"]
-)
-_killing_spree_state_machine = InitialStreakState(
-    states=HALO_KILLING_SPREE_STATES,
-    interval_s=local_conf["killing_spree_interval_s"]
+store = Store(
+    state_machines=[
+        InitialStreakState(
+            states=HALO_MULTIKILL_STATES,
+            interval_s=local_conf["multikill_interval_s"]
+        ),
+        InitialStreakState(
+            states=HALO_KILLING_SPREE_STATES,
+            interval_s=local_conf["killing_spree_interval_s"]
+        )
+    ]
 )
 acheivements=[]
 
 
 def on_card_answered(self, ease):
-    global _multikill_state_machine
-    global _killing_spree_state_machine
+    global store
+    store.on_answer(card_did_pass=did_card_pass(ease))
 
-    card_did_pass = did_card_pass(
-        answer=ease
+    acheivements.extend(
+        Acheivement(medal=medal)
+        for medal
+        in store.displayable_medals
     )
 
-    _multikill_state_machine = _multikill_state_machine.on_answer(
-        card_did_pass=card_did_pass
-    )
-
-    _killing_spree_state_machine = _killing_spree_state_machine.on_answer(
-        card_did_pass=card_did_pass
-    )
-
-    displayable_medals = []
-
-    if _multikill_state_machine.current_medal_state.is_displayable_medal:
-        displayable_medals.append(_multikill_state_machine.current_medal_state)
-        acheivements.append(
-            Acheivement(
-                medal=_multikill_state_machine.current_medal_state
-            )
-        )
-
-    if _killing_spree_state_machine.current_medal_state.is_displayable_medal:
-        displayable_medals.append(_killing_spree_state_machine.current_medal_state)
-        acheivements.append(
-            Acheivement(
-                medal=_killing_spree_state_machine.current_medal_state
-            )
-        )
-
-    show_tool_tip_if_medals(displayable_medals)
+    show_tool_tip_if_medals(store.displayable_medals)
 
 
 def show_tool_tip_if_medals(displayable_medals):
@@ -151,17 +130,13 @@ def did_card_pass(answer, again_answer=1):
 
 
 def on_show_question():
-    global _multikill_state_machine
-    global _killing_spree_state_machine
-    _multikill_state_machine = _multikill_state_machine.on_show_question()
-    _killing_spree_state_machine = _killing_spree_state_machine.on_show_question()
+    global store
+    store.on_show_question()
 
 
 def on_show_answer():
-    global _multikill_state_machine
-    global _killing_spree_state_machine
-    _multikill_state_machine = _multikill_state_machine.on_show_answer()
-    _killing_spree_state_machine = _killing_spree_state_machine.on_show_answer()
+    global store
+    store.on_show_answer()
 
 
 def inject_medals_with_js(self: Overview, acheivements):
