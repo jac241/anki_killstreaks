@@ -6,6 +6,7 @@ License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 """
 
 from datetime import datetime
+import pytest
 
 from anki_killstreaks.streaks import *
 
@@ -164,3 +165,27 @@ def test_should_be_able_to_get_perfection_medal_after_50_kills():
     for i in range(50):
         state = state.on_answer(card_did_pass=True)
     assert state.current_medal_state.name == 'Perfection'
+
+@pytest.fixture
+def question_shown_state():
+    return QuestionShownState(
+        states=[
+            MultikillStartingState(),
+            KillingSpreeEndState()
+        ],
+        question_shown_at=datetime.now(),
+    )
+        
+
+def test_Store_on_show_question_should_delegate_to_composing_states(question_shown_state: QuestionShownState):
+    initial_state = question_shown_state.current_medal_state
+
+    store = Store(
+        state_machines=[
+            question_shown_state
+        ]
+    )
+
+    store.on_show_question()
+
+    assert store.state_machines[0].current_medal_state == initial_state

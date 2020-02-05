@@ -10,7 +10,6 @@ from os.path import join, dirname
 
 import attr
 
-
 class MultikillMixin:
     def requirements_met(
         self,
@@ -102,6 +101,18 @@ class InitialStreakState:
     @property
     def current_medal_state(self):
         return self._states[self._current_streak_index]
+
+
+class Store:
+    def __init__(self, state_machines):
+        self.state_machines = state_machines
+
+    def on_show_question(self):
+        self.state_machines = [
+            m.on_show_question()
+            for m
+            in self.state_machines
+        ]
 
 
 class QuestionShownState:
