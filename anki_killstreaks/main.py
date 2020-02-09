@@ -17,6 +17,7 @@ import os
 import random
 from datetime import datetime, timedelta
 from functools import partial
+from threading import Thread
 
 from aqt import mw
 from aqt.qt import *
@@ -25,10 +26,11 @@ from aqt.reviewer import Reviewer
 from aqt.overview import Overview
 from anki.hooks import addHook, wrap
 
-from .config import local_conf
-from .streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
+from anki_killstreaks.config import local_conf
+from anki_killstreaks.streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
     HALO_KILLING_SPREE_STATES, Acheivement, Store
-from .views import MedalsOverviewJS
+from anki_killstreaks.views import MedalsOverviewJS
+from anki_killstreaks.persistence import migrate_database
 
 
 _tooltipTimer = None
@@ -140,10 +142,15 @@ def on_show_answer():
 
 
 def inject_medals_with_js(self: Overview, acheivements):
-    self.mw.web.eval(MedalsOverviewJS(acheivements=acheivements))
+    def compute_then_inject():
+        self.mw.web.eval(MedalsOverviewJS(acheivements=acheivements))
+
+    Thread(target=compute_then_inject).start()
 
 
 # before required b/c Reviewer._answerCard triggers the showQuestion hook.
+migrate_database()
+
 Reviewer._answerCard = wrap(Reviewer._answerCard, on_card_answered, 'before')
 addHook("showQuestion", on_show_question)
 addHook("showAnswer", on_show_answer)

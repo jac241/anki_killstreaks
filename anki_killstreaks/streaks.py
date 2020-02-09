@@ -8,7 +8,8 @@ License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 from datetime import datetime, timedelta
 from os.path import join, dirname
 
-import attr
+from anki_killstreaks._vendor import attr
+
 
 class MultikillMixin:
     def requirements_met(
