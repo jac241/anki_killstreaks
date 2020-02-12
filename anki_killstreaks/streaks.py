@@ -104,30 +104,40 @@ class InitialStreakState:
         return self._states[self._current_streak_index]
 
 
+def did_card_pass(answer, again_answer=1):
+    return answer > again_answer
+
+
 class Store:
     def __init__(self, state_machines):
         self.state_machines = state_machines
 
     def on_show_question(self):
-        self.state_machines = [
-            m.on_show_question()
-            for m
-            in self.state_machines
-        ]
+        return self.__class__(
+            state_machines = [
+                m.on_show_question()
+                for m
+                in self.state_machines
+            ]
+        )
 
     def on_show_answer(self):
-        self.state_machines = [
-            m.on_show_answer()
-            for m
-            in self.state_machines
-        ]
+        return self.__class__(
+            state_machines=[
+                m.on_show_answer()
+                for m
+                in self.state_machines
+            ]
+        )
 
     def on_answer(self, card_did_pass):
-        self.state_machines = [
-            m.on_answer(card_did_pass=card_did_pass)
-            for m
-            in self.state_machines
-        ]
+        return self.__class__(
+            state_machines=[
+                m.on_answer(card_did_pass=card_did_pass)
+                for m
+                in self.state_machines
+            ]
+        )
 
     @property
     def displayable_medals(self):

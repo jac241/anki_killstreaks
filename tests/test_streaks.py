@@ -191,7 +191,7 @@ def answer_shown_state():
         interval_s=8,
         current_streak_index=0
     )
-        
+
 
 def test_Store_on_show_question_should_delegate_to_composing_states(answer_shown_state):
     store = Store(
@@ -200,9 +200,9 @@ def test_Store_on_show_question_should_delegate_to_composing_states(answer_shown
         ]
     )
 
-    store.on_show_question()
+    new_store = store.on_show_question()
 
-    assert store.state_machines[0] is not answer_shown_state
+    assert new_store.state_machines[0] is not answer_shown_state
 
 
 def test_Store_on_show_answer_should_delegate_to_composing_states(question_shown_state):
@@ -212,9 +212,9 @@ def test_Store_on_show_answer_should_delegate_to_composing_states(question_shown
         ]
     )
 
-    store.on_show_answer()
+    new_store = store.on_show_answer()
 
-    assert store.state_machines[0] is not question_shown_state
+    assert new_store.state_machines[0] is not question_shown_state
 
 
 def test_Store_on_answer_should_delegate_to_composing_states(answer_shown_state):
@@ -226,8 +226,8 @@ def test_Store_on_answer_should_delegate_to_composing_states(answer_shown_state)
         ]
     )
 
-    store.on_answer(card_did_pass=True)
-    assert store.state_machines[0].current_medal_state is not initial_state
+    new_store = store.on_answer(card_did_pass=True)
+    assert new_store.state_machines[0].current_medal_state is not initial_state
 
 
 def test_Store_displayable_medals_should_return_any_displayable_medals_earned(answer_shown_state):

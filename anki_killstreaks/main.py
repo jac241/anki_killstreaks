@@ -27,10 +27,11 @@ from aqt.overview import Overview
 from anki.hooks import addHook, wrap
 
 from anki_killstreaks.config import local_conf
+from anki_killstreaks.controllers import ReviewingController, build_on_answer_wrapper
+from anki_killstreaks.persistence import migrate_database
 from anki_killstreaks.streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
     HALO_KILLING_SPREE_STATES, Acheivement, Store
 from anki_killstreaks.views import MedalsOverviewJS
-from anki_killstreaks.persistence import migrate_database
 
 
 _tooltipTimer = None
@@ -94,51 +95,66 @@ def medal_html(medal):
         name=medal.name,
     )
 
-store = Store(
-    state_machines=[
-        InitialStreakState(
-            states=HALO_MULTIKILL_STATES,
-            interval_s=local_conf["multikill_interval_s"]
-        ),
-        InitialStreakState(
-            states=HALO_KILLING_SPREE_STATES,
-            interval_s=local_conf["killing_spree_interval_s"]
-        )
-    ]
-)
-acheivements=[]
-
-
-def on_card_answered(self, ease):
-    global store
-    store.on_answer(card_did_pass=did_card_pass(ease))
-
-    acheivements.extend(
-        Acheivement(medal=medal)
-        for medal
-        in store.displayable_medals
+def main():
+    store = Store(
+        state_machines=[
+            InitialStreakState(
+                states=HALO_MULTIKILL_STATES,
+                interval_s=local_conf["multikill_interval_s"]
+            ),
+            InitialStreakState(
+                states=HALO_KILLING_SPREE_STATES,
+                interval_s=local_conf["killing_spree_interval_s"]
+            )
+        ]
     )
 
-    show_tool_tip_if_medals(store.displayable_medals)
+    reviewing_controller = ReviewingController(
+        store=store,
+        acheivements=[],
+        show_acheivements=show_tool_tip_if_medals,
+    )
+
+    migrate_database()
+
+    Reviewer._answerCard = wrap(
+        Reviewer._answerCard,
+        partial(build_on_answer_wrapper, on_answer=reviewing_controller.on_answer),
+        'before',
+    )
+
+    addHook("showQuestion", reviewing_controller.on_show_question)
+    addHook("showAnswer", reviewing_controller.on_show_answer)
+
+    DeckBrowser.refresh = wrap(
+        old=DeckBrowser.refresh,
+        new=partial(
+            inject_medals_with_js,
+            acheivements=reviewing_controller.acheivements,
+        ),
+        pos="after"
+    )
+    DeckBrowser.show = wrap(
+        old=DeckBrowser.show,
+        new=partial(
+            inject_medals_with_js,
+            acheivements=reviewing_controller.acheivements,
+        ),
+        pos="after"
+    )
+    Overview.refresh = wrap(
+        old=Overview.refresh,
+        new=partial(
+            inject_medals_with_js,
+            acheivements=reviewing_controller.acheivements,
+        ),
+        pos="after"
+    )
 
 
 def show_tool_tip_if_medals(displayable_medals):
     if len(displayable_medals) > 0:
         showToolTip(displayable_medals)
-
-
-def did_card_pass(answer, again_answer=1):
-    return answer > again_answer
-
-
-def on_show_question():
-    global store
-    store.on_show_question()
-
-
-def on_show_answer():
-    global store
-    store.on_show_answer()
 
 
 def inject_medals_with_js(self: Overview, acheivements):
@@ -148,24 +164,4 @@ def inject_medals_with_js(self: Overview, acheivements):
     Thread(target=compute_then_inject).start()
 
 
-# before required b/c Reviewer._answerCard triggers the showQuestion hook.
-migrate_database()
-
-Reviewer._answerCard = wrap(Reviewer._answerCard, on_card_answered, 'before')
-addHook("showQuestion", on_show_question)
-addHook("showAnswer", on_show_answer)
-DeckBrowser.refresh = wrap(
-    old=DeckBrowser.refresh,
-    new=partial(inject_medals_with_js, acheivements=acheivements),
-    pos="after"
-)
-DeckBrowser.show = wrap(
-    old=DeckBrowser.show,
-    new=partial(inject_medals_with_js, acheivements=acheivements),
-    pos="after"
-)
-Overview.refresh = wrap(
-    old=Overview.refresh,
-    new=partial(inject_medals_with_js, acheivements=acheivements),
-    pos="after"
-)
+main()
