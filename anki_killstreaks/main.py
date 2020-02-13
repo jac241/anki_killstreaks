@@ -13,10 +13,10 @@ License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 Modifications by jac241 <https://github.com/jac241> for Anki Killstreaks addon
 """
 
-import os
-import random
 from datetime import datetime, timedelta
 from functools import partial
+import os
+import random
 from threading import Thread
 
 from aqt import mw
@@ -28,9 +28,13 @@ from anki.hooks import addHook, wrap
 
 from anki_killstreaks.config import local_conf
 from anki_killstreaks.controllers import ReviewingController, build_on_answer_wrapper
-from anki_killstreaks.persistence import migrate_database
+from anki_killstreaks.persistence import (
+    migrate_database,
+    get_db_connection,
+    AcheivementsRepository,
+)
 from anki_killstreaks.streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
-    HALO_KILLING_SPREE_STATES, Acheivement, Store
+    HALO_KILLING_SPREE_STATES, Store
 from anki_killstreaks.views import MedalsOverviewJS
 
 
@@ -96,60 +100,65 @@ def medal_html(medal):
     )
 
 def main():
-    store = Store(
-        state_machines=[
-            InitialStreakState(
-                states=HALO_MULTIKILL_STATES,
-                interval_s=local_conf["multikill_interval_s"]
+    db_settings = migrate_database()
+
+    with get_db_connection(db_settings) as db_connection:
+        store = Store(
+            state_machines=[
+                InitialStreakState(
+                    states=HALO_MULTIKILL_STATES,
+                    interval_s=local_conf["multikill_interval_s"]
+                ),
+                InitialStreakState(
+                    states=HALO_KILLING_SPREE_STATES,
+                    interval_s=local_conf["killing_spree_interval_s"]
+                )
+            ]
+        )
+
+        acheivements_repo = AcheivementsRepository(
+            db_connection=db_connection,
+        )
+
+        reviewing_controller = ReviewingController(
+            store=store,
+            acheivements_repo=acheivements_repo,
+            show_acheivements=show_tool_tip_if_medals,
+        )
+
+        Reviewer._answerCard = wrap(
+            Reviewer._answerCard,
+            partial(build_on_answer_wrapper, on_answer=reviewing_controller.on_answer),
+            'before',
+        )
+
+        addHook("showQuestion", reviewing_controller.on_show_question)
+        addHook("showAnswer", reviewing_controller.on_show_answer)
+
+        DeckBrowser.refresh = wrap(
+            old=DeckBrowser.refresh,
+            new=partial(
+                inject_medals_with_js,
+                db_settings=db_settings,
             ),
-            InitialStreakState(
-                states=HALO_KILLING_SPREE_STATES,
-                interval_s=local_conf["killing_spree_interval_s"]
-            )
-        ]
-    )
-
-    reviewing_controller = ReviewingController(
-        store=store,
-        acheivements=[],
-        show_acheivements=show_tool_tip_if_medals,
-    )
-
-    migrate_database()
-
-    Reviewer._answerCard = wrap(
-        Reviewer._answerCard,
-        partial(build_on_answer_wrapper, on_answer=reviewing_controller.on_answer),
-        'before',
-    )
-
-    addHook("showQuestion", reviewing_controller.on_show_question)
-    addHook("showAnswer", reviewing_controller.on_show_answer)
-
-    DeckBrowser.refresh = wrap(
-        old=DeckBrowser.refresh,
-        new=partial(
-            inject_medals_with_js,
-            acheivements=reviewing_controller.acheivements,
-        ),
-        pos="after"
-    )
-    DeckBrowser.show = wrap(
-        old=DeckBrowser.show,
-        new=partial(
-            inject_medals_with_js,
-            acheivements=reviewing_controller.acheivements,
-        ),
-        pos="after"
-    )
-    Overview.refresh = wrap(
-        old=Overview.refresh,
-        new=partial(
-            inject_medals_with_js,
-            acheivements=reviewing_controller.acheivements,
-        ),
-        pos="after"
-    )
+            pos="after"
+        )
+        DeckBrowser.show = wrap(
+            old=DeckBrowser.show,
+            new=partial(
+                inject_medals_with_js,
+                db_settings=db_settings,
+            ),
+            pos="after"
+        )
+        Overview.refresh = wrap(
+            old=Overview.refresh,
+            new=partial(
+                inject_medals_with_js,
+                db_settings=db_settings,
+            ),
+            pos="after"
+        )
 
 
 def show_tool_tip_if_medals(displayable_medals):
@@ -157,9 +166,16 @@ def show_tool_tip_if_medals(displayable_medals):
         showToolTip(displayable_medals)
 
 
-def inject_medals_with_js(self: Overview, acheivements):
+def inject_medals_with_js(self: Overview, db_settings):
     def compute_then_inject():
-        self.mw.web.eval(MedalsOverviewJS(acheivements=acheivements))
+        with get_db_connection(db_settings) as db_connection:
+            acheivements_repo = AcheivementsRepository(
+                db_connection=db_connection,
+            )
+
+            self.mw.web.eval(
+                MedalsOverviewJS(acheivements=acheivements_repo.all())
+            )
 
     Thread(target=compute_then_inject).start()
 

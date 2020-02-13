@@ -6,6 +6,7 @@ License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 """
 
 from datetime import datetime, timedelta
+import itertools
 from os.path import join, dirname
 
 from anki_killstreaks._vendor import attr
@@ -276,7 +277,7 @@ def image_path(filename):
 
 
 @attr.s(frozen=True)
-class Acheivement:
+class NewAcheivement:
     medal = attr.ib()
 
     @property
@@ -405,3 +406,14 @@ HALO_KILLING_SPREE_STATES = [
     ),
     KillingSpreeEndState(),
 ]
+
+def get_all_displayable_medals():
+    all_medals = itertools.chain(
+        HALO_MULTIKILL_STATES,
+        HALO_KILLING_SPREE_STATES,
+    )
+    return filter(
+        lambda m: m.is_displayable_medal,
+        all_medals
+    )
+

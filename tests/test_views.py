@@ -1,24 +1,24 @@
 from anki_killstreaks.views import medal_types, AppendingInjector, \
         MedalsOverviewJS
-from anki_killstreaks.streaks import Acheivement, KillingSpreeMedalState, \
+from anki_killstreaks.streaks import NewAcheivement, KillingSpreeMedalState, \
         image_path
 
 
 def test_medal_types_should_group_acheivements_and_count_medals():
     acheivements = [
-        Acheivement(
+        NewAcheivement(
             medal=KillingSpreeMedalState(
                 name='Double kill',
                 medal_image=image_path('Doublekill_Medal.webp.png')
             )
         ),
-        Acheivement(
+        NewAcheivement(
             medal=KillingSpreeMedalState(
                 name='Double kill',
                 medal_image=image_path('Doublekill_Medal.webp.png')
             )
         ),
-        Acheivement(
+        NewAcheivement(
             medal=KillingSpreeMedalState(
                 name='Triple kill',
                 medal_image=image_path('Doublekill_Medal.webp.png')
@@ -37,7 +37,7 @@ def test_medal_types_should_group_acheivements_and_count_medals():
 
 def test_MedalsOverviewJS_smoke_test():
     assert MedalsOverviewJS([
-            Acheivement(
+            NewAcheivement(
                 medal=KillingSpreeMedalState(
                     name='Double kill',
                     medal_image=image_path('Doublekill_Medal.webp.png')

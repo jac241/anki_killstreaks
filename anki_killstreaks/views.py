@@ -3,6 +3,8 @@ from collections import Counter
 import attr
 import base64
 
+from anki_killstreaks.toolz import unique
+
 
 def MedalsOverviewJS(acheivements):
     return AppendingInjector(html=MedalsOverview(medal_types(acheivements)))
@@ -15,7 +17,8 @@ def AppendingInjector(html):
 def medal_types(acheivements):
     counter = Counter(a.medal_name for a in acheivements)
 
-    unique_achievements = list(dict.fromkeys(acheivements))
+    unique_achievements = unique(acheivements, lambda a: a.medal_name)
+
     acheivements_by_name = dict(
         (a.medal_name, a)
         for a

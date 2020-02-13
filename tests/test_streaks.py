@@ -166,12 +166,13 @@ def test_should_be_able_to_get_perfection_medal_after_50_kills():
         state = state.on_answer(card_did_pass=True)
     assert state.current_medal_state.name == 'Perfection'
 
+
 @pytest.fixture
 def question_shown_state():
     return QuestionShownState(
         states=[
             MultikillStartingState(),
-            KillingSpreeMedalState(name='test', medal_image=None),
+            KillingSpreeMedalState(name='Double Kill', medal_image=None),
             KillingSpreeEndState()
         ],
         question_shown_at=datetime.now(),
