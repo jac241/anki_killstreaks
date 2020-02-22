@@ -10,6 +10,10 @@ def MedalsOverviewJS(acheivements):
     return AppendingInjector(html=MedalsOverview(medal_types(acheivements)))
 
 
+def MedalsOverviewHTML(acheivements, header_text):
+    return MedalsOverview(medal_types(acheivements), header_text)
+
+
 def AppendingInjector(html):
     return f"$('body').append(String.raw`{html}`);".replace("\n", " ")
 
@@ -77,13 +81,13 @@ def Head():
     """
 
 
-def MedalsOverview(medal_types):
+def MedalsOverview(medal_types, header_text="Medals earned this session:"):
     medals = ""
     for medal_type in medal_types:
         medals += f"{Medal(medal_type)}"
-    
+
     medal_header = (
-        r"<h3>Medals earned this session:</h3>"
+        rf"<h3>{header_text}</h3>"
         if len(medals) > 0
         else ""
     )
@@ -91,7 +95,7 @@ def MedalsOverview(medal_types):
     return f"""
         {Head()}
         <center>
-            {medal_header} 
+            {medal_header}
             <div class="medals-overview">
                 {medals}
             </div>

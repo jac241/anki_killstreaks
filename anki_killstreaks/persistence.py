@@ -52,9 +52,10 @@ class AcheivementsRepository:
     def create_all(self, new_acheivements):
         self.conn.executemany(
             "INSERT INTO acheivements(medal_id) VALUES (?)",
-            [(a.medal_name, ) for a in new_acheivements]
+            ((a.medal_name, ) for a in new_acheivements)
         )
 
+    # This whole method can be replaced with a groupby count(*) on medal_id
     def all(self):
         cursor = self.conn.execute("SELECT * FROM acheivements")
 
@@ -64,6 +65,8 @@ class AcheivementsRepository:
             in cursor
         ]
 
+        # will probably become a performance issue, move to
+        # spot where we need this join.
         matches = join(
             leftseq=get_all_displayable_medals(),
             rightseq=loaded_acheivements,
@@ -76,6 +79,10 @@ class AcheivementsRepository:
             for medal, persisted_acheivement
             in matches
         ]
+
+    def count_by_medal_id():
+        return []
+
 
 
 @attr.s

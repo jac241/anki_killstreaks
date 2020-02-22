@@ -12,21 +12,28 @@ def test_migrate_database_creates_a_medals_database(db_settings):
     assert returned_settings.db_path.exists()
 
 
-def test_AcheivementsRepository_create_all_should_save_acheivements(db_connection):
-    repo = AcheivementsRepository(db_connection=db_connection)
+@pytest.fixture
+def acheivements_repo(db_connection):
+    return AcheivementsRepository(db_connection=db_connection)
 
-    repo.create_all(
-        [
-            NewAcheivement(
-                medal=MultikillMedalState(
-                    name='Double Kill',
-                    medal_image=None
-                )
-            )
-        ]
+@pytest.fixture
+def a_new_acheivement():
+    return NewAcheivement(
+        medal=MultikillMedalState(
+            name='Double Kill',
+            medal_image=None
+        )
     )
 
-    acheivements = repo.all()
+
+def test_AcheivementsRepository_create_all_should_save_acheivements(acheivements_repo, a_new_acheivement):
+    acheivements_repo.create_all([a_new_acheivement])
+
+    acheivements = acheivements_repo.all()
 
     assert len(acheivements) == 1
+    assert acheivements[0].medal_name == a_new_acheivement.medal_name
 
+
+def test_AcheivementsRepository_count_by_medal_id_returns_array_of_counted_acheivements(acheivements_repo, a_new_acheivement):
+    acheivements_repo.create_all([a_new_acheivement])

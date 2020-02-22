@@ -7,6 +7,14 @@ License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 from anki_killstreaks.streaks import did_card_pass, NewAcheivement
 
 
+# for handling undo, make Action class that takes store instance,
+# repo instance, and answer and has undo and redo (or call) methods
+# store these in a stack on the controller (maybe pass in so we can
+# reinstanciate the controller on profile change) maybe immutable
+# list? when undo hit, pop the stack and call undo on the action,
+# replacing the controller's current store instance with the
+# popped action's.
+
 class ReviewingController:
     def __init__(self, store, acheivements_repo, show_acheivements):
         self.store = store

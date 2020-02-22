@@ -25,6 +25,7 @@ from aqt.deckbrowser import DeckBrowser
 from aqt.reviewer import Reviewer
 from aqt.overview import Overview
 from anki.hooks import addHook, wrap
+from anki.stats import CollectionStats
 
 from anki_killstreaks.config import local_conf
 from anki_killstreaks.controllers import ReviewingController, build_on_answer_wrapper
@@ -35,7 +36,7 @@ from anki_killstreaks.persistence import (
 )
 from anki_killstreaks.streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
     HALO_KILLING_SPREE_STATES, Store
-from anki_killstreaks.views import MedalsOverviewJS
+from anki_killstreaks.views import MedalsOverviewJS, MedalsOverviewHTML
 
 
 _tooltipTimer = None
@@ -160,6 +161,14 @@ def main():
             pos="after"
         )
 
+        CollectionStats.todayStats = wrap(
+            old=CollectionStats.todayStats,
+            new=partial(
+                show_medals_overview, acheivements_repo=acheivements_repo
+            ),
+            pos="around"
+        )
+
 
 def show_tool_tip_if_medals(displayable_medals):
     if len(displayable_medals) > 0:
@@ -178,6 +187,15 @@ def inject_medals_with_js(self: Overview, db_settings):
             )
 
     Thread(target=compute_then_inject).start()
+
+
+def show_medals_overview(self: CollectionStats, _old, acheivements_repo):
+    return _old(self) + MedalsOverviewHTML(
+        acheivements=acheivements_repo.all(),
+        header_text="All Medals Earned:"
+    )
+
+
 
 
 main()
