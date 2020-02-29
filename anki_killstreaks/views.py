@@ -25,11 +25,16 @@ def AppendingInjector(html):
 
 
 def medal_types(acheivement_count_by_medal_id: dict):
-    medals_with_counts = join(
+    medal_count_pairs = join(
         leftseq=get_all_displayable_medals(),
         rightseq=acheivement_count_by_medal_id.items(),
         leftkey=lambda dm: dm.name,
         rightkey=lambda ac: ac[0]
+    )
+
+    sorted_medals_with_counts = sorted(
+        medal_count_pairs,
+        key=lambda medal_count_pairs: medal_count_pairs[0].rank
     )
 
     return [
@@ -39,7 +44,7 @@ def medal_types(acheivement_count_by_medal_id: dict):
             count=count,
         )
         for medal, (medal_id, count)
-        in medals_with_counts
+        in sorted_medals_with_counts
     ]
 
 

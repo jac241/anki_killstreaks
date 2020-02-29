@@ -41,49 +41,58 @@ class KillingSpreeMixin:
 
 # first just needs to be after minimum time
 class MultikillStartingState(KillingSpreeMixin):
-    def __init__(self):
-        self.is_displayable_medal = False
-        self.num_states_to_advance_if_on_streak = 1
+    is_displayable_medal = False
+    num_states_to_advance_if_on_streak = 1
+    rank = 0
 
 
 class MultikillFirstAnswerState(MultikillMixin):
-    def __init__(self):
-        self.is_displayable_medal = False
-        self.num_states_to_advance_if_on_streak = 1
+    is_displayable_medal = False
+    num_states_to_advance_if_on_streak = 1
+    rank = 1
 
 
 class MultikillMedalState(MultikillMixin):
-    def __init__(self, name, medal_image):
+    is_displayable_medal = True
+    num_states_to_advance_if_on_streak = 1
+
+    def __init__(self, name, medal_image, rank):
         self.name = name
         self.medal_image = medal_image
-        self.is_displayable_medal = True
-        self.num_states_to_advance_if_on_streak = 1
+        self.rank = rank
 
 
 class EndState(MultikillMixin):
-    def __init__(self):
-        self.is_displayable_medal = False
-        self.num_states_to_advance_if_on_streak = 0
+    is_displayable_medal = False
+    num_states_to_advance_if_on_streak = 0
 
+    def __init__(self, rank):
+        self.rank = rank
 
 class KillingSpreeNoMedalState(KillingSpreeMixin):
-    def __init__(self):
-        self.is_displayable_medal = False
-        self.num_states_to_advance_if_on_streak = 1
+    is_displayable_medal = False
+    num_states_to_advance_if_on_streak = 1
+
+    def __init__(self, rank):
+        self.rank = rank
 
 
 class KillingSpreeMedalState(KillingSpreeMixin):
-    def __init__(self, name, medal_image):
+    is_displayable_medal = True
+    num_states_to_advance_if_on_streak = 1
+
+    def __init__(self, name, medal_image, rank):
         self.name = name
         self.medal_image = medal_image
-        self.is_displayable_medal = True
-        self.num_states_to_advance_if_on_streak = 1
+        self.rank = rank
 
 
 class KillingSpreeEndState(KillingSpreeMixin):
-    def __init__(self):
-        self.is_displayable_medal = False
-        self.num_states_to_advance_if_on_streak = 0
+    is_displayable_medal = False
+    num_states_to_advance_if_on_streak = 0
+
+    def __init__(self, rank):
+        self.rank = rank
 
 
 class InitialStreakState:
@@ -294,117 +303,133 @@ HALO_MULTIKILL_STATES = [
     MultikillFirstAnswerState(),
     MultikillMedalState(
         medal_image=image_path('Doublekill_Medal.webp.png'),
-        name='Double Kill'
+        name='Double Kill',
+        rank=2
     ),
     MultikillMedalState(
         medal_image=image_path('Triplekill_Medal.webp.png'),
-        name='Triple Kill'
+        name='Triple Kill',
+        rank=3
     ),
     MultikillMedalState(
         medal_image=image_path('Overkill_Medal.png'),
-        name='Overkill'
+        name='Overkill',
+        rank=4
     ),
     MultikillMedalState(
         medal_image=image_path('Killtacular_Medal.webp.png'),
-        name='Killtacular'
+        name='Killtacular',
+        rank=5
     ),
     MultikillMedalState(
         medal_image=image_path('Killtrocity_Medal.webp.png'),
-        name='Killtrocity'
+        name='Killtrocity',
+        rank=6
     ),
     MultikillMedalState(
         medal_image=image_path('Killimanjaro_Medal.webp.png'),
-        name='Killimanjaro'
+        name='Killimanjaro',
+        rank=7
     ),
     MultikillMedalState(
         medal_image=image_path('Killtastrophe_Medal.webp.png'),
-        name='Killtastrophe'
+        name='Killtastrophe',
+        rank=8
     ),
     MultikillMedalState(
         medal_image=image_path('Killpocalypse_Medal.webp.png'),
-        name='Killpocalypse'
+        name='Killpocalypse',
+        rank=9
     ),
     MultikillMedalState(
         medal_image=image_path('Killionaire_Medal.webp.png'),
-        name='Killionaire'
+        name='Killionaire',
+        rank=10
     ),
-    EndState(),
+    EndState(rank=11),
 ]
 
 HALO_KILLING_SPREE_STATES = [
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(rank=0),
+    KillingSpreeNoMedalState(rank=1),
+    KillingSpreeNoMedalState(rank=2),
+    KillingSpreeNoMedalState(rank=3),
+    KillingSpreeNoMedalState(rank=4),
     KillingSpreeMedalState(
         medal_image=image_path('Killing_Spree_Medal.png'),
-        name='Killing Spree'
+        name='Killing Spree',
+        rank=5
     ),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(rank=6),
+    KillingSpreeNoMedalState(rank=7),
+    KillingSpreeNoMedalState(rank=8),
+    KillingSpreeNoMedalState(rank=9),
     KillingSpreeMedalState(
         medal_image=image_path('Killing_Frenzy_Medal.webp.png'),
-        name='Killing Frenzy'
+        name='Killing Frenzy',
+        rank=10
     ),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(rank=11),
+    KillingSpreeNoMedalState(rank=12),
+    KillingSpreeNoMedalState(rank=13),
+    KillingSpreeNoMedalState(rank=14),
     KillingSpreeMedalState(
         medal_image=image_path('Running_Riot_Medal.webp.png'),
-        name='Running Riot'
+        name='Running Riot',
+        rank=15
     ),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(rank=16),
+    KillingSpreeNoMedalState(rank=17),
+    KillingSpreeNoMedalState(rank=18),
+    KillingSpreeNoMedalState(rank=19),
     KillingSpreeMedalState(
         medal_image=image_path('Rampage_Medal.webp.png'),
-        name='Rampage'
+        name='Rampage',
+        rank=20
     ),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(rank=21),
+    KillingSpreeNoMedalState(rank=22),
+    KillingSpreeNoMedalState(rank=23),
+    KillingSpreeNoMedalState(rank=24),
     KillingSpreeMedalState(
         medal_image=image_path('Untouchable_Medal.webp.png'),
-        name='Untouchable'
+        name='Untouchable',
+        rank=25
     ),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(rank=26),
+    KillingSpreeNoMedalState(rank=27),
+    KillingSpreeNoMedalState(rank=28),
+    KillingSpreeNoMedalState(rank=29),
     KillingSpreeMedalState(
         medal_image=image_path('Invincible_Medal.webp.png'),
-        name='Invincible'
+        name='Invincible',
+        rank=30
     ),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
-    KillingSpreeNoMedalState(),
+    KillingSpreeNoMedalState(rank=31),
+    KillingSpreeNoMedalState(rank=32),
+    KillingSpreeNoMedalState(rank=33),
+    KillingSpreeNoMedalState(rank=34),
+    KillingSpreeNoMedalState(rank=35),
+    KillingSpreeNoMedalState(rank=36),
+    KillingSpreeNoMedalState(rank=37),
+    KillingSpreeNoMedalState(rank=38),
+    KillingSpreeNoMedalState(rank=39),
+    KillingSpreeNoMedalState(rank=40),
+    KillingSpreeNoMedalState(rank=41),
+    KillingSpreeNoMedalState(rank=42),
+    KillingSpreeNoMedalState(rank=43),
+    KillingSpreeNoMedalState(rank=44),
+    KillingSpreeNoMedalState(rank=45),
+    KillingSpreeNoMedalState(rank=46),
+    KillingSpreeNoMedalState(rank=47),
+    KillingSpreeNoMedalState(rank=48),
+    KillingSpreeNoMedalState(rank=49),
     KillingSpreeMedalState(
         medal_image=image_path('Perfection_Medal.webp.png'),
-        name='Perfection'
+        name='Perfection',
+        rank=50
     ),
-    KillingSpreeEndState(),
+    KillingSpreeEndState(rank=51),
 ]
 
 def get_all_displayable_medals():

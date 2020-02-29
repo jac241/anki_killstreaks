@@ -22,7 +22,8 @@ def a_new_acheivement():
     return NewAcheivement(
         medal=MultikillMedalState(
             name='Double Kill',
-            medal_image=None
+            medal_image=None,
+            rank=2
         )
     )
 

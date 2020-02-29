@@ -14,8 +14,8 @@ def test_states_requirements_met_should_return_true_if_within_interval():
     states = [
         MultikillStartingState(),
         MultikillFirstAnswerState(),
-        MultikillMedalState(name='test', medal_image=None),
-        EndState()
+        MultikillMedalState(name='test', medal_image=None, rank=2),
+        EndState(rank=3)
     ]
 
     for state in states:
@@ -58,8 +58,8 @@ def test_QuestionShownState_on_answer_should_advance():
     states = [
         MultikillStartingState(),
         MultikillFirstAnswerState(),
-        MultikillMedalState(name='test', medal_image=None),
-        EndState()
+        MultikillMedalState(name='test', medal_image=None, rank=2),
+        EndState(rank=3)
     ]
 
     machine = QuestionShownState(
@@ -75,8 +75,8 @@ def test_QuestionShownState_on_answer_should_advance():
 def test_multikill_flow_should_work():
     states = [
         MultikillStartingState(),
-        MultikillMedalState(name='test', medal_image=None),
-        EndState()
+        MultikillMedalState(name='test', medal_image=None, rank=1),
+        EndState(rank=2)
     ]
 
     machine = QuestionShownState(
@@ -96,8 +96,8 @@ def test_multikill_flow_should_work():
 def test_multikill_should_reset_when_again_pressed():
     states = [
         MultikillStartingState(),
-        MultikillMedalState(name='test', medal_image=None),
-        EndState()
+        MultikillMedalState(name='test', medal_image=None, rank=1),
+        EndState(rank=2)
     ]
 
     question_shown_state = QuestionShownState(
@@ -117,8 +117,8 @@ def test_AnswerShownState_should_reset_to_QuestionShownState_when_recieves_on_sh
     """This can happen when card is buried with answer shown"""
     states = [
         MultikillStartingState(),
-        MultikillMedalState(name='test', medal_image=None),
-        EndState()
+        MultikillMedalState(name='test', medal_image=None, rank=1),
+        EndState(rank=2)
     ]
 
     answer_shown_state = AnswerShownState(
@@ -139,8 +139,8 @@ def test_AnswerShownState_should_go_to_index_1_if_answer_was_correct_but_out_of_
     states = [
         MultikillStartingState(),
         MultikillFirstAnswerState(),
-        MultikillMedalState(name='test', medal_image=None),
-        EndState()
+        MultikillMedalState(name='test', medal_image=None, rank=2),
+        EndState(rank=3)
     ]
 
     answer_shown_state = AnswerShownState(
@@ -172,8 +172,8 @@ def question_shown_state():
     return QuestionShownState(
         states=[
             MultikillStartingState(),
-            KillingSpreeMedalState(name='Double Kill', medal_image=None),
-            KillingSpreeEndState()
+            KillingSpreeMedalState(name='Double Kill', medal_image=None, rank=1),
+            KillingSpreeEndState(rank=2)
         ],
         question_shown_at=datetime.now(),
     )
@@ -184,8 +184,8 @@ def answer_shown_state():
     return AnswerShownState(
         states=[
             MultikillStartingState(),
-            KillingSpreeMedalState(name='test', medal_image=None),
-            KillingSpreeEndState()
+            KillingSpreeMedalState(name='test', medal_image=None, rank=1),
+            KillingSpreeEndState(rank=2)
         ],
         question_shown_at=datetime.now(),
         answer_shown_at=datetime.now() + timedelta(seconds=1),
