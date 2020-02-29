@@ -36,7 +36,7 @@ from anki_killstreaks.persistence import (
 )
 from anki_killstreaks.streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
     HALO_KILLING_SPREE_STATES, Store
-from anki_killstreaks.views import MedalsOverviewJS, MedalsOverviewHTML
+from anki_killstreaks.views import MedalsOverviewHTML, TodaysMedalsJS
 
 
 _tooltipTimer = None
@@ -136,28 +136,25 @@ def main():
         addHook("showQuestion", reviewing_controller.on_show_question)
         addHook("showAnswer", reviewing_controller.on_show_answer)
 
+        todays_medals_injector = partial(
+            inject_medals_with_js,
+            view=TodaysMedalsJS,
+            db_settings=db_settings
+        )
+
         DeckBrowser.refresh = wrap(
             old=DeckBrowser.refresh,
-            new=partial(
-                inject_medals_with_js,
-                db_settings=db_settings,
-            ),
+            new=todays_medals_injector,
             pos="after"
         )
         DeckBrowser.show = wrap(
             old=DeckBrowser.show,
-            new=partial(
-                inject_medals_with_js,
-                db_settings=db_settings,
-            ),
+            new=todays_medals_injector,
             pos="after"
         )
         Overview.refresh = wrap(
             old=Overview.refresh,
-            new=partial(
-                inject_medals_with_js,
-                db_settings=db_settings,
-            ),
+            new=todays_medals_injector,
             pos="after"
         )
 
@@ -175,7 +172,11 @@ def show_tool_tip_if_medals(displayable_medals):
         showToolTip(displayable_medals)
 
 
-def inject_medals_with_js(self: Overview, db_settings):
+def inject_medals_with_js(
+    self: Overview,
+    db_settings,
+    view
+):
     def compute_then_inject():
         with get_db_connection(db_settings) as db_connection:
             acheivements_repo = AcheivementsRepository(
@@ -183,7 +184,7 @@ def inject_medals_with_js(self: Overview, db_settings):
             )
 
             self.mw.web.eval(
-                MedalsOverviewJS(acheivements=acheivements_repo.all())
+                view(acheivements=acheivements_repo.todays_acheivements(cutoff_time(self)))
             )
 
     Thread(target=compute_then_inject).start()
@@ -191,11 +192,15 @@ def inject_medals_with_js(self: Overview, db_settings):
 
 def show_medals_overview(self: CollectionStats, _old, acheivements_repo):
     return _old(self) + MedalsOverviewHTML(
-        acheivements=acheivements_repo.all(),
+        acheivements=acheivements_repo.count_by_medal_id(),
         header_text="All Medals Earned:"
     )
 
 
+def cutoff_time(self):
+    one_day_s = 86400
+    rolloverHour = self.mw.col.conf.get("rollover", 4)
+    return self.mw.col.sched.dayCutoff - (rolloverHour * 3600) - one_day_s
 
 
 main()

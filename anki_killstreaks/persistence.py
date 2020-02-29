@@ -1,3 +1,4 @@
+from datetime import datetime
 import itertools
 from pathlib import Path
 import sqlite3
@@ -80,8 +81,26 @@ class AcheivementsRepository:
             in matches
         ]
 
-    def count_by_medal_id():
-        return []
+
+    def todays_acheivements(self, day_start_time):
+        """
+        :param day_start_time unix epoch time corresponding to when day starts
+        """
+        return self.count_by_medal_id(created_at_gt=datetime.utcfromtimestamp(day_start_time))
+
+
+    def count_by_medal_id(self, created_at_gt=datetime.min):
+        cursor = self.conn.execute(
+            """
+            SELECT medal_id, count(*)
+            FROM acheivements
+            WHERE created_at > ?
+            GROUP BY medal_id
+            """,
+            (created_at_gt,)
+        )
+
+        return dict(row for row in cursor)
 
 
 

@@ -3,40 +3,43 @@ from collections import Counter
 import attr
 import base64
 
-from anki_killstreaks.toolz import unique
-
-
-def MedalsOverviewJS(acheivements):
-    return AppendingInjector(html=MedalsOverview(medal_types(acheivements)))
+from anki_killstreaks.toolz import unique, join
+from anki_killstreaks.streaks import get_all_displayable_medals
 
 
 def MedalsOverviewHTML(acheivements, header_text):
     return MedalsOverview(medal_types(acheivements), header_text)
 
 
+def TodaysMedalsJS(acheivements):
+    return AppendingInjector(
+        html=MedalsOverview(
+            medal_types=medal_types(acheivements),
+            header_text="Medals Earned Today:"
+        )
+    )
+
+
 def AppendingInjector(html):
     return f"$('body').append(String.raw`{html}`);".replace("\n", " ")
 
 
-def medal_types(acheivements):
-    counter = Counter(a.medal_name for a in acheivements)
-
-    unique_achievements = unique(acheivements, lambda a: a.medal_name)
-
-    acheivements_by_name = dict(
-        (a.medal_name, a)
-        for a
-        in unique_achievements
+def medal_types(acheivement_count_by_medal_id: dict):
+    medals_with_counts = join(
+        leftseq=get_all_displayable_medals(),
+        rightseq=acheivement_count_by_medal_id.items(),
+        leftkey=lambda dm: dm.name,
+        rightkey=lambda ac: ac[0]
     )
 
     return [
         MedalType(
-            name=key,
-            img_src=acheivements_by_name[key].medal_img_src,
-            count=value,
+            name=medal.name,
+            img_src=medal.medal_image,
+            count=count,
         )
-        for key, value
-        in counter.items()
+        for medal, (medal_id, count)
+        in medals_with_counts
     ]
 
 
