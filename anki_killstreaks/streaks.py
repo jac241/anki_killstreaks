@@ -288,6 +288,7 @@ def image_path(filename):
 @attr.s(frozen=True)
 class NewAcheivement:
     medal = attr.ib()
+    deck_id = attr.ib()
 
     @property
     def medal_name(self):

@@ -21,12 +21,12 @@ class ReviewingController:
         self.acheivements_repo = acheivements_repo
         self.show_acheivements = show_acheivements
 
-    def on_answer(self, ease, grade_card=did_card_pass):
+    def on_answer(self, ease, deck_id, grade_card=did_card_pass):
         self.store = self.store.on_answer(did_card_pass(ease))
 
         self.acheivements_repo.create_all(
             [
-                NewAcheivement(medal=medal)
+                NewAcheivement(medal=medal, deck_id=deck_id)
                 for medal
                 in self.store.displayable_medals
             ]
@@ -41,6 +41,7 @@ class ReviewingController:
         self.store = self.store.on_show_answer()
 
 
-def build_on_answer_wrapper(_reviewer, ease, on_answer):
-    on_answer(ease)
+def build_on_answer_wrapper(reviewer, ease, on_answer):
+    deck_id = reviewer.mw.col.decks.current()['id']
+    on_answer(ease=ease, deck_id=deck_id)
 

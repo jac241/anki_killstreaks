@@ -52,8 +52,8 @@ class AcheivementsRepository:
 
     def create_all(self, new_acheivements):
         self.conn.executemany(
-            "INSERT INTO acheivements(medal_id) VALUES (?)",
-            ((a.medal_name, ) for a in new_acheivements)
+            "INSERT INTO acheivements(medal_id, deck_id) VALUES (?, ?)",
+            ((a.medal_name, a.deck_id) for a in new_acheivements)
         )
 
     # This whole method can be replaced with a groupby count(*) on medal_id
@@ -88,7 +88,6 @@ class AcheivementsRepository:
         """
         return self.count_by_medal_id(created_at_gt=datetime.utcfromtimestamp(day_start_time))
 
-
     def count_by_medal_id(self, created_at_gt=datetime.min):
         cursor = self.conn.execute(
             """
@@ -102,6 +101,22 @@ class AcheivementsRepository:
 
         return dict(row for row in cursor)
 
+    def todays_acheivements_for_deck_ids(self, day_start_time, deck_ids):
+        created_at_gt = datetime.utcfromtimestamp(day_start_time)
+
+        cursor = self.conn.execute(
+            f"""
+            SELECT medal_id, count(*)
+            FROM acheivements
+            WHERE created_at > ? AND
+                deck_id in ({','.join('?' for i in deck_ids)})
+            GROUP BY medal_id
+            """,
+            (created_at_gt, *deck_ids)
+        )
+
+        return dict(row for row in cursor)
+
 
 
 @attr.s
@@ -109,6 +124,7 @@ class PersistedAcheivement:
     id_ = attr.ib()
     medal_id = attr.ib()
     created_at = attr.ib()
+    deck_id = attr.ib()
     medal = attr.ib()
 
     def with_medal(self, medal):

@@ -39,7 +39,7 @@ def store(question_shown_state):
 def test_ReviewingController_on_answer_should_update_store(reviewing_controller):
     initial_store = reviewing_controller.store
 
-    reviewing_controller.on_answer(3)
+    reviewing_controller.on_answer(ease=3, deck_id=0)
 
     assert type(reviewing_controller.store) == type(initial_store)
     assert reviewing_controller.store != initial_store
@@ -48,19 +48,19 @@ def test_ReviewingController_on_answer_should_update_store(reviewing_controller)
 def test_ReviewingController_on_answer_should_store_earned_acheivements(reviewing_controller):
     reviewing_controller.acheivements = []
 
-    reviewing_controller.on_answer(3)
+    reviewing_controller.on_answer(ease=3, deck_id=0)
 
     assert len(reviewing_controller.acheivements_repo.all()) == 1
 
 
 def test_ReviewingController_on_answer_should_show_acheivements_with_earned_medals(reviewing_controller):
-    reviewing_controller.on_answer(4)
+    reviewing_controller.on_answer(ease=3, deck_id=0)
 
     reviewing_controller.show_acheivements.assert_called_once()
 
 
 def test_ReviewingController_on_answer_should_not_have_no_acheivements_if_card_does_not_pass(reviewing_controller):
-    reviewing_controller.on_answer(1)
+    reviewing_controller.on_answer(ease=1, deck_id=0)
 
     assert len(reviewing_controller.acheivements_repo.all()) == 0
 

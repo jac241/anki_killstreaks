@@ -15,9 +15,19 @@ def TodaysMedalsJS(acheivements):
     return AppendingInjector(
         html=MedalsOverview(
             medal_types=medal_types(acheivements),
-            header_text="Medals Earned Today:"
+            header_text="All medals earned today:"
         )
     )
+
+
+def TodaysMedalsForDeckJS(acheivements, deck):
+    return AppendingInjector(
+        html=MedalsOverview(
+            medal_types=medal_types(acheivements),
+            header_text=f'Medals earned today reviewing deck "{deck.name}":'
+        )
+    )
+
 
 
 def AppendingInjector(html):

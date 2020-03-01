@@ -36,7 +36,8 @@ from anki_killstreaks.persistence import (
 )
 from anki_killstreaks.streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
     HALO_KILLING_SPREE_STATES, Store
-from anki_killstreaks.views import MedalsOverviewHTML, TodaysMedalsJS
+from anki_killstreaks.views import MedalsOverviewHTML, TodaysMedalsJS, TodaysMedalsForDeckJS
+from anki_killstreaks._vendor import attr
 
 
 _tooltipTimer = None
@@ -154,10 +155,9 @@ def main():
         )
         Overview.refresh = wrap(
             old=Overview.refresh,
-            new=todays_medals_injector,
+            new=partial(inject_medals_for_deck_overview, db_settings=db_settings),
             pos="after"
         )
-
         CollectionStats.todayStats = wrap(
             old=CollectionStats.todayStats,
             new=partial(
@@ -184,10 +184,39 @@ def inject_medals_with_js(
             )
 
             self.mw.web.eval(
-                view(acheivements=acheivements_repo.todays_acheivements(cutoff_time(self)))
+                view(
+                    acheivements=acheivements_repo.todays_acheivements(
+                        cutoff_time(self)
+                    )
+                )
             )
 
     Thread(target=compute_then_inject).start()
+
+
+def inject_medals_for_deck_overview(self: Overview, db_settings):
+    def compute_then_inject():
+        with get_db_connection(db_settings) as db_connection:
+            acheivements_repo = AcheivementsRepository(
+                db_connection=db_connection,
+            )
+
+            decks = get_current_deck_and_children(deck_manager=self.mw.col.decks)
+            deck_ids = [d.id_ for d in decks]
+
+            self.mw.web.eval(
+                TodaysMedalsForDeckJS(
+                    acheivements=acheivements_repo.todays_acheivements_for_deck_ids(
+                        day_start_time=cutoff_time(self),
+                        deck_ids=deck_ids
+                    ),
+                    deck=decks[0]
+                )
+            )
+
+    Thread(target=compute_then_inject).start()
+
+
 
 
 def show_medals_overview(self: CollectionStats, _old, acheivements_repo):
@@ -201,6 +230,26 @@ def cutoff_time(self):
     one_day_s = 86400
     rolloverHour = self.mw.col.conf.get("rollover", 4)
     return self.mw.col.sched.dayCutoff - (rolloverHour * 3600) - one_day_s
+
+
+@attr.s
+class Deck:
+    id_ = attr.ib()
+    name = attr.ib()
+
+
+def get_current_deck_and_children(deck_manager):
+    current_deck_attrs = deck_manager.current()
+
+    current_deck = Deck(current_deck_attrs['id'], current_deck_attrs['name'])
+    children = [
+        Deck(name=name_id_pair[0], id_=name_id_pair[1])
+        for name_id_pair
+        in deck_manager.children(current_deck.id_)
+    ]
+
+    return [current_deck, *children]
+
 
 
 main()

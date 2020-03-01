@@ -24,7 +24,8 @@ def a_new_acheivement():
             name='Double Kill',
             medal_image=None,
             rank=2
-        )
+        ),
+        deck_id=0
     )
 
 
@@ -50,12 +51,34 @@ def test_AcheivementsRepository_todays_acheivements_returns_acheivements_grouped
     acheivements_repo.create_all([a_new_acheivement])
 
     acheivements_repo.conn.execute(
-        "INSERT INTO acheivements(medal_id, created_at) VALUES (?, ?)",
-        ("Double Kill", datetime.now() - timedelta(days=2))
+        "INSERT INTO acheivements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+        ("Double Kill", datetime.now() - timedelta(days=2), 0)
     )
 
-    day_start_time = datetime.combine(datetime.today().date(), datetime.min.time()) + timedelta(hours=4)
+    day_start_time = datetime.combine(datetime.today().date(), datetime.min.time())
     result = acheivements_repo.todays_acheivements(day_start_time.timestamp())
 
     assert result['Double Kill'] == 1
+
+
+def test_AcheivementsRepository_todays_acheivements_returns_acheivements_for_today_scoped_by_deck_ids(acheivements_repo, a_new_acheivement):
+    acheivements_repo.create_all([a_new_acheivement, a_new_acheivement])
+
+    acheivements_repo.conn.execute(
+        "INSERT INTO acheivements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+        ("Double Kill", datetime.now() - timedelta(days=2), 0)
+    )
+
+    acheivements_repo.conn.execute(
+        "INSERT INTO acheivements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+        ("Double Kill", datetime.now() - timedelta(days=2), 1)
+    )
+
+    day_start_time = datetime.combine(datetime.today().date(), datetime.min.time())
+    result = acheivements_repo.todays_acheivements_for_deck_ids(
+        day_start_time=day_start_time.timestamp(),
+        deck_ids=[0]
+    )
+
+    assert result['Double Kill'] == 2
 
