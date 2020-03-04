@@ -32,7 +32,7 @@ from anki_killstreaks.controllers import ReviewingController, build_on_answer_wr
 from anki_killstreaks.persistence import (
     migrate_database,
     get_db_connection,
-    AcheivementsRepository,
+    AchievementsRepository,
 )
 from anki_killstreaks.streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
     HALO_KILLING_SPREE_STATES, Store
@@ -118,14 +118,14 @@ def main():
             ]
         )
 
-        acheivements_repo = AcheivementsRepository(
+        achievements_repo = AchievementsRepository(
             db_connection=db_connection,
         )
 
         reviewing_controller = ReviewingController(
             store=store,
-            acheivements_repo=acheivements_repo,
-            show_acheivements=show_tool_tip_if_medals,
+            achievements_repo=achievements_repo,
+            show_achievements=show_tool_tip_if_medals,
         )
 
         Reviewer._answerCard = wrap(
@@ -161,7 +161,7 @@ def main():
         CollectionStats.todayStats = wrap(
             old=CollectionStats.todayStats,
             new=partial(
-                show_medals_overview, acheivements_repo=acheivements_repo
+                show_medals_overview, achievements_repo=achievements_repo
             ),
             pos="around"
         )
@@ -179,13 +179,13 @@ def inject_medals_with_js(
 ):
     def compute_then_inject():
         with get_db_connection(db_settings) as db_connection:
-            acheivements_repo = AcheivementsRepository(
+            achievements_repo = AchievementsRepository(
                 db_connection=db_connection,
             )
 
             self.mw.web.eval(
                 view(
-                    acheivements=acheivements_repo.todays_acheivements(
+                    achievements=achievements_repo.todays_achievements(
                         cutoff_time(self)
                     )
                 )
@@ -197,7 +197,7 @@ def inject_medals_with_js(
 def inject_medals_for_deck_overview(self: Overview, db_settings):
     def compute_then_inject():
         with get_db_connection(db_settings) as db_connection:
-            acheivements_repo = AcheivementsRepository(
+            achievements_repo = AchievementsRepository(
                 db_connection=db_connection,
             )
 
@@ -206,7 +206,7 @@ def inject_medals_for_deck_overview(self: Overview, db_settings):
 
             self.mw.web.eval(
                 TodaysMedalsForDeckJS(
-                    acheivements=acheivements_repo.todays_acheivements_for_deck_ids(
+                    achievements=achievements_repo.todays_achievements_for_deck_ids(
                         day_start_time=cutoff_time(self),
                         deck_ids=deck_ids
                     ),
@@ -215,21 +215,6 @@ def inject_medals_for_deck_overview(self: Overview, db_settings):
             )
 
     Thread(target=compute_then_inject).start()
-
-
-
-
-def show_medals_overview(self: CollectionStats, _old, acheivements_repo):
-    return _old(self) + MedalsOverviewHTML(
-        acheivements=acheivements_repo.count_by_medal_id(),
-        header_text="All Medals Earned:"
-    )
-
-
-def cutoff_time(self):
-    one_day_s = 86400
-    rolloverHour = self.mw.col.conf.get("rollover", 4)
-    return self.mw.col.sched.dayCutoff - (rolloverHour * 3600) - one_day_s
 
 
 @attr.s
@@ -250,6 +235,81 @@ def get_current_deck_and_children(deck_manager):
 
     return [current_deck, *children]
 
+
+def show_medals_overview(self: CollectionStats, _old, achievements_repo):
+    # if self.wholeCollection:
+    current_deck = self.col.decks.current()["name"]
+
+    header_text = _get_stats_header(
+        deck_name=current_deck,
+        scope_is_whole_collection=self.wholeCollection,
+        period=self.type
+    )
+
+    deck_ids = [d.id_ for d in get_current_deck_and_children(self.col.decks)]
+
+    achievements = _get_acheivements_scoped_to_deck_or_collection(
+        deck_ids=deck_ids,
+        scope_is_whole_collection=self.wholeCollection,
+        achievements_repo=achievements_repo,
+        start_datetime=_get_start_datetime_for_period(self.type)
+    )
+
+    return _old(self) + MedalsOverviewHTML(
+        achievements=achievements,
+        header_text=header_text
+    )
+
+
+def _get_stats_header(deck_name, scope_is_whole_collection, period):
+    scope_name = "your whole collection" if scope_is_whole_collection else f'deck "{deck_name}"'
+    time_period_description = _get_time_period_description(period)
+    return f"Medals earned while reviewing {scope_name} {time_period_description}"
+
+
+PERIOD_MONTH = 0
+PERIOD_YEAR = 1
+
+
+def _get_time_period_description(period):
+    if period == PERIOD_MONTH:
+        return "over the past month"
+    elif period == PERIOD_YEAR:
+        return "over the past year"
+    else:
+        return "over all time"
+
+
+def _get_start_datetime_for_period(period):
+    if period == PERIOD_MONTH:
+        return datetime.now() - timedelta(days=30)
+    elif period == PERIOD_YEAR:
+        return datetime.now() - timedelta(days=365)
+    else:
+        return datetime.min
+
+
+def _get_acheivements_scoped_to_deck_or_collection(
+    deck_ids,
+    scope_is_whole_collection,
+    achievements_repo,
+    start_datetime
+):
+    if scope_is_whole_collection:
+        return achievements_repo.achievements_for_whole_collection_since(
+            since_datetime=start_datetime
+        )
+    else:
+        return achievements_repo.achievements_for_deck_ids_since(
+            deck_ids=deck_ids,
+            since_datetime=start_datetime
+        )
+
+
+def cutoff_time(self):
+    one_day_s = 86400
+    rolloverHour = self.mw.col.conf.get("rollover", 4)
+    return self.mw.col.sched.dayCutoff - (rolloverHour * 3600) - one_day_s
 
 
 main()

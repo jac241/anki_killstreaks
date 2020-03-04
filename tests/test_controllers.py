@@ -10,21 +10,21 @@ import pytest
 from tests.test_streaks import question_shown_state
 
 from anki_killstreaks.controllers import ReviewingController
-from anki_killstreaks.persistence import AcheivementsRepository
+from anki_killstreaks.persistence import AchievementsRepository
 from anki_killstreaks.streaks import Store
 
 
 @pytest.fixture
-def reviewing_controller(store, acheivements_repo):
+def reviewing_controller(store, achievements_repo):
     return ReviewingController(
         store=store,
-        show_acheivements=Mock(),
-        acheivements_repo=acheivements_repo
+        show_achievements=Mock(),
+        achievements_repo=achievements_repo
     )
 
 @pytest.fixture
-def acheivements_repo(db_connection):
-    return AcheivementsRepository(db_connection=db_connection)
+def achievements_repo(db_connection):
+    return AchievementsRepository(db_connection=db_connection)
 
 
 @pytest.fixture
@@ -45,24 +45,24 @@ def test_ReviewingController_on_answer_should_update_store(reviewing_controller)
     assert reviewing_controller.store != initial_store
 
 
-def test_ReviewingController_on_answer_should_store_earned_acheivements(reviewing_controller):
-    reviewing_controller.acheivements = []
+def test_ReviewingController_on_answer_should_store_earned_achievements(reviewing_controller):
+    reviewing_controller.achievements = []
 
     reviewing_controller.on_answer(ease=3, deck_id=0)
 
-    assert len(reviewing_controller.acheivements_repo.all()) == 1
+    assert len(reviewing_controller.achievements_repo.all()) == 1
 
 
-def test_ReviewingController_on_answer_should_show_acheivements_with_earned_medals(reviewing_controller):
+def test_ReviewingController_on_answer_should_show_achievements_with_earned_medals(reviewing_controller):
     reviewing_controller.on_answer(ease=3, deck_id=0)
 
-    reviewing_controller.show_acheivements.assert_called_once()
+    reviewing_controller.show_achievements.assert_called_once()
 
 
-def test_ReviewingController_on_answer_should_not_have_no_acheivements_if_card_does_not_pass(reviewing_controller):
+def test_ReviewingController_on_answer_should_not_have_no_achievements_if_card_does_not_pass(reviewing_controller):
     reviewing_controller.on_answer(ease=1, deck_id=0)
 
-    assert len(reviewing_controller.acheivements_repo.all()) == 0
+    assert len(reviewing_controller.achievements_repo.all()) == 0
 
 
 def test_ReviewingController_on_show_question_should_update_store(reviewing_controller):

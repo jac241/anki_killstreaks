@@ -7,37 +7,39 @@ from anki_killstreaks.toolz import unique, join
 from anki_killstreaks.streaks import get_all_displayable_medals
 
 
-def MedalsOverviewHTML(acheivements, header_text):
-    return MedalsOverview(medal_types(acheivements), header_text)
+def MedalsOverviewHTML(achievements, header_text):
+    return MedalsOverview(medal_types(achievements), header_text)
 
 
-def TodaysMedalsJS(acheivements):
+def TodaysMedalsJS(achievements):
     return AppendingInjector(
         html=MedalsOverview(
-            medal_types=medal_types(acheivements),
+            medal_types=medal_types(achievements),
             header_text="All medals earned today:"
         )
     )
 
 
-def TodaysMedalsForDeckJS(acheivements, deck):
+def TodaysMedalsForDeckJS(achievements, deck):
     return AppendingInjector(
         html=MedalsOverview(
-            medal_types=medal_types(acheivements),
+            medal_types=medal_types(achievements),
             header_text=f'Medals earned today reviewing deck "{deck.name}":'
         )
     )
-
 
 
 def AppendingInjector(html):
     return f"$('body').append(String.raw`{html}`);".replace("\n", " ")
 
 
-def medal_types(acheivement_count_by_medal_id: dict):
+
+
+
+def medal_types(achievement_count_by_medal_id: dict):
     medal_count_pairs = join(
         leftseq=get_all_displayable_medals(),
-        rightseq=acheivement_count_by_medal_id.items(),
+        rightseq=achievement_count_by_medal_id.items(),
         leftkey=lambda dm: dm.name,
         rightkey=lambda ac: ac[0]
     )

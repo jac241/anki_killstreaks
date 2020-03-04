@@ -286,7 +286,7 @@ def image_path(filename):
 
 
 @attr.s(frozen=True)
-class NewAcheivement:
+class NewAchievement:
     medal = attr.ib()
     deck_id = attr.ib()
 
