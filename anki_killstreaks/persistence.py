@@ -11,15 +11,22 @@ from anki_killstreaks.toolz import join
 from anki_killstreaks.streaks import get_all_displayable_medals
 
 
+this_addon_path = Path(__file__).parent.absolute()
+
+
 @attr.s(frozen=True)
 class DbSettings:
     db_path = attr.ib()
     migration_dir_path = attr.ib()
 
     @classmethod
-    def from_addon_path(cls, addon_path):
+    def from_profile_folder_path(
+        cls,
+        profile_folder_path,
+        addon_path=this_addon_path
+    ):
         return cls(
-            db_path=addon_path / 'user_files' / 'medals.db',
+            db_path=profile_folder_path / 'anki_killstreaks.db',
             migration_dir_path=addon_path / 'migrations'
         )
 
@@ -29,10 +36,10 @@ class DbSettings:
 
 
 this_addon_path = Path(__file__).parent.absolute()
-default_settings = DbSettings.from_addon_path(this_addon_path)
+# default_settings = DbSettings.from_addon_path(this_addon_path)
 
 
-def migrate_database(settings=default_settings):
+def migrate_database(settings):
     backend = get_backend(settings.db_uri)
     migrations = read_migrations(str(settings.migration_dir_path))
 
@@ -42,7 +49,7 @@ def migrate_database(settings=default_settings):
     return settings
 
 
-def get_db_connection(db_settings=default_settings):
+def get_db_connection(db_settings):
     return sqlite3.connect(str(db_settings.db_path), isolation_level=None)
 
 

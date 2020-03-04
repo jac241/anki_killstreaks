@@ -3,6 +3,10 @@ Anki Killstreaks add-on
 
 Copyright: (c) jac241 2019-2020 <https://github.com/jac241>
 License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
+
+The goal of these controller classes is to have these be the only objects that
+hold state in the add-on. The other classes ideally should be immutable.
+This pattern has worked alright so far for this simple application.
 """
 from functools import wraps
 
@@ -10,6 +14,7 @@ from anki_killstreaks._vendor import attr
 
 from anki_killstreaks.persistence import (
     migrate_database,
+    DbSettings,
     get_db_connection,
     AchievementsRepository,
 )
@@ -44,16 +49,26 @@ class ProfileController:
     profile. This ensures that the hooks and method wrapping around Anki objects
     only occurs once. This is necessary because their is no way to unwrap methods or
     unbind hook handlers.
+
+    Unfortunate that this basically became a god object...
     """
+    # required attributes for class
     _local_conf = attr.ib()
     _show_achievements = attr.ib()
+    _get_profile_folder_path = attr.ib()
+
+    # Attributes modified in load_profile
     is_loaded = attr.ib(default=False)
     _db_settings = attr.ib(default=None)
     _achievements_repo = attr.ib(default=None)
     _reviewing_controller = attr.ib(default=None)
 
     def load_profile(self):
-        self._db_settings = migrate_database()
+        self._db_settings = DbSettings.from_profile_folder_path(
+            profile_folder_path=self._get_profile_folder_path()
+        )
+
+        migrate_database(settings=self._db_settings)
 
         with get_db_connection(self._db_settings) as db_connection:
             store = Store(
@@ -86,7 +101,6 @@ class ProfileController:
         self._reviewing_controller = None
         self._acheivements_repo = None
         self.is_loaded = False
-
 
     @ensure_loaded
     def get_db_settings(self):

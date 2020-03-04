@@ -16,6 +16,7 @@ Modifications by jac241 <https://github.com/jac241> for Anki Killstreaks addon
 from datetime import datetime, timedelta
 from functools import partial, wraps
 import os
+from pathlib import Path
 import random
 from threading import Thread
 
@@ -42,9 +43,19 @@ def show_tool_tip_if_medals(displayable_medals):
         showToolTip(displayable_medals)
 
 
+def _get_profile_folder_path(profile_manager=mw.pm):
+
+    folder = profile_manager.profileFolder()
+    # not sure when addons are loaded
+    assert folder
+
+    return Path(folder)
+
+
 _profile_controller = ProfileController(
     local_conf=local_conf,
     show_achievements=show_tool_tip_if_medals,
+    get_profile_folder_path=_get_profile_folder_path,
 )
 
 
