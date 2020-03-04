@@ -264,7 +264,7 @@ def show_medals_overview(self: CollectionStats, _old, achievements_repo):
 def _get_stats_header(deck_name, scope_is_whole_collection, period):
     scope_name = "your whole collection" if scope_is_whole_collection else f'deck "{deck_name}"'
     time_period_description = _get_time_period_description(period)
-    return f"Medals earned while reviewing {scope_name} {time_period_description}"
+    return f"Medals earned while reviewing {scope_name} {time_period_description}:"
 
 
 PERIOD_MONTH = 0
@@ -277,7 +277,7 @@ def _get_time_period_description(period):
     elif period == PERIOD_YEAR:
         return "over the past year"
     else:
-        return "over all time"
+        return "over the deck's life"
 
 
 def _get_start_datetime_for_period(period):
