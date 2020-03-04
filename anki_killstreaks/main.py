@@ -14,7 +14,7 @@ Modifications by jac241 <https://github.com/jac241> for Anki Killstreaks addon
 """
 
 from datetime import datetime, timedelta
-from functools import partial
+from functools import partial, wraps
 import os
 import random
 from threading import Thread
@@ -28,142 +28,54 @@ from anki.hooks import addHook, wrap
 from anki.stats import CollectionStats
 
 from anki_killstreaks.config import local_conf
-from anki_killstreaks.controllers import ReviewingController, build_on_answer_wrapper
-from anki_killstreaks.persistence import (
-    migrate_database,
-    get_db_connection,
-    AchievementsRepository,
+from anki_killstreaks.controllers import (
+    ProfileController,
+    ReviewingController,
+    build_on_answer_wrapper,
 )
-from anki_killstreaks.streaks import InitialStreakState, HALO_MULTIKILL_STATES, \
-    HALO_KILLING_SPREE_STATES, Store
 from anki_killstreaks.views import MedalsOverviewHTML, TodaysMedalsJS, TodaysMedalsForDeckJS
 from anki_killstreaks._vendor import attr
 
 
-@attr.s
-class ProfileController:
-    """
-    Class that contains the parts of the application that need to change
-    when the profile changes. This class (plus potentially others like it)
-    will be bound to all of the Anki classes. Whenever a user changes profiles,
-    the state contained in this class will be mutated to reflect the new
-    profile. This ensures that the hooks and method wrapping around Anki objects
-    only occurs once. This is necessary because their is no way to unwrap methods or
-    unbind hook handlers.
-    """
-    _db_settings = attr.ib(default=None)
-    _achievements_repo = attr.ib(default=None)
-    _reviewing_controller = attr.ib(default=None)
-
-    def load_profile(self):
-        self._db_settings = migrate_database()
-
-        with get_db_connection(self._db_settings) as db_connection:
-            store = Store(
-                state_machines=[
-                    InitialStreakState(
-                        states=HALO_MULTIKILL_STATES,
-                        interval_s=local_conf["multikill_interval_s"]
-                    ),
-                    InitialStreakState(
-                        states=HALO_KILLING_SPREE_STATES,
-                        interval_s=local_conf["killing_spree_interval_s"]
-                    )
-                ]
-            )
-
-            self._achievements_repo = AchievementsRepository(
-                db_connection=db_connection,
-            )
-
-            self._reviewing_controller = ReviewingController(
-                store=store,
-                achievements_repo=self._achievements_repo,
-                show_achievements=show_tool_tip_if_medals,
-            )
-
-    def get_db_settings(self):
-        """
-        not using properties or attr built in methods because we need to be
-        able to bind the getters for certain wrapping functions in the add-on
-        """
-        return self._db_settings
-
-    def get_achievements_repo(self):
-        return self._achievements_repo
-
-    def on_show_question(self):
-        self._reviewing_controller.on_show_question()
-
-    def on_show_answer(self):
-        self._reviewing_controller.on_show_answer()
-
-    def on_answer(self, *args, **kwargs):
-        self._reviewing_controller.on_answer(*args, **kwargs)
-
-    def unload_profile(self):
-        self._db_settings = None
-        self._reviewing_controller = None
-        self._acheivements_repo = None
+def show_tool_tip_if_medals(displayable_medals):
+    if len(displayable_medals) > 0:
+        showToolTip(displayable_medals)
 
 
-profile_controller = ProfileController()
+_profile_controller = ProfileController(
+    local_conf=local_conf,
+    show_achievements=show_tool_tip_if_medals,
+)
 
 
 def main():
-    addHook("profileLoaded", _load_addon_for_profile)
-    addHook("unloadProfile", profile_controller.unload_profile)
+    _wrap_anki_objects(_profile_controller)
+    addHook("unloadProfile", _profile_controller.unload_profile)
 
 
-def _load_addon_for_profile():
-    profile_controller.load_profile()
-    _wrap_anki_objects()
-    # db_settings = migrate_database()
-
-    # with get_db_connection(db_settings) as db_connection:
-        # store = Store(
-            # state_machines=[
-                # InitialStreakState(
-                    # states=HALO_MULTIKILL_STATES,
-                    # interval_s=local_conf["multikill_interval_s"]
-                # ),
-                # InitialStreakState(
-                    # states=HALO_KILLING_SPREE_STATES,
-                    # interval_s=local_conf["killing_spree_interval_s"]
-                # )
-            # ]
-        # )
-
-        # achievements_repo = AchievementsRepository(
-            # db_connection=db_connection,
-        # )
-
-        # reviewing_controller = ReviewingController(
-            # store=store,
-            # achievements_repo=achievements_repo,
-            # show_achievements=show_tool_tip_if_medals,
-        # )
-
-        # Reviewer._answerCard = wrap(
-            # Reviewer._answerCard,
-            # partial(build_on_answer_wrapper, on_answer=reviewing_controller.on_answer),
-            # 'before',
-        # )
-
-def _wrap_anki_objects():
+def _wrap_anki_objects(profile_controller):
+    """
+    profileLoaded hook fired after deck broswer gets shown(???), so we can't
+    actually rely on that hook for anything... To get around this,
+    made a decorator that I'll decorate any method that uses the profile
+    controller to make sure it's loaded
+    """
     addHook("showQuestion", profile_controller.on_show_question)
     addHook("showAnswer", profile_controller.on_show_answer)
 
     Reviewer._answerCard = wrap(
         Reviewer._answerCard,
-        partial(build_on_answer_wrapper, on_answer=profile_controller.on_answer),
+        partial(
+            build_on_answer_wrapper,
+            on_answer=profile_controller.on_answer
+        ),
         'before',
     )
 
     todays_medals_injector = partial(
         inject_medals_with_js,
         view=TodaysMedalsJS,
-        get_db_settings=profile_controller.get_db_settings
+        get_achievements_repo=profile_controller.get_achievements_repo,
     )
 
     DeckBrowser.refresh = wrap(
@@ -180,7 +92,7 @@ def _wrap_anki_objects():
         old=Overview.refresh,
         new=partial(
             inject_medals_for_deck_overview,
-            get_db_settings=profile_controller.get_db_settings
+            get_achievements_repo=profile_controller.get_achievements_repo
         ),
         pos="after"
     )
@@ -194,9 +106,9 @@ def _wrap_anki_objects():
     )
 
 
-def show_tool_tip_if_medals(displayable_medals):
-    if len(displayable_medals) > 0:
-        showToolTip(displayable_medals)
+def _ensure_profile_controller_loaded():
+    if not _profile_controller.is_loaded:
+        _profile_controller.load_profile()
 
 
 _tooltipTimer = None
@@ -261,49 +173,29 @@ def medal_html(medal):
     )
 
 
-def inject_medals_with_js(
-    self: Overview,
-    get_db_settings,
-    view
-):
-    def compute_then_inject():
-        with get_db_connection(get_db_settings()) as db_connection:
-            achievements_repo = AchievementsRepository(
-                db_connection=db_connection,
+def inject_medals_with_js(self: Overview, get_achievements_repo, view):
+    self.mw.web.eval(
+        view(
+            achievements=get_achievements_repo().todays_achievements(
+                cutoff_time(self)
             )
-
-            self.mw.web.eval(
-                view(
-                    achievements=achievements_repo.todays_achievements(
-                        cutoff_time(self)
-                    )
-                )
-            )
-
-    Thread(target=compute_then_inject).start()
+        )
+    )
 
 
-def inject_medals_for_deck_overview(self: Overview, get_db_settings):
-    def compute_then_inject():
-        with get_db_connection(get_db_settings()) as db_connection:
-            achievements_repo = AchievementsRepository(
-                db_connection=db_connection,
-            )
+def inject_medals_for_deck_overview(self: Overview, get_achievements_repo):
+    decks = get_current_deck_and_children(deck_manager=self.mw.col.decks)
+    deck_ids = [d.id_ for d in decks]
 
-            decks = get_current_deck_and_children(deck_manager=self.mw.col.decks)
-            deck_ids = [d.id_ for d in decks]
-
-            self.mw.web.eval(
-                TodaysMedalsForDeckJS(
-                    achievements=achievements_repo.todays_achievements_for_deck_ids(
-                        day_start_time=cutoff_time(self),
-                        deck_ids=deck_ids
-                    ),
-                    deck=decks[0]
-                )
-            )
-
-    Thread(target=compute_then_inject).start()
+    self.mw.web.eval(
+        TodaysMedalsForDeckJS(
+            achievements=get_achievements_repo().todays_achievements_for_deck_ids(
+                day_start_time=cutoff_time(self),
+                deck_ids=deck_ids
+            ),
+            deck=decks[0]
+        )
+    )
 
 
 @attr.s
