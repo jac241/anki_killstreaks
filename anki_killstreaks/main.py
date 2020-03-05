@@ -34,6 +34,7 @@ from anki_killstreaks.controllers import (
     ReviewingController,
     build_on_answer_wrapper,
 )
+from anki_killstreaks.persistence import day_start_time, min_datetime
 from anki_killstreaks.views import MedalsOverviewHTML, TodaysMedalsJS, TodaysMedalsForDeckJS
 from anki_killstreaks._vendor import attr
 
@@ -188,7 +189,7 @@ def inject_medals_with_js(self: Overview, get_achievements_repo, view):
     self.mw.web.eval(
         view(
             achievements=get_achievements_repo().todays_achievements(
-                cutoff_time(self)
+                cutoff_datetime(self)
             )
         )
     )
@@ -201,7 +202,7 @@ def inject_medals_for_deck_overview(self: Overview, get_achievements_repo):
     self.mw.web.eval(
         TodaysMedalsForDeckJS(
             achievements=get_achievements_repo().todays_achievements_for_deck_ids(
-                day_start_time=cutoff_time(self),
+                day_start_time=cutoff_datetime(self),
                 deck_ids=deck_ids
             ),
             deck=decks[0]
@@ -278,7 +279,7 @@ def _get_start_datetime_for_period(period):
     elif period == PERIOD_YEAR:
         return datetime.now() - timedelta(days=365)
     else:
-        return datetime.min
+        return min_datetime
 
 
 def _get_achievements_scoped_to_deck_or_collection(
@@ -298,10 +299,8 @@ def _get_achievements_scoped_to_deck_or_collection(
         )
 
 
-def cutoff_time(self):
-    one_day_s = 86400
-    rolloverHour = self.mw.col.conf.get("rollover", 4)
-    return self.mw.col.sched.dayCutoff - (rolloverHour * 3600) - one_day_s
+def cutoff_datetime(self):
+    return day_start_time(rollover_hour=self.mw.col.conf.get("rollover", 4))
 
 
 main()

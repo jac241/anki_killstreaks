@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, timezone
 from pathlib import Path
 import sqlite3
 
 import pytest
-from anki_killstreaks.persistence import DbSettings, migrate_database, AchievementsRepository
+from anki_killstreaks.persistence import DbSettings, migrate_database, AchievementsRepository, day_start_time
 from anki_killstreaks.streaks import MultikillMedalState, NewAchievement
 
 
@@ -52,11 +52,11 @@ def test_AchievementsRepository_todays_achievements_returns_achievements_grouped
 
     achievements_repo.conn.execute(
         "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
-        ("Double Kill", datetime.now() - timedelta(days=2), 0)
+        ("Double Kill", datetime.now().astimezone(timezone.utc) - timedelta(days=2), 0)
     )
 
-    day_start_time = datetime.combine(datetime.today().date(), datetime.min.time())
-    result = achievements_repo.todays_achievements(day_start_time.timestamp())
+    # I guess don't run this at 4am lol
+    result = achievements_repo.todays_achievements(day_start_time(rollover_hour=4))
 
     assert result['Double Kill'] == 1
 
@@ -76,7 +76,7 @@ def test_AchievementsRepository_todays_achievements_returns_achievements_for_tod
 
     day_start_time = datetime.combine(datetime.today().date(), datetime.min.time())
     result = achievements_repo.todays_achievements_for_deck_ids(
-        day_start_time=day_start_time.timestamp(),
+        day_start_time=day_start_time,
         deck_ids=[0]
     )
 
@@ -129,3 +129,22 @@ def test_AchievementsRepository_achievements_for_whole_collection_since_returns_
     )
 
     assert result['Double Kill'] == 3
+
+
+def test_day_start_time_should_return_4am_today_if_it_is_after_4am():
+    result = day_start_time(rollover_hour=4)
+
+    today = datetime.today()
+    assert result == datetime(
+        year=today.year, month=today.month, day=today.day, hour=4
+    )
+
+
+def test_day_start_time_should_return_4_am_yesterday_if_it_is_before_4am_today():
+    midnight_today = datetime.combine(datetime.now().date(), datetime.min.time())
+    result = day_start_time(rollover_hour=4, current_time=midnight_today)
+
+    yesterday = datetime.today() - timedelta(days=1)
+    assert result == datetime(
+        year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=4
+    )

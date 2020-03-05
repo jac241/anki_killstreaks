@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, date, timezone, time
 import itertools
 from pathlib import Path
 import sqlite3
@@ -12,6 +12,7 @@ from anki_killstreaks.streaks import get_all_displayable_medals
 
 
 this_addon_path = Path(__file__).parent.absolute()
+min_datetime = datetime(year=2019, month=12, day=25) # day I started making the addon :-)
 
 
 @attr.s(frozen=True)
@@ -63,7 +64,7 @@ class AchievementsRepository:
             ((a.medal_name, a.deck_id) for a in new_achievements)
         )
 
-    # This whole method can be replaced with a groupby count(*) on medal_id
+    # only used by tests, should eliminate
     def all(self):
         cursor = self.conn.execute("SELECT * FROM achievements")
 
@@ -90,12 +91,9 @@ class AchievementsRepository:
 
 
     def todays_achievements(self, day_start_time):
-        """
-        :param day_start_time unix epoch time corresponding to when day starts
-        """
-        return self.count_by_medal_id(created_at_gt=datetime.utcfromtimestamp(day_start_time))
+        return self.count_by_medal_id(created_at_gt=day_start_time)
 
-    def count_by_medal_id(self, created_at_gt=datetime.min):
+    def count_by_medal_id(self, created_at_gt=min_datetime):
         cursor = self.conn.execute(
             """
             SELECT medal_id, count(*)
@@ -103,17 +101,15 @@ class AchievementsRepository:
             WHERE created_at > ?
             GROUP BY medal_id
             """,
-            (created_at_gt,)
+            (created_at_gt.astimezone(timezone.utc),)
         )
 
         return dict(row for row in cursor)
 
     def todays_achievements_for_deck_ids(self, day_start_time, deck_ids):
-        created_at_gt = datetime.utcfromtimestamp(day_start_time)
-
         return self.achievements_for_deck_ids_since(
             deck_ids=deck_ids,
-            since_datetime=created_at_gt
+            since_datetime=day_start_time
         )
 
     def achievements_for_deck_ids_since(self, deck_ids, since_datetime):
@@ -125,7 +121,7 @@ class AchievementsRepository:
                 deck_id in ({','.join('?' for i in deck_ids)})
             GROUP BY medal_id
             """,
-            (since_datetime, *deck_ids)
+            (since_datetime.astimezone(timezone.utc), *deck_ids)
         )
 
         return dict(row for row in cursor)
@@ -138,11 +134,10 @@ class AchievementsRepository:
             WHERE created_at > ?
             GROUP BY medal_id
             """,
-            (since_datetime,)
+            (since_datetime.astimezone(timezone.utc),)
         )
 
         return dict(row for row in cursor)
-
 
 
 @attr.s
@@ -163,3 +158,11 @@ class PersistedAchievement:
     @property
     def medal_img_src(self):
         return self.medal.medal_image
+
+
+def day_start_time(rollover_hour, current_time=datetime.now()):
+    if current_time.hour > rollover_hour:
+        return datetime.combine(current_time.date(), time(hour=rollover_hour))
+    else:
+        yesterday = current_time - timedelta(days=1)
+        return datetime.combine(yesterday.date(), time(hour=rollover_hour))
