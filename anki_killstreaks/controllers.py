@@ -130,15 +130,24 @@ class ProfileController:
     def get_reviewing_controller(self):
         return self._reviewing_controller
 
+    @ensure_loaded
+    def get_settings_repo(self):
+        with get_db_connection(self._db_settings) as db_connection:
+            return SettingsRepository(db_connection=db_connection)
 
-def call_on_provided(get_object, method, *args, **kwargs):
+    def toggle_auto_switch_game(self, should_auto_switch_game):
+        pass
+
+
+
+def call_on_object_from_factory_func(method, factory_function, *args, **kwargs):
     """
     This function takes a factory method, and then calls the passed method
     on the created object with the passed arguments. This lets us not delegate
     to the reviewing controller within the ProfileController.
     """
     def call_method(*args, **kwargs):
-        return getattr(get_object(), method)(*args, **kwargs)
+        return getattr(factory_function(), method)(*args, **kwargs)
     return call_method
 
 
@@ -179,16 +188,3 @@ def build_on_answer_wrapper(reviewer, ease, on_answer):
     deck_id = reviewer.mw.col.decks.current()['id']
     on_answer(ease=ease, deck_id=deck_id)
 
-
-@attr.s
-class GameController:
-    _profile_controller = attr.ib()
-
-    def load_current_game_id(self):
-        with self._profile_controller.get_db_connection() as db_connection:
-            return SettingsRepository(db_connection).current_game_id
-
-    def set_current_game_id(self, game_id):
-        with self._profile_controller.get_db_connection() as db_connection:
-            SettingsRepository(db_connection).current_game_id = game_id
-            self._profile_controller.change_game(game_id=game_id)

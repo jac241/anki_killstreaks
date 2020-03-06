@@ -184,3 +184,5 @@ class SettingsRepository:
             (game_id,)
         )
 
+    def toggle_auto_switch_game(self):
+        return True

@@ -174,3 +174,7 @@ def test_SettingsRepository_current_game_id_should_return_default_game_id_on_fir
 def test_SettingsRepository_current_game_id_should_be_able_to_be_saved(settings_repo):
     settings_repo.current_game_id = "new_game"
     assert settings_repo.current_game_id == "new_game"
+
+def test_SettingsRepository_toggle_auto_switch_game_should_do_what_it_says(settings_repo):
+    result = settings_repo.toggle_auto_switch_game()
+    assert result
