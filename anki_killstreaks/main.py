@@ -232,11 +232,11 @@ def medal_html(medal):
     return """
         <td valign="middle" style="text-align:center">
             <img src="{img_src}">
-            <center><b>{name}!</b><br></center>
+            <center><b>{call}!</b><br></center>
         </td>
     """.format(
         img_src=medal.medal_image,
-        name=medal.name,
+        call=medal.call,
     )
 
 

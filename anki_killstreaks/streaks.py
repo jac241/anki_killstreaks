@@ -65,6 +65,12 @@ class MultikillMedalState(MultikillMixin):
     medal_image = attr.ib()
     rank = attr.ib()
     game_id = attr.ib()
+    _call = attr.ib(default=None)
+
+    @property
+    def call(self):
+        return self._call if self._call else self.name
+
 
 
 class EndState(MultikillMixin):
@@ -92,6 +98,11 @@ class KillingSpreeMedalState(KillingSpreeMixin):
     medal_image = attr.ib()
     rank = attr.ib()
     game_id = attr.ib()
+    _call = attr.ib(default=None)
+
+    @property
+    def call(self):
+        return self._call if self._call else self.name
 
 
 class KillingSpreeEndState(KillingSpreeMixin):
@@ -107,6 +118,8 @@ class InitialStreakState:
         self._states = states
         self._interval_s = interval_s
         self._current_streak_index = current_streak_index
+        # If you switch games while reviewing, need to have a time to start with
+        self._initialized_at = datetime.now()
 
     def on_show_question(self):
         return QuestionShownState(
@@ -115,6 +128,27 @@ class InitialStreakState:
             current_streak_index=self._current_streak_index,
             question_shown_at=datetime.now()
         )
+
+    # For case of switching games while reviewing
+    def on_show_answer(self):
+        return AnswerShownState(
+            states=self._states,
+            question_shown_at=self._initialized_at,
+            answer_shown_at=datetime.now(),
+            interval_s=self._interval_s,
+            current_streak_index=self._current_streak_index
+        )
+
+    def on_answer(self, card_did_pass):
+        answer_state = AnswerShownState(
+            states=self._states,
+            question_shown_at=self._initialized_at,
+            answer_shown_at=datetime.now(),
+            interval_s=self._interval_s,
+            current_streak_index=self._current_streak_index
+        )
+
+        return answer_state.on_answer(card_did_pass)
 
     @property
     def current_medal_state(self):
@@ -482,59 +516,67 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeNoMedalState(rank=2),
     KillingSpreeMedalState(
         id_='mw2_uav',
-        medal_image=image_path('Killing_Spree_Medal.png'),
+        medal_image=image_path('mw2/uav.webp.png'),
         name='UAV',
         game_id='mw2',
-        rank=3
+        call='UAV recon standing by',
+        rank=3,
     ),
     KillingSpreeMedalState(
         id_='mw2_care_package',
-        medal_image=image_path('Killing_Spree_Medal.png'),
+        medal_image=image_path('mw2/care_package.webp.png'),
         name='Care Package',
         game_id='mw2',
+        call='Care package waiting for your mark',
         rank=4
     ),
     KillingSpreeMedalState(
         id_='mw2_predator_missile',
-        medal_image=image_path('Killing_Spree_Medal.png'),
+        medal_image=image_path('mw2/predator_missile.webp.png'),
         name='Predator Missile',
         game_id='mw2',
+        call='Predator missile ready for launch',
         rank=5
     ),
     KillingSpreeMedalState(
         id_='mw2_precision_airstrike',
-        medal_image=image_path('Killing_Spree_Medal.png'),
+        medal_image=image_path('mw2/precision_airstrike.webp.png'),
         name='Precision Airstrike',
         game_id='mw2',
+        call='Airstrike standing by',
         rank=6
     ),
     KillingSpreeMedalState(
         id_='mw2_harrier_strike',
-        medal_image=image_path('Killing_Spree_Medal.png'),
+        medal_image=image_path('mw2/harrier_strike.webp.png'),
         name='Harrier Strike',
         game_id='mw2',
+        call="Harrier's waiting for your mark",
         rank=7
     ),
     KillingSpreeMedalState(
         id_='mw2_emergency_airdrop',
-        medal_image=image_path('Killing_Frenzy_Medal.webp.png'),
+        medal_image=image_path('mw2/emergency_airdrop.webp.png'),
         name='Emergency Airdrop',
         game_id='mw2',
+        call="Emergency airdrop, show us where you want it",
         rank=8
     ),
     KillingSpreeMedalState(
         id_='mw2_pave_low',
-        medal_image=image_path('Killing_Frenzy_Medal.webp.png'),
+        medal_image=image_path('mw2/pave_low.webp.png'),
         name='Pave Low',
         game_id='mw2',
+        call="Pave low ready for deployment",
         rank=9
     ),
     KillingSpreeNoMedalState(rank=10),
     KillingSpreeMedalState(
         id_='mw2_chopper_gunner',
-        medal_image=image_path('Killing_Frenzy_Medal.webp.png'),
-        name='Killing Frenzy',
+        medal_image=image_path('mw2/chopper_gunner.webp.png'),
+        name='Chopper Gunner',
         game_id='mw2',
+        call="Chopper ready for deployment",
         rank=11
     ),
     KillingSpreeNoMedalState(rank=12),
@@ -542,9 +584,10 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeNoMedalState(rank=14),
     KillingSpreeMedalState(
         id_='mw2_emp',
-        medal_image=image_path('Running_Riot_Medal.webp.png'),
+        medal_image=image_path('mw2/emp.webp.png'),
         name='EMP',
         game_id='mw2',
+        call="EMP ready to go",
         rank=15
     ),
     KillingSpreeNoMedalState(rank=16),
@@ -558,9 +601,10 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeNoMedalState(rank=24),
     KillingSpreeMedalState(
         id_='mw2_tactical_nuke',
-        medal_image=image_path('Untouchable_Medal.webp.png'),
+        medal_image=image_path('mw2/tactical_nuke.webp.png'),
         name='Tactical Nuke',
         game_id='mw2',
+        call="Tactical nuke ready, turn the key",
         rank=25
     ),
     KillingSpreeEndState(rank=26),
