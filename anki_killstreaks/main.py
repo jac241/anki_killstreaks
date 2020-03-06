@@ -34,6 +34,7 @@ from anki_killstreaks.controllers import (
     ReviewingController,
     build_on_answer_wrapper,
     GameController,
+    call_on_provided,
 )
 from anki_killstreaks.persistence import day_start_time, min_datetime
 from anki_killstreaks.streaks import get_stores_by_game_id
@@ -87,14 +88,20 @@ def _wrap_anki_objects(profile_controller):
     """
     addHook("unloadProfile", _profile_controller.unload_profile)
 
-    addHook("showQuestion", profile_controller.on_show_question)
-    addHook("showAnswer", profile_controller.on_show_answer)
+    # Need to make sure we call these methods on the current reviewing controller
+    call_on_reviewing_controller = partial(
+        call_on_provided,
+        profile_controller.get_reviewing_controller,
+    )
+
+    addHook("showQuestion", call_on_reviewing_controller('on_show_question'))
+    addHook("showAnswer", call_on_reviewing_controller('on_show_answer'))
 
     Reviewer._answerCard = wrap(
         Reviewer._answerCard,
         partial(
             build_on_answer_wrapper,
-            on_answer=profile_controller.on_answer
+            on_answer=call_on_reviewing_controller('on_answer')
         ),
         'before',
     )

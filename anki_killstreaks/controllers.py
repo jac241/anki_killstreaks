@@ -114,19 +114,6 @@ class ProfileController:
     def get_db_connection(self):
         return get_db_connection(self._db_settings)
 
-    # delegate to reviewing controller
-    @ensure_loaded
-    def on_show_question(self):
-        self._reviewing_controller.on_show_question()
-
-    @ensure_loaded
-    def on_show_answer(self):
-        self._reviewing_controller.on_show_answer()
-
-    @ensure_loaded
-    def on_answer(self, *args, **kwargs):
-        self._reviewing_controller.on_answer(*args, **kwargs)
-
     def change_game(self, game_id):
         self._reviewing_controller = ReviewingController(
             store=self._stores_by_game_id[game_id],
@@ -139,6 +126,20 @@ class ProfileController:
         with get_db_connection(self._db_settings) as db_connection:
             return SettingsRepository(db_connection).current_game_id
 
+    @ensure_loaded
+    def get_reviewing_controller(self):
+        return self._reviewing_controller
+
+
+def call_on_provided(get_object, method, *args, **kwargs):
+    """
+    This function takes a factory method, and then calls the passed method
+    on the created object with the passed arguments. This lets us not delegate
+    to the reviewing controller within the ProfileController.
+    """
+    def call_method(*args, **kwargs):
+        return getattr(get_object(), method)(*args, **kwargs)
+    return call_method
 
 
 # for handling undo, make Action class that takes store instance,
