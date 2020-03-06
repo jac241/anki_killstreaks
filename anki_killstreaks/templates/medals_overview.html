@@ -33,7 +33,7 @@ game-medals
     display: block;
   }
 </style>
-<center>
+<center id="anki_killstreaks">
   <h2>{{ header_text }}</h2>
   {% for game_id, medal_types in medal_types_by_game_id.items() %}
     <div class="{{ game_classes(game_id, selected_game_id) }}" data-game-id="{{ game_id }}">

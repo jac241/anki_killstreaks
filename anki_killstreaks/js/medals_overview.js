@@ -10,5 +10,9 @@
 
       this.classList.toggle("game-medals--current", shouldShowGame);
     });
+    var ksElement = document.querySelector("#anki_killstreaks");
+    var topOfKsElement = ksElement.getBoundingClientRect().top;
+
+    window.scrollTo(window.scrollX, topOfKsElement);
   });
 })(jQuery);
