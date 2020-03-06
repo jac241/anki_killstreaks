@@ -166,3 +166,21 @@ def day_start_time(rollover_hour, current_time=datetime.now()):
     else:
         yesterday = current_time - timedelta(days=1)
         return datetime.combine(yesterday.date(), time(hour=rollover_hour))
+
+
+class SettingsRepository:
+    def __init__(self, db_connection):
+        self.conn = db_connection
+
+    @property
+    def current_game_id(self):
+        cursor = self.conn.execute("SELECT current_game_id FROM settings;")
+        return cursor.fetchone()[0]
+
+    @current_game_id.setter
+    def current_game_id(self, game_id):
+        self.conn.execute(
+            "UPDATE settings SET current_game_id = ?",
+            (game_id,)
+        )
+

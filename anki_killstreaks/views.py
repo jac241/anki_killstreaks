@@ -33,9 +33,6 @@ def AppendingInjector(html):
     return f"$('body').append(String.raw`{html}`);".replace("\n", " ")
 
 
-
-
-
 def medal_types(achievement_count_by_medal_id: dict):
     medal_count_pairs = join(
         leftseq=get_all_displayable_medals(),

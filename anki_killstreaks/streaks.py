@@ -12,6 +12,9 @@ from os.path import join, dirname
 from anki_killstreaks._vendor import attr
 
 
+DEFAULT_GAME_ID = 'halo_3'
+
+
 class MultikillMixin:
     def requirements_met(
         self,

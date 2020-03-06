@@ -3,8 +3,18 @@ from pathlib import Path
 import sqlite3
 
 import pytest
-from anki_killstreaks.persistence import DbSettings, migrate_database, AchievementsRepository, day_start_time
-from anki_killstreaks.streaks import MultikillMedalState, NewAchievement
+from anki_killstreaks.persistence import (
+    DbSettings,
+    migrate_database,
+    AchievementsRepository,
+    day_start_time,
+    SettingsRepository,
+)
+from anki_killstreaks.streaks import (
+    MultikillMedalState,
+    NewAchievement,
+    DEFAULT_GAME_ID,
+)
 
 
 def test_migrate_database_creates_a_medals_database(db_settings):
@@ -148,3 +158,17 @@ def test_day_start_time_should_return_4_am_yesterday_if_it_is_before_4am_today()
     assert result == datetime(
         year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=4
     )
+
+
+@pytest.fixture
+def settings_repo(db_connection):
+    return SettingsRepository(db_connection=db_connection)
+
+
+def test_SettingsRepository_current_game_id_should_return_default_game_id_on_first_run(settings_repo):
+    assert settings_repo.current_game_id == DEFAULT_GAME_ID
+
+
+def test_SettingsRepository_current_game_id_should_be_able_to_be_saved(settings_repo):
+    settings_repo.current_game_id = "new_game"
+    assert settings_repo.current_game_id == "new_game"

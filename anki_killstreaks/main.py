@@ -33,6 +33,7 @@ from anki_killstreaks.controllers import (
     ProfileController,
     ReviewingController,
     build_on_answer_wrapper,
+    MenuController,
 )
 from anki_killstreaks.persistence import day_start_time, min_datetime
 from anki_killstreaks.views import MedalsOverviewHTML, TodaysMedalsJS, TodaysMedalsForDeckJS
@@ -59,10 +60,14 @@ _profile_controller = ProfileController(
     get_profile_folder_path=_get_profile_folder_path,
 )
 
+_menu_controller = MenuController(
+    profile_controller=_profile_controller
+)
+
 
 def main():
     _wrap_anki_objects(_profile_controller)
-    addHook("unloadProfile", _profile_controller.unload_profile)
+    _connect_menu(main_window=mw, menu_controller=_menu_controller)
 
 
 def _wrap_anki_objects(profile_controller):
@@ -72,6 +77,8 @@ def _wrap_anki_objects(profile_controller):
     made a decorator that I'll decorate any method that uses the profile
     controller to make sure it's loaded
     """
+    addHook("unloadProfile", _profile_controller.unload_profile)
+
     addHook("showQuestion", profile_controller.on_show_question)
     addHook("showAnswer", profile_controller.on_show_answer)
 
@@ -118,9 +125,54 @@ def _wrap_anki_objects(profile_controller):
     )
 
 
-def _ensure_profile_controller_loaded():
-    if not _profile_controller.is_loaded:
-        _profile_controller.load_profile()
+selected_game = 'halo_3'
+
+
+def check_correct_game_in_menu(menu_actions_by_game_id, menu_controller):
+    current_game_id = menu_controller.load_current_game_id()
+
+    for game_id, action in menu_actions_by_game_id.items():
+        if game_id == current_game_id:
+            action.setChecked(True)
+        else:
+            action.setChecked(False)
+
+
+def select_game(game):
+    global selected_game
+    selected_game = game
+
+
+def _connect_menu(main_window, menu_controller):
+    top_menu = QMenu('Killstreaks', main_window)
+    game_menu = QMenu('Select game', main_window)
+
+    halo_3_action = game_menu.addAction('Halo 3')
+    halo_3_action.setCheckable(True)
+    halo_3_action.triggered.connect(
+        partial(menu_controller.set_current_game_id, game_id='halo_3')
+    )
+
+    mw2_action = game_menu.addAction('Call of Duty: Modern Warfare 2')
+    mw2_action.setCheckable(True)
+    mw2_action.triggered.connect(
+        partial(menu_controller.set_current_game_id, game_id='mw2')
+    )
+
+    top_menu.addMenu(game_menu)
+
+    game_menu.aboutToShow.connect(
+        partial(
+            check_correct_game_in_menu,
+            menu_actions_by_game_id=dict(
+                halo_3=halo_3_action,
+                mw2=mw2_action
+            ),
+            menu_controller=menu_controller,
+        )
+    )
+
+    main_window.form.menubar.addMenu(top_menu)
 
 
 _tooltipTimer = None

@@ -17,6 +17,7 @@ from anki_killstreaks.persistence import (
     DbSettings,
     get_db_connection,
     AchievementsRepository,
+    SettingsRepository,
 )
 from anki_killstreaks.streaks import (
     did_card_pass,
@@ -51,6 +52,10 @@ class ProfileController:
     unbind hook handlers.
 
     Unfortunate that this basically became a god object...
+
+
+    Get placed in front of accessors to let you know they rely on profile
+    dependent state that changes when you switch profiles.
     """
     # required attributes for class
     _local_conf = attr.ib()
@@ -114,6 +119,9 @@ class ProfileController:
     def get_achievements_repo(self):
         return self._achievements_repo
 
+    def get_db_connection(self):
+        return get_db_connection(self._db_settings)
+
     # delegate to reviewing controller
     @ensure_loaded
     def on_show_question(self):
@@ -127,6 +135,10 @@ class ProfileController:
     def on_answer(self, *args, **kwargs):
         self._reviewing_controller.on_answer(*args, **kwargs)
 
+    # def change_game(self, game_id):
+        # pass
+
+
 
 # for handling undo, make Action class that takes store instance,
 # repo instance, and answer and has undo and redo (or call) methods
@@ -135,7 +147,6 @@ class ProfileController:
 # list? when undo hit, pop the stack and call undo on the action,
 # replacing the controller's current store instance with the
 # popped action's.
-
 class ReviewingController:
     def __init__(self, store, achievements_repo, show_achievements):
         self.store = store
@@ -166,3 +177,18 @@ def build_on_answer_wrapper(reviewer, ease, on_answer):
     deck_id = reviewer.mw.col.decks.current()['id']
     on_answer(ease=ease, deck_id=deck_id)
 
+
+# TODO Rename GameController ha
+@attr.s
+class MenuController:
+    _profile_controller = attr.ib()
+    # _game_stores = attr.ib()
+
+    def load_current_game_id(self):
+        with self._profile_controller.get_db_connection() as db_connection:
+            return SettingsRepository(db_connection).current_game_id
+
+    def set_current_game_id(self, game_id):
+        with self._profile_controller.get_db_connection() as db_connection:
+            SettingsRepository(db_connection).current_game_id = game_id
+            self._profile_controller.change_game(game_id=game_id)
