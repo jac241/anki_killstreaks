@@ -103,6 +103,7 @@ def _wrap_anki_objects(profile_controller):
         inject_medals_with_js,
         view=TodaysMedalsJS,
         get_achievements_repo=profile_controller.get_achievements_repo,
+        get_current_game_id=profile_controller.get_current_game_id,
     )
 
     DeckBrowser.refresh = wrap(
@@ -115,19 +116,23 @@ def _wrap_anki_objects(profile_controller):
         new=todays_medals_injector,
         pos="after"
     )
+
     Overview.refresh = wrap(
         old=Overview.refresh,
         new=partial(
             inject_medals_for_deck_overview,
-            get_achievements_repo=profile_controller.get_achievements_repo
+            get_achievements_repo=profile_controller.get_achievements_repo,
+            get_current_game_id=profile_controller.get_current_game_id,
         ),
         pos="after"
     )
+
     CollectionStats.todayStats = wrap(
         old=CollectionStats.todayStats,
         new=partial(
             show_medals_overview,
-            get_achievements_repo=profile_controller.get_achievements_repo
+            get_achievements_repo=profile_controller.get_achievements_repo,
+            get_current_game_id=profile_controller.get_current_game_id,
         ),
         pos="around"
     )
@@ -245,18 +250,28 @@ def medal_html(medal):
     )
 
 
-def inject_medals_with_js(self: Overview, get_achievements_repo, view):
+def inject_medals_with_js(
+    self: Overview,
+    get_achievements_repo,
+    get_current_game_id,
+    view
+):
     self.mw.web.eval(
         view(
             achievements=get_achievements_repo().todays_achievements(
                 cutoff_datetime(self)
-            )
+            ),
+            current_game_id=get_current_game_id()
         )
     )
     self.mw.web.eval(js_content('medals_overview.js'))
 
 
-def inject_medals_for_deck_overview(self: Overview, get_achievements_repo):
+def inject_medals_for_deck_overview(
+    self: Overview,
+    get_achievements_repo,
+    get_current_game_id,
+):
     decks = get_current_deck_and_children(deck_manager=self.mw.col.decks)
     deck_ids = [d.id_ for d in decks]
 
@@ -266,7 +281,8 @@ def inject_medals_for_deck_overview(self: Overview, get_achievements_repo):
                 day_start_time=cutoff_datetime(self),
                 deck_ids=deck_ids
             ),
-            deck=decks[0]
+            deck=decks[0],
+            current_game_id=get_current_game_id()
         )
     )
     self.mw.web.eval(js_content('medals_overview.js'))
@@ -291,7 +307,12 @@ def get_current_deck_and_children(deck_manager):
     return [current_deck, *children]
 
 
-def show_medals_overview(self: CollectionStats, _old, get_achievements_repo):
+def show_medals_overview(
+    self: CollectionStats,
+    _old,
+    get_achievements_repo,
+    get_current_game_id,
+):
     # if self.wholeCollection:
     current_deck = self.col.decks.current()["name"]
 
@@ -312,7 +333,8 @@ def show_medals_overview(self: CollectionStats, _old, get_achievements_repo):
 
     return _old(self) + MedalsOverviewHTML(
         achievements=achievements,
-        header_text=header_text
+        header_text=header_text,
+        current_game_id=get_current_game_id()
     )
 
 

@@ -23,5 +23,6 @@ def test_MedalsOverviewJS_smoke_test():
     assert TodaysMedalsJS(
         {
             'Double Kill': 2
-        }
+        },
+        current_game_id='halo_3',
     )

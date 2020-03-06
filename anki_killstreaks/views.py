@@ -9,19 +9,24 @@ from anki_killstreaks.streaks import get_all_displayable_medals, all_game_ids
 from anki_killstreaks._vendor import jinja2
 
 
-def MedalsOverviewHTML(achievements, header_text):
-    return MedalsOverview(medal_types(achievements), header_text) + MedalsOverviewScript()
+def MedalsOverviewHTML(achievements, header_text, current_game_id):
+    return MedalsOverview(
+        medal_types=medal_types(achievements),
+        header_text=header_text,
+        current_game_id=current_game_id,
+    ) + MedalsOverviewScript()
 
 
 def MedalsOverviewScript():
     return f"<script>{js_content('medals_overview.js')}</script>"
 
 
-def TodaysMedalsJS(achievements):
+def TodaysMedalsJS(achievements, current_game_id):
     return AppendingInjector(
         html=MedalsOverview(
             medal_types=medal_types(achievements),
-            header_text="All medals earned today:"
+            header_text="All medals earned today:",
+            current_game_id=current_game_id,
         )
     )
 
@@ -99,7 +104,11 @@ _template_loader = jinja2.FileSystemLoader(searchpath=_templates_dir)
 _template_env = jinja2.Environment(loader=_template_loader)
 
 
-def MedalsOverview(medal_types, header_text="Medals earned this session:"):
+def MedalsOverview(
+    medal_types,
+    current_game_id,
+    header_text="Medals earned this session:",
+):
     template = _template_env.get_template('medals_overview.html')
     return template.render(
         medal_types_by_game_id=medal_types_by_game_id(medal_types, all_game_ids),
@@ -108,7 +117,7 @@ def MedalsOverview(medal_types, header_text="Medals earned this session:"):
             halo_3="Halo 3",
             mw2="Call of Duty: Modern Warfare 2",
         ),
-        selected_game_id="halo_3",
+        selected_game_id=current_game_id,
     )
 
 def js_content(filename):

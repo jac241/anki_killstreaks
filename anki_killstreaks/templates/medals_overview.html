@@ -59,7 +59,7 @@ game-medals
   <label for="game_select">Show medals for game:</label>
   <select id="game_select">
     {% for game_id, name in game_names_by_id.items() %}
-      <option value="{{ game_id }}">{{ name }}</option>
+      <option value="{{ game_id }}" {{ "selected" if game_id == selected_game_id else "" }}>{{ name }}</option>
     {% endfor %}
     <option value="_all">All games</option>
   </select>

@@ -134,6 +134,11 @@ class ProfileController:
             show_achievements=self._show_achievements
         )
 
+    @ensure_loaded
+    def get_current_game_id(self):
+        with get_db_connection(self._db_settings) as db_connection:
+            return SettingsRepository(db_connection).current_game_id
+
 
 
 # for handling undo, make Action class that takes store instance,
