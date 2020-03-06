@@ -37,7 +37,12 @@ from anki_killstreaks.controllers import (
 )
 from anki_killstreaks.persistence import day_start_time, min_datetime
 from anki_killstreaks.streaks import get_stores_by_game_id
-from anki_killstreaks.views import MedalsOverviewHTML, TodaysMedalsJS, TodaysMedalsForDeckJS
+from anki_killstreaks.views import (
+    MedalsOverviewHTML,
+    TodaysMedalsJS,
+    TodaysMedalsForDeckJS,
+    js_content,
+)
 from anki_killstreaks._vendor import attr
 
 
@@ -248,6 +253,7 @@ def inject_medals_with_js(self: Overview, get_achievements_repo, view):
             )
         )
     )
+    self.mw.web.eval(js_content('medals_overview.js'))
 
 
 def inject_medals_for_deck_overview(self: Overview, get_achievements_repo):
@@ -263,6 +269,7 @@ def inject_medals_for_deck_overview(self: Overview, get_achievements_repo):
             deck=decks[0]
         )
     )
+    self.mw.web.eval(js_content('medals_overview.js'))
 
 
 @attr.s

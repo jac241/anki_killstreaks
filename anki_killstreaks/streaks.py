@@ -13,6 +13,7 @@ from anki_killstreaks._vendor import attr
 
 
 DEFAULT_GAME_ID = 'halo_3'
+all_game_ids = ['halo_3', 'mw2']
 
 
 class MultikillMixin:

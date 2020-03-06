@@ -38,6 +38,20 @@ def groupby(key, seq):
         rv[k] = v.__self__
     return rv
 
+
+def getter(index):
+    if isinstance(index, list):
+        if len(index) == 1:
+            index = index[0]
+            return lambda x: (x[index],)
+        elif index:
+            return operator.itemgetter(*index)
+        else:
+            return lambda x: ()
+    else:
+        return operator.itemgetter(index)
+
+
 def join(leftkey, leftseq, rightkey, rightseq,
          left_default=no_default, right_default=no_default):
     """ Join two sequences on common attributes
