@@ -32,6 +32,9 @@ game-medals
   .game-medals.game-medals--current {
     display: block;
   }
+  p.small {
+    font-size: .8em
+  }
 </style>
 <center id="anki_killstreaks">
   <h2>{{ header_text }}</h2>
@@ -60,4 +63,8 @@ game-medals
     {% endfor %}
     <option value="_all">All games</option>
   </select>
+  <p class="small">
+    To change which game's medals you earn while reviewing, use the Killstreaks
+    menu in Anki's menu bar.
+  </p>
 </center>
