@@ -61,7 +61,7 @@ class AchievementsRepository:
     def create_all(self, new_achievements):
         self.conn.executemany(
             "INSERT INTO achievements(medal_id, deck_id) VALUES (?, ?)",
-            ((a.medal_name, a.deck_id) for a in new_achievements)
+            ((a.medal_id, a.deck_id) for a in new_achievements)
         )
 
     # only used by tests, should eliminate

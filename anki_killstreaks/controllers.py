@@ -26,6 +26,7 @@ from anki_killstreaks.streaks import (
     InitialStreakState,
     HALO_MULTIKILL_STATES,
     HALO_KILLING_SPREE_STATES,
+    get_stores_by_game_id,
 )
 
 
@@ -61,6 +62,7 @@ class ProfileController:
     _local_conf = attr.ib()
     _show_achievements = attr.ib()
     _get_profile_folder_path = attr.ib()
+    _stores_by_game_id = attr.ib()
 
     # Attributes modified in load_profile
     is_loaded = attr.ib(default=False)
@@ -76,18 +78,8 @@ class ProfileController:
         migrate_database(settings=self._db_settings)
 
         with get_db_connection(self._db_settings) as db_connection:
-            store = Store(
-                state_machines=[
-                    InitialStreakState(
-                        states=HALO_MULTIKILL_STATES,
-                        interval_s=self._local_conf["multikill_interval_s"]
-                    ),
-                    InitialStreakState(
-                        states=HALO_KILLING_SPREE_STATES,
-                        interval_s=self._local_conf["killing_spree_interval_s"]
-                    )
-                ]
-            )
+            settings_repo = SettingsRepository(db_connection)
+            store = self._stores_by_game_id[settings_repo.current_game_id]
 
             self._achievements_repo = AchievementsRepository(
                 db_connection=db_connection,
@@ -135,8 +127,12 @@ class ProfileController:
     def on_answer(self, *args, **kwargs):
         self._reviewing_controller.on_answer(*args, **kwargs)
 
-    # def change_game(self, game_id):
-        # pass
+    def change_game(self, game_id):
+        self._reviewing_controller = ReviewingController(
+            store=self._stores_by_game_id[game_id],
+            achievements_repo=self._achievements_repo,
+            show_achievements=self._show_achievements
+        )
 
 
 
@@ -178,11 +174,9 @@ def build_on_answer_wrapper(reviewer, ease, on_answer):
     on_answer(ease=ease, deck_id=deck_id)
 
 
-# TODO Rename GameController ha
 @attr.s
-class MenuController:
+class GameController:
     _profile_controller = attr.ib()
-    # _game_stores = attr.ib()
 
     def load_current_game_id(self):
         with self._profile_controller.get_db_connection() as db_connection:

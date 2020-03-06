@@ -31,9 +31,11 @@ def achievements_repo(db_connection):
 def a_new_achievement():
     return NewAchievement(
         medal=MultikillMedalState(
+            id_='Double Kill',
             name='Double Kill',
             medal_image=None,
-            rank=2
+            rank=2,
+            game_id='halo_3'
         ),
         deck_id=0
     )

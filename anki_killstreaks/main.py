@@ -33,9 +33,10 @@ from anki_killstreaks.controllers import (
     ProfileController,
     ReviewingController,
     build_on_answer_wrapper,
-    MenuController,
+    GameController,
 )
 from anki_killstreaks.persistence import day_start_time, min_datetime
+from anki_killstreaks.streaks import get_stores_by_game_id
 from anki_killstreaks.views import MedalsOverviewHTML, TodaysMedalsJS, TodaysMedalsForDeckJS
 from anki_killstreaks._vendor import attr
 
@@ -53,21 +54,23 @@ def _get_profile_folder_path(profile_manager=mw.pm):
 
     return Path(folder)
 
+_stores_by_game_id = get_stores_by_game_id(config=local_conf)
 
 _profile_controller = ProfileController(
     local_conf=local_conf,
     show_achievements=show_tool_tip_if_medals,
     get_profile_folder_path=_get_profile_folder_path,
+    stores_by_game_id=_stores_by_game_id,
 )
 
-_menu_controller = MenuController(
+_game_controller = GameController(
     profile_controller=_profile_controller
 )
 
 
 def main():
     _wrap_anki_objects(_profile_controller)
-    _connect_menu(main_window=mw, menu_controller=_menu_controller)
+    _connect_menu(main_window=mw, game_controller=_game_controller)
 
 
 def _wrap_anki_objects(profile_controller):
@@ -128,8 +131,8 @@ def _wrap_anki_objects(profile_controller):
 selected_game = 'halo_3'
 
 
-def check_correct_game_in_menu(menu_actions_by_game_id, menu_controller):
-    current_game_id = menu_controller.load_current_game_id()
+def check_correct_game_in_menu(menu_actions_by_game_id, game_controller):
+    current_game_id = game_controller.load_current_game_id()
 
     for game_id, action in menu_actions_by_game_id.items():
         if game_id == current_game_id:
@@ -143,20 +146,20 @@ def select_game(game):
     selected_game = game
 
 
-def _connect_menu(main_window, menu_controller):
+def _connect_menu(main_window, game_controller):
     top_menu = QMenu('Killstreaks', main_window)
     game_menu = QMenu('Select game', main_window)
 
     halo_3_action = game_menu.addAction('Halo 3')
     halo_3_action.setCheckable(True)
     halo_3_action.triggered.connect(
-        partial(menu_controller.set_current_game_id, game_id='halo_3')
+        partial(game_controller.set_current_game_id, game_id='halo_3')
     )
 
     mw2_action = game_menu.addAction('Call of Duty: Modern Warfare 2')
     mw2_action.setCheckable(True)
     mw2_action.triggered.connect(
-        partial(menu_controller.set_current_game_id, game_id='mw2')
+        partial(game_controller.set_current_game_id, game_id='mw2')
     )
 
     top_menu.addMenu(game_menu)
@@ -168,7 +171,7 @@ def _connect_menu(main_window, menu_controller):
                 halo_3=halo_3_action,
                 mw2=mw2_action
             ),
-            menu_controller=menu_controller,
+            game_controller=game_controller,
         )
     )
 

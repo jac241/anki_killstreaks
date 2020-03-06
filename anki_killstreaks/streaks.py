@@ -55,14 +55,16 @@ class MultikillFirstAnswerState(MultikillMixin):
     rank = 1
 
 
+@attr.s(frozen=True)
 class MultikillMedalState(MultikillMixin):
     is_displayable_medal = True
     num_states_to_advance_if_on_streak = 1
 
-    def __init__(self, name, medal_image, rank):
-        self.name = name
-        self.medal_image = medal_image
-        self.rank = rank
+    id_ = attr.ib()
+    name = attr.ib()
+    medal_image = attr.ib()
+    rank = attr.ib()
+    game_id = attr.ib()
 
 
 class EndState(MultikillMixin):
@@ -80,14 +82,16 @@ class KillingSpreeNoMedalState(KillingSpreeMixin):
         self.rank = rank
 
 
+@attr.s(frozen=True)
 class KillingSpreeMedalState(KillingSpreeMixin):
     is_displayable_medal = True
     num_states_to_advance_if_on_streak = 1
 
-    def __init__(self, name, medal_image, rank):
-        self.name = name
-        self.medal_image = medal_image
-        self.rank = rank
+    id_ = attr.ib()
+    name = attr.ib()
+    medal_image = attr.ib()
+    rank = attr.ib()
+    game_id = attr.ib()
 
 
 class KillingSpreeEndState(KillingSpreeMixin):
@@ -294,6 +298,10 @@ class NewAchievement:
     deck_id = attr.ib()
 
     @property
+    def medal_id(self):
+        return self.medal.id_
+
+    @property
     def medal_name(self):
         return self.medal.name
 
@@ -306,48 +314,66 @@ HALO_MULTIKILL_STATES = [
     MultikillStartingState(),
     MultikillFirstAnswerState(),
     MultikillMedalState(
+        id_='Double Kill',
         medal_image=image_path('Doublekill_Medal.webp.png'),
         name='Double Kill',
+        game_id='halo_3',
         rank=2
     ),
     MultikillMedalState(
+        id_='Triple Kill',
         medal_image=image_path('Triplekill_Medal.webp.png'),
         name='Triple Kill',
+        game_id='halo_3',
         rank=3
     ),
     MultikillMedalState(
+        id_='Overkill',
         medal_image=image_path('Overkill_Medal.png'),
         name='Overkill',
+        game_id='halo_3',
         rank=4
     ),
     MultikillMedalState(
+        id_='Killtacular',
         medal_image=image_path('Killtacular_Medal.webp.png'),
         name='Killtacular',
+        game_id='halo_3',
         rank=5
     ),
     MultikillMedalState(
+        id_='Killtrocity',
         medal_image=image_path('Killtrocity_Medal.webp.png'),
         name='Killtrocity',
+        game_id='halo_3',
         rank=6
     ),
     MultikillMedalState(
+        id_='Killimanjaro',
         medal_image=image_path('Killimanjaro_Medal.webp.png'),
         name='Killimanjaro',
+        game_id='halo_3',
         rank=7
     ),
     MultikillMedalState(
+        id_='Killtastrophe',
         medal_image=image_path('Killtastrophe_Medal.webp.png'),
         name='Killtastrophe',
+        game_id='halo_3',
         rank=8
     ),
     MultikillMedalState(
+        id_='Killpocalypse',
         medal_image=image_path('Killpocalypse_Medal.webp.png'),
         name='Killpocalypse',
+        game_id='halo_3',
         rank=9
     ),
     MultikillMedalState(
+        id_='Killionaire',
         medal_image=image_path('Killionaire_Medal.webp.png'),
         name='Killionaire',
+        game_id='halo_3',
         rank=10
     ),
     EndState(rank=11),
@@ -360,8 +386,10 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=3),
     KillingSpreeNoMedalState(rank=4),
     KillingSpreeMedalState(
+        id_='Killing Spree',
         medal_image=image_path('Killing_Spree_Medal.png'),
         name='Killing Spree',
+        game_id='halo_3',
         rank=5
     ),
     KillingSpreeNoMedalState(rank=6),
@@ -369,8 +397,10 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=8),
     KillingSpreeNoMedalState(rank=9),
     KillingSpreeMedalState(
+        id_='Killing Frenzy',
         medal_image=image_path('Killing_Frenzy_Medal.webp.png'),
         name='Killing Frenzy',
+        game_id='halo_3',
         rank=10
     ),
     KillingSpreeNoMedalState(rank=11),
@@ -378,8 +408,10 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=13),
     KillingSpreeNoMedalState(rank=14),
     KillingSpreeMedalState(
+        id_='Running Riot',
         medal_image=image_path('Running_Riot_Medal.webp.png'),
         name='Running Riot',
+        game_id='halo_3',
         rank=15
     ),
     KillingSpreeNoMedalState(rank=16),
@@ -387,8 +419,10 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=18),
     KillingSpreeNoMedalState(rank=19),
     KillingSpreeMedalState(
+        id_='Rampage',
         medal_image=image_path('Rampage_Medal.webp.png'),
         name='Rampage',
+        game_id='halo_3',
         rank=20
     ),
     KillingSpreeNoMedalState(rank=21),
@@ -396,8 +430,10 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=23),
     KillingSpreeNoMedalState(rank=24),
     KillingSpreeMedalState(
+        id_='Untouchable',
         medal_image=image_path('Untouchable_Medal.webp.png'),
         name='Untouchable',
+        game_id='halo_3',
         rank=25
     ),
     KillingSpreeNoMedalState(rank=26),
@@ -405,8 +441,10 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=28),
     KillingSpreeNoMedalState(rank=29),
     KillingSpreeMedalState(
+        id_='Invincible',
         medal_image=image_path('Invincible_Medal.webp.png'),
         name='Invincible',
+        game_id='halo_3',
         rank=30
     ),
     KillingSpreeNoMedalState(rank=31),
@@ -429,20 +467,138 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=48),
     KillingSpreeNoMedalState(rank=49),
     KillingSpreeMedalState(
+        id_='Perfection',
         medal_image=image_path('Perfection_Medal.webp.png'),
         name='Perfection',
+        game_id='halo_3',
         rank=50
     ),
     KillingSpreeEndState(rank=51),
 ]
 
+MW2_KILLSTREAK_STATES = [
+    KillingSpreeNoMedalState(rank=0),
+    KillingSpreeNoMedalState(rank=1),
+    KillingSpreeNoMedalState(rank=2),
+    KillingSpreeMedalState(
+        id_='mw2_uav',
+        medal_image=image_path('Killing_Spree_Medal.png'),
+        name='UAV',
+        game_id='mw2',
+        rank=3
+    ),
+    KillingSpreeMedalState(
+        id_='mw2_care_package',
+        medal_image=image_path('Killing_Spree_Medal.png'),
+        name='Care Package',
+        game_id='mw2',
+        rank=4
+    ),
+    KillingSpreeMedalState(
+        id_='mw2_predator_missile',
+        medal_image=image_path('Killing_Spree_Medal.png'),
+        name='Predator Missile',
+        game_id='mw2',
+        rank=5
+    ),
+    KillingSpreeMedalState(
+        id_='mw2_precision_airstrike',
+        medal_image=image_path('Killing_Spree_Medal.png'),
+        name='Precision Airstrike',
+        game_id='mw2',
+        rank=6
+    ),
+    KillingSpreeMedalState(
+        id_='mw2_harrier_strike',
+        medal_image=image_path('Killing_Spree_Medal.png'),
+        name='Harrier Strike',
+        game_id='mw2',
+        rank=7
+    ),
+    KillingSpreeMedalState(
+        id_='mw2_emergency_airdrop',
+        medal_image=image_path('Killing_Frenzy_Medal.webp.png'),
+        name='Emergency Airdrop',
+        game_id='mw2',
+        rank=8
+    ),
+    KillingSpreeMedalState(
+        id_='mw2_pave_low',
+        medal_image=image_path('Killing_Frenzy_Medal.webp.png'),
+        name='Pave Low',
+        game_id='mw2',
+        rank=9
+    ),
+    KillingSpreeNoMedalState(rank=10),
+    KillingSpreeMedalState(
+        id_='mw2_chopper_gunner',
+        medal_image=image_path('Killing_Frenzy_Medal.webp.png'),
+        name='Killing Frenzy',
+        game_id='mw2',
+        rank=11
+    ),
+    KillingSpreeNoMedalState(rank=12),
+    KillingSpreeNoMedalState(rank=13),
+    KillingSpreeNoMedalState(rank=14),
+    KillingSpreeMedalState(
+        id_='mw2_emp',
+        medal_image=image_path('Running_Riot_Medal.webp.png'),
+        name='EMP',
+        game_id='mw2',
+        rank=15
+    ),
+    KillingSpreeNoMedalState(rank=16),
+    KillingSpreeNoMedalState(rank=17),
+    KillingSpreeNoMedalState(rank=18),
+    KillingSpreeNoMedalState(rank=19),
+    KillingSpreeNoMedalState(rank=20),
+    KillingSpreeNoMedalState(rank=21),
+    KillingSpreeNoMedalState(rank=22),
+    KillingSpreeNoMedalState(rank=23),
+    KillingSpreeNoMedalState(rank=24),
+    KillingSpreeMedalState(
+        id_='mw2_tactical_nuke',
+        medal_image=image_path('Untouchable_Medal.webp.png'),
+        name='Tactical Nuke',
+        game_id='mw2',
+        rank=25
+    ),
+    KillingSpreeEndState(rank=26),
+    ]
+
+
 def get_all_displayable_medals():
     all_medals = itertools.chain(
         HALO_MULTIKILL_STATES,
         HALO_KILLING_SPREE_STATES,
+        MW2_KILLSTREAK_STATES,
     )
     return filter(
         lambda m: m.is_displayable_medal,
         all_medals
+    )
+
+def get_stores_by_game_id(config):
+    return dict(
+        halo_3=Store(
+            state_machines=[
+                InitialStreakState(
+                    states=HALO_MULTIKILL_STATES,
+                    interval_s=config["multikill_interval_s"]
+                ),
+                InitialStreakState(
+                    states=HALO_KILLING_SPREE_STATES,
+                    interval_s=config["killing_spree_interval_s"]
+                )
+            ]
+        ),
+        mw2=Store(
+            state_machines=[
+                InitialStreakState(
+                    states=MW2_KILLSTREAK_STATES,
+                    interval_s=config["killing_spree_interval_s"]
+                )
+            ]
+        )
     )
 

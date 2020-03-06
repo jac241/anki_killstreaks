@@ -14,7 +14,7 @@ def test_states_requirements_met_should_return_true_if_within_interval():
     states = [
         MultikillStartingState(),
         MultikillFirstAnswerState(),
-        MultikillMedalState(name='test', medal_image=None, rank=2),
+        MultikillMedalState(id_='t', name='test', medal_image=None, rank=2, game_id='tg'),
         EndState(rank=3)
     ]
 
@@ -58,7 +58,7 @@ def test_QuestionShownState_on_answer_should_advance():
     states = [
         MultikillStartingState(),
         MultikillFirstAnswerState(),
-        MultikillMedalState(name='test', medal_image=None, rank=2),
+        MultikillMedalState(id_='t', name='test', medal_image=None, rank=2, game_id='tg'),
         EndState(rank=3)
     ]
 
@@ -75,7 +75,13 @@ def test_QuestionShownState_on_answer_should_advance():
 def test_multikill_flow_should_work():
     states = [
         MultikillStartingState(),
-        MultikillMedalState(name='test', medal_image=None, rank=1),
+        MultikillMedalState(
+            id_='test',
+            name='test',
+            medal_image=None,
+            rank=2,
+            game_id='t',
+        ),
         EndState(rank=2)
     ]
 
@@ -96,7 +102,13 @@ def test_multikill_flow_should_work():
 def test_multikill_should_reset_when_again_pressed():
     states = [
         MultikillStartingState(),
-        MultikillMedalState(name='test', medal_image=None, rank=1),
+        MultikillMedalState(
+            id_='test',
+            name='test',
+            medal_image=None,
+            rank=2,
+            game_id='t',
+        ),
         EndState(rank=2)
     ]
 
@@ -117,7 +129,13 @@ def test_AnswerShownState_should_reset_to_QuestionShownState_when_recieves_on_sh
     """This can happen when card is buried with answer shown"""
     states = [
         MultikillStartingState(),
-        MultikillMedalState(name='test', medal_image=None, rank=1),
+        MultikillMedalState(
+            id_='test',
+            name='test',
+            medal_image=None,
+            rank=2,
+            game_id='t',
+        ),
         EndState(rank=2)
     ]
 
@@ -139,7 +157,13 @@ def test_AnswerShownState_should_go_to_index_1_if_answer_was_correct_but_out_of_
     states = [
         MultikillStartingState(),
         MultikillFirstAnswerState(),
-        MultikillMedalState(name='test', medal_image=None, rank=2),
+        MultikillMedalState(
+            id_='test',
+            name='test',
+            medal_image=None,
+            rank=2,
+            game_id='t',
+        ),
         EndState(rank=3)
     ]
 
@@ -172,7 +196,13 @@ def question_shown_state():
     return QuestionShownState(
         states=[
             MultikillStartingState(),
-            KillingSpreeMedalState(name='Double Kill', medal_image=None, rank=1),
+            MultikillMedalState(
+                id_='Double Kill',
+                name='Double Kill',
+                medal_image=None,
+                rank=1,
+                game_id='halo_3'
+            ),
             KillingSpreeEndState(rank=2)
         ],
         question_shown_at=datetime.now(),
@@ -184,7 +214,13 @@ def answer_shown_state():
     return AnswerShownState(
         states=[
             MultikillStartingState(),
-            KillingSpreeMedalState(name='test', medal_image=None, rank=1),
+            MultikillMedalState(
+                id_='Double Kill',
+                name='Double Kill',
+                medal_image=None,
+                rank=1,
+                game_id='halo_3'
+            ),
             KillingSpreeEndState(rank=2)
         ],
         question_shown_at=datetime.now(),

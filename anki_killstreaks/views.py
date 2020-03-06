@@ -37,7 +37,7 @@ def medal_types(achievement_count_by_medal_id: dict):
     medal_count_pairs = join(
         leftseq=get_all_displayable_medals(),
         rightseq=achievement_count_by_medal_id.items(),
-        leftkey=lambda dm: dm.name,
+        leftkey=lambda dm: dm.id_,
         rightkey=lambda ac: ac[0]
     )
 
