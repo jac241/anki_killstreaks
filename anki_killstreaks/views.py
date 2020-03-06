@@ -31,11 +31,12 @@ def TodaysMedalsJS(achievements, current_game_id):
     )
 
 
-def TodaysMedalsForDeckJS(achievements, deck):
+def TodaysMedalsForDeckJS(achievements, deck, current_game_id):
     return AppendingInjector(
         html=MedalsOverview(
             medal_types=medal_types(achievements),
-            header_text=f'Medals earned today reviewing deck "{deck.name}":'
+            header_text=f'Medals earned today reviewing deck "{deck.name}":',
+            current_game_id=current_game_id,
         )
     )
 
