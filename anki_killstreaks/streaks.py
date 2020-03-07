@@ -13,7 +13,7 @@ from anki_killstreaks._vendor import attr
 
 
 DEFAULT_GAME_ID = 'halo_3'
-all_game_ids = ['halo_3', 'mw2']
+all_game_ids = ['halo_3', 'mw2', 'halo_5']
 
 
 class MultikillMixin:
@@ -611,12 +611,186 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeEndState(rank=26),
     ]
 
+HALO_5_MULTIKILL_STATES = [
+    MultikillStartingState(),
+    MultikillFirstAnswerState(),
+    MultikillMedalState(
+        id_='halo_5_double_kill',
+        medal_image=image_path('halo_5/double_kill.png'),
+        name='Double Kill',
+        game_id='halo_5',
+        rank=2
+    ),
+    MultikillMedalState(
+        id_='halo_5_triple_Kill',
+        medal_image=image_path('halo_5/triple_kill.png'),
+        name='Triple Kill',
+        game_id='halo_5',
+        rank=3
+    ),
+    MultikillMedalState(
+        id_='halo_5_overkill',
+        medal_image=image_path('halo_5/overkill.png'),
+        name='Overkill',
+        game_id='halo_5',
+        rank=4
+    ),
+    MultikillMedalState(
+        id_='halo_5_killtacular',
+        medal_image=image_path('halo_5/killtacular.png'),
+        name='Killtacular',
+        game_id='halo_5',
+        rank=5
+    ),
+    MultikillMedalState(
+        id_='halo_5_killtrocity',
+        medal_image=image_path('halo_5/killtrocity.png'),
+        name='Killtrocity',
+        game_id='halo_5',
+        rank=6
+    ),
+    MultikillMedalState(
+        id_='halo_5_killimanjaro',
+        medal_image=image_path('halo_5/killimanjaro.png'),
+        name='Killimanjaro',
+        game_id='halo_5',
+        rank=7
+    ),
+    MultikillMedalState(
+        id_='halo_5_killtastrophe',
+        medal_image=image_path('halo_5/killtastrophe.png'),
+        name='Killtastrophe',
+        game_id='halo_5',
+        rank=8
+    ),
+    MultikillMedalState(
+        id_='halo_5_killpocalypse',
+        medal_image=image_path('halo_5/killpocalypse.png'),
+        name='Killpocalypse',
+        game_id='halo_5',
+        rank=9
+    ),
+    MultikillMedalState(
+        id_='halo_5_killionaire',
+        medal_image=image_path('halo_5/killionaire.png'),
+        name='Killionaire',
+        game_id='halo_5',
+        rank=10
+    ),
+    EndState(rank=11),
+]
+
+HALO_5_KILLING_SPREE_STATES = [
+    KillingSpreeNoMedalState(rank=0),
+    KillingSpreeNoMedalState(rank=1),
+    KillingSpreeNoMedalState(rank=2),
+    KillingSpreeNoMedalState(rank=3),
+    KillingSpreeNoMedalState(rank=4),
+    KillingSpreeMedalState(
+        id_='halo_5_killing_spree',
+        medal_image=image_path('halo_5/killing_Spree.png'),
+        name='Killing Spree',
+        game_id='halo_5',
+        rank=5
+    ),
+    KillingSpreeNoMedalState(rank=6),
+    KillingSpreeNoMedalState(rank=7),
+    KillingSpreeNoMedalState(rank=8),
+    KillingSpreeNoMedalState(rank=9),
+    KillingSpreeMedalState(
+        id_='halo_5_killing_frenzy',
+        medal_image=image_path('halo_5/killing_Frenzy.png'),
+        name='Killing Frenzy',
+        game_id='halo_5',
+        rank=10
+    ),
+    KillingSpreeNoMedalState(rank=11),
+    KillingSpreeNoMedalState(rank=12),
+    KillingSpreeNoMedalState(rank=13),
+    KillingSpreeNoMedalState(rank=14),
+    KillingSpreeMedalState(
+        id_='halo_5_running_riot',
+        medal_image=image_path('halo_5/running_riot.png'),
+        name='Running Riot',
+        game_id='halo_5',
+        rank=15
+    ),
+    KillingSpreeNoMedalState(rank=16),
+    KillingSpreeNoMedalState(rank=17),
+    KillingSpreeNoMedalState(rank=18),
+    KillingSpreeNoMedalState(rank=19),
+    KillingSpreeMedalState(
+        id_='halo_5_rampage',
+        medal_image=image_path('halo_5/rampage.png'),
+        name='Rampage',
+        game_id='halo_5',
+        rank=20
+    ),
+    KillingSpreeNoMedalState(rank=21),
+    KillingSpreeNoMedalState(rank=22),
+    KillingSpreeNoMedalState(rank=23),
+    KillingSpreeNoMedalState(rank=24),
+    KillingSpreeMedalState(
+        id_='halo_5_untouchable',
+        medal_image=image_path('halo_5/untouchable.png'),
+        name='Untouchable',
+        game_id='halo_5',
+        rank=25
+    ),
+    KillingSpreeNoMedalState(rank=26),
+    KillingSpreeNoMedalState(rank=27),
+    KillingSpreeNoMedalState(rank=28),
+    KillingSpreeNoMedalState(rank=29),
+    KillingSpreeMedalState(
+        id_='halo_5_invincible',
+        medal_image=image_path('halo_5/invincible.png'),
+        name='Invincible',
+        game_id='halo_5',
+        rank=30
+    ),
+    KillingSpreeNoMedalState(rank=31),
+    KillingSpreeNoMedalState(rank=32),
+    KillingSpreeNoMedalState(rank=33),
+    KillingSpreeNoMedalState(rank=34),
+    KillingSpreeNoMedalState(rank=35),
+    KillingSpreeNoMedalState(rank=36),
+    KillingSpreeNoMedalState(rank=37),
+    KillingSpreeNoMedalState(rank=38),
+    KillingSpreeNoMedalState(rank=39),
+    KillingSpreeMedalState(
+        id_='halo_5_unfriggenbelievable',
+        medal_image=image_path('halo_5/unfriggenbelievable.png'),
+        name='Unfriggen believable',
+        game_id='halo_5',
+        rank=40
+    ),
+    KillingSpreeNoMedalState(rank=41),
+    KillingSpreeNoMedalState(rank=42),
+    KillingSpreeNoMedalState(rank=43),
+    KillingSpreeNoMedalState(rank=44),
+    KillingSpreeNoMedalState(rank=45),
+    KillingSpreeNoMedalState(rank=46),
+    KillingSpreeNoMedalState(rank=47),
+    KillingSpreeNoMedalState(rank=48),
+    KillingSpreeNoMedalState(rank=49),
+    KillingSpreeMedalState(
+        id_='halo_5_perfection',
+        medal_image=image_path('halo_5/perfection.png'),
+        name='Perfection',
+        game_id='halo_5',
+        rank=50
+    ),
+    KillingSpreeEndState(rank=51),
+]
+
 
 def get_all_displayable_medals():
     all_medals = itertools.chain(
         HALO_MULTIKILL_STATES,
         HALO_KILLING_SPREE_STATES,
         MW2_KILLSTREAK_STATES,
+        HALO_5_MULTIKILL_STATES,
+        HALO_5_KILLING_SPREE_STATES,
     )
     return filter(
         lambda m: m.is_displayable_medal,
@@ -644,6 +818,18 @@ def get_stores_by_game_id(config):
                     interval_s=config["killing_spree_interval_s"]
                 )
             ]
-        )
+        ),
+        halo_5=Store(
+            state_machines=[
+                InitialStreakState(
+                    states=HALO_5_MULTIKILL_STATES,
+                    interval_s=config["multikill_interval_s"]
+                ),
+                InitialStreakState(
+                    states=HALO_5_KILLING_SPREE_STATES,
+                    interval_s=config["killing_spree_interval_s"]
+                )
+            ]
+        ),
     )
 

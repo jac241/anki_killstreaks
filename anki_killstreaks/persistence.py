@@ -79,7 +79,7 @@ class AchievementsRepository:
         matches = join(
             leftseq=get_all_displayable_medals(),
             rightseq=loaded_achievements,
-            leftkey=lambda dm: dm.name,
+            leftkey=lambda dm: dm.id_,
             rightkey=lambda la: la.medal_id
         )
 

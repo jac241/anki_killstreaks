@@ -117,6 +117,7 @@ def MedalsOverview(
         game_names_by_id=dict(
             halo_3="Halo 3",
             mw2="Call of Duty: Modern Warfare 2",
+            halo_5="Halo 5",
         ),
         selected_game_id=current_game_id,
     )
