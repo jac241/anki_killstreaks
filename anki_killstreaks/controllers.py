@@ -8,7 +8,7 @@ The goal of these controller classes is to have these be the only objects that
 hold state in the add-on. The other classes ideally should be immutable.
 This pattern has worked alright so far for this simple application.
 """
-from functools import wraps
+from functools import wraps, partial
 
 from anki_killstreaks._vendor import attr
 
@@ -27,6 +27,7 @@ from anki_killstreaks.streaks import (
     HALO_MULTIKILL_STATES,
     HALO_KILLING_SPREE_STATES,
     get_stores_by_game_id,
+    get_next_game_id,
 )
 
 
@@ -86,17 +87,30 @@ class ProfileController:
             )
 
             self._reviewing_controller = self._build_reviewing_controller(
-                game_id=settings_repo.current_game_id
+                game_id=settings_repo.current_game_id,
+                should_auto_switch_game=settings_repo.should_auto_switch_game,
             )
 
         self.is_loaded = True
 
-    def _build_reviewing_controller(self, game_id):
-        return ReviewingController(
+    def _build_reviewing_controller(self, game_id, should_auto_switch_game):
+        new_controller = ReviewingController(
             store=self._stores_by_game_id[game_id],
             achievements_repo=self._achievements_repo,
             show_achievements=self._show_achievements
         )
+
+        if should_auto_switch_game:
+            return AllMedalsAcheivedNotifier(
+                controller=new_controller,
+                remaining_medals=new_controller.all_displayable_medals,
+                notify=partial(
+                    self.change_game,
+                    game_id=get_next_game_id(current_game_id=game_id),
+                ),
+            )
+        else:
+            return new_controller
 
     def unload_profile(self):
         self._db_settings = None
@@ -105,7 +119,10 @@ class ProfileController:
         self.is_loaded = False
 
     def change_game(self, game_id):
-        self._reviewing_controller = self._build_reviewing_controller(game_id)
+        self._reviewing_controller = self._build_reviewing_controller(
+            game_id=game_id,
+            should_auto_switch_game=self.get_settings_repo().should_auto_switch_game
+        )
 
     def toggle_auto_switch_game(self, should_auto_switch_game):
         pass
@@ -176,11 +193,12 @@ class ReviewingController:
             [
                 NewAchievement(medal=medal, deck_id=deck_id)
                 for medal
-                in self.store.displayable_medals
+                in self.store.current_displayable_medals
             ]
         )
 
-        self.show_achievements(self.store.displayable_medals)
+        self.show_achievements(self.store.current_displayable_medals)
+        return self.store.current_displayable_medals
 
     def on_show_question(self):
         self.store = self.store.on_show_question()
@@ -188,8 +206,30 @@ class ReviewingController:
     def on_show_answer(self):
         self.store = self.store.on_show_answer()
 
+    @property
+    def all_displayable_medals(self):
+        return self.store.all_displayable_medals
+
 
 def build_on_answer_wrapper(reviewer, ease, on_answer):
     deck_id = reviewer.mw.col.decks.current()['id']
     on_answer(ease=ease, deck_id=deck_id)
 
+
+@attr.s
+class AllMedalsAcheivedNotifier:
+    _controller = attr.ib()
+    _remaining_medals = attr.ib(type=frozenset)
+    _notify = attr.ib()
+
+    def on_answer(self, *args, **kwargs):
+        earned_medals = self._controller.on_answer(*args, **kwargs)
+        self._remaining_medals -= frozenset(earned_medals)
+
+        if len(self._remaining_medals) == 0:
+            self._notify()
+
+        return earned_medals
+
+    def __getattr__(self, attr):
+        return getattr(self._controller, attr)

@@ -4,12 +4,13 @@ Anki Killstreaks add-on
 Copyright: (c) jac241 2019-2020 <https://github.com/jac241>
 License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 """
+import itertools
 from unittest.mock import Mock
 
 import pytest
 from tests.test_streaks import question_shown_state
 
-from anki_killstreaks.controllers import ReviewingController
+from anki_killstreaks.controllers import ReviewingController, AllMedalsAcheivedNotifier
 from anki_killstreaks.persistence import AchievementsRepository
 from anki_killstreaks.streaks import Store
 
@@ -81,3 +82,33 @@ def test_ReviewingController_on_show_answer_should_update_store(reviewing_contro
 
     assert type(reviewing_controller.store) == type(initial_store)
     assert reviewing_controller.store != initial_store
+
+
+def test_ReviewingController_all_displayable_medals_delegates_to_store(reviewing_controller):
+    assert reviewing_controller.all_displayable_medals == reviewing_controller.store.all_displayable_medals
+
+
+def test_AllMedalsAcheivedNotifier_should_call_callback_when_all_medals_acheived(reviewing_controller):
+    flag = False
+    def notify():
+        nonlocal flag
+        flag = True
+
+    notifier = AllMedalsAcheivedNotifier(
+        controller=reviewing_controller,
+        remaining_medals=reviewing_controller.all_displayable_medals,
+        notify=notify
+    )
+
+    all_medals = list(
+        itertools.chain.from_iterable(
+            m.states
+            for m
+            in reviewing_controller.store.state_machines
+        )
+    )
+
+    for _ in all_medals:
+        notifier.on_answer(ease=4, deck_id=0)
+
+    assert flag == True

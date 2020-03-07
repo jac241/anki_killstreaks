@@ -10,6 +10,46 @@ import pytest
 
 from anki_killstreaks.streaks import *
 
+
+@pytest.fixture
+def question_shown_state():
+    return QuestionShownState(
+        states=[
+            MultikillStartingState(),
+            MultikillMedalState(
+                id_='Double Kill',
+                name='Double Kill',
+                medal_image=None,
+                rank=1,
+                game_id='halo_3'
+            ),
+            KillingSpreeEndState(rank=2)
+        ],
+        question_shown_at=datetime.now(),
+    )
+
+
+@pytest.fixture
+def answer_shown_state():
+    return AnswerShownState(
+        states=[
+            MultikillStartingState(),
+            MultikillMedalState(
+                id_='Double Kill',
+                name='Double Kill',
+                medal_image=None,
+                rank=1,
+                game_id='halo_3'
+            ),
+            KillingSpreeEndState(rank=2)
+        ],
+        question_shown_at=datetime.now(),
+        answer_shown_at=datetime.now() + timedelta(seconds=1),
+        interval_s=8,
+        current_streak_index=0
+    )
+
+
 def test_states_requirements_met_should_return_true_if_within_interval():
     states = [
         MultikillStartingState(),
@@ -191,45 +231,6 @@ def test_should_be_able_to_get_perfection_medal_after_50_kills():
     assert state.current_medal_state.name == 'Perfection'
 
 
-@pytest.fixture
-def question_shown_state():
-    return QuestionShownState(
-        states=[
-            MultikillStartingState(),
-            MultikillMedalState(
-                id_='Double Kill',
-                name='Double Kill',
-                medal_image=None,
-                rank=1,
-                game_id='halo_3'
-            ),
-            KillingSpreeEndState(rank=2)
-        ],
-        question_shown_at=datetime.now(),
-    )
-
-
-@pytest.fixture
-def answer_shown_state():
-    return AnswerShownState(
-        states=[
-            MultikillStartingState(),
-            MultikillMedalState(
-                id_='Double Kill',
-                name='Double Kill',
-                medal_image=None,
-                rank=1,
-                game_id='halo_3'
-            ),
-            KillingSpreeEndState(rank=2)
-        ],
-        question_shown_at=datetime.now(),
-        answer_shown_at=datetime.now() + timedelta(seconds=1),
-        interval_s=8,
-        current_streak_index=0
-    )
-
-
 def test_Store_on_show_question_should_delegate_to_composing_states(answer_shown_state):
     store = Store(
         state_machines=[
@@ -278,6 +279,23 @@ def test_Store_displayable_medals_should_return_any_displayable_medals_earned(an
         ]
     )
 
-    medals = store.displayable_medals
+    medals = store.current_displayable_medals
     assert len(medals) == 1
     assert medals[0] == machine_with_medal.current_medal_state
+
+
+def test_Store_all_displayable_medals_should_return_all_set_of_possible_displayable_medals_from_machines(answer_shown_state):
+    store = Store(
+        state_machines=[
+            answer_shown_state,
+            answer_shown_state,
+        ]
+    )
+    all_displayable_medals = [
+        m
+        for m in answer_shown_state.states
+        if m.is_displayable_medal
+    ]
+
+    result = store.all_displayable_medals
+    assert len(result) == len(all_displayable_medals)

@@ -26,8 +26,7 @@ class MultikillMixin:
     ):
         delta = question_answered_at - question_shown_at
         return (
-            delta >= timedelta(seconds=min_interval_s) and
-            delta < timedelta(seconds=interval_s)
+                timedelta(seconds=min_interval_s) <= delta < timedelta(seconds=interval_s)
         )
 
 
@@ -116,7 +115,7 @@ class KillingSpreeEndState(KillingSpreeMixin):
 
 class InitialStreakState:
     def __init__(self, states, interval_s=8, current_streak_index=0):
-        self._states = states
+        self.states = states
         self._interval_s = interval_s
         self._current_streak_index = current_streak_index
         # If you switch games while reviewing, need to have a time to start with
@@ -124,7 +123,7 @@ class InitialStreakState:
 
     def on_show_question(self):
         return QuestionShownState(
-            states=self._states,
+            states=self.states,
             interval_s=self._interval_s,
             current_streak_index=self._current_streak_index,
             question_shown_at=datetime.now()
@@ -133,7 +132,7 @@ class InitialStreakState:
     # For case of switching games while reviewing
     def on_show_answer(self):
         return AnswerShownState(
-            states=self._states,
+            states=self.states,
             question_shown_at=self._initialized_at,
             answer_shown_at=datetime.now(),
             interval_s=self._interval_s,
@@ -142,7 +141,7 @@ class InitialStreakState:
 
     def on_answer(self, card_did_pass):
         answer_state = AnswerShownState(
-            states=self._states,
+            states=self.states,
             question_shown_at=self._initialized_at,
             answer_shown_at=datetime.now(),
             interval_s=self._interval_s,
@@ -153,7 +152,7 @@ class InitialStreakState:
 
     @property
     def current_medal_state(self):
-        return self._states[self._current_streak_index]
+        return self.states[self._current_streak_index]
 
 
 def did_card_pass(answer, again_answer=1):
@@ -192,13 +191,23 @@ class Store:
         )
 
     @property
-    def displayable_medals(self):
+    def current_displayable_medals(self):
         return [
             m.current_medal_state
             for m
             in self.state_machines
             if m.current_medal_state.is_displayable_medal
         ]
+
+    @property
+    def all_displayable_medals(self):
+        all_medals = itertools.chain.from_iterable(m.states for m in self.state_machines)
+
+        return frozenset(
+            medal
+            for medal in all_medals
+            if medal.is_displayable_medal
+        )
 
 
 class QuestionShownState:
@@ -209,14 +218,14 @@ class QuestionShownState:
         interval_s=8,
         current_streak_index=0
     ):
-        self._states = states
+        self.states = states
         self._question_shown_at = question_shown_at
         self._interval_s = interval_s
         self._current_streak_index = current_streak_index
 
     def on_show_question(self):
         return QuestionShownState(
-            states=self._states,
+            states=self.states,
             question_shown_at=datetime.now(),
             interval_s=self._interval_s,
             current_streak_index=self._current_streak_index
@@ -224,7 +233,7 @@ class QuestionShownState:
 
     def on_show_answer(self):
         return AnswerShownState(
-            states=self._states,
+            states=self.states,
             question_shown_at=self._question_shown_at,
             answer_shown_at=datetime.now(),
             interval_s=self._interval_s,
@@ -233,7 +242,7 @@ class QuestionShownState:
 
     def on_answer(self, card_did_pass):
         answer_state = AnswerShownState(
-            states=self._states,
+            states=self.states,
             question_shown_at=self._question_shown_at,
             answer_shown_at=datetime.now(),
             interval_s=self._interval_s,
@@ -245,7 +254,7 @@ class QuestionShownState:
 
     @property
     def current_medal_state(self):
-        return self._states[self._current_streak_index]
+        return self.states[self._current_streak_index]
 
 
 class AnswerShownState:
@@ -257,7 +266,7 @@ class AnswerShownState:
         interval_s,
         current_streak_index
     ):
-        self._states = states
+        self.states = states
         self._question_shown_at=question_shown_at
         self._answer_shown_at=answer_shown_at
         self._interval_s=interval_s
@@ -279,7 +288,7 @@ class AnswerShownState:
 
     def on_show_question(self):
         return QuestionShownState(
-            states=self._states,
+            states=self.states,
             question_shown_at=datetime.now(),
             interval_s=self._interval_s,
             current_streak_index=self._current_streak_index
@@ -300,7 +309,7 @@ class AnswerShownState:
 
     def _advanced_state_machine(self):
         return QuestionShownState(
-            states=self._states,
+            states=self.states,
             question_shown_at=datetime.now(),
             interval_s=self._interval_s,
             current_streak_index=self._current_streak_index + self.current_medal_state.num_states_to_advance_if_on_streak
@@ -308,7 +317,7 @@ class AnswerShownState:
 
     def _reset_state_machine(self, new_index=0):
         return QuestionShownState(
-            states=self._states,
+            states=self.states,
             question_shown_at=datetime.now(),
             interval_s=self._interval_s,
             current_streak_index=new_index
@@ -316,7 +325,7 @@ class AnswerShownState:
 
     @property
     def current_medal_state(self):
-        return self._states[self._current_streak_index]
+        return self.states[self._current_streak_index]
 
 
 images_dir = join(dirname(__file__), 'images')
@@ -832,3 +841,7 @@ def get_stores_by_game_id(config):
         ),
     )
 
+
+def get_next_game_id(current_game_id):
+    next_index = (all_game_ids.index(current_game_id) + 1) % len(all_game_ids)
+    return all_game_ids[next_index]
