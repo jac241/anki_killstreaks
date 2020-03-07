@@ -85,19 +85,30 @@ class ProfileController:
                 db_connection=db_connection,
             )
 
-            self._reviewing_controller = ReviewingController(
-                store=store,
-                achievements_repo=self._achievements_repo,
-                show_achievements=self._show_achievements,
+            self._reviewing_controller = self._build_reviewing_controller(
+                game_id=settings_repo.current_game_id
             )
 
         self.is_loaded = True
+
+    def _build_reviewing_controller(self, game_id):
+        return ReviewingController(
+            store=self._stores_by_game_id[game_id],
+            achievements_repo=self._achievements_repo,
+            show_achievements=self._show_achievements
+        )
 
     def unload_profile(self):
         self._db_settings = None
         self._reviewing_controller = None
         self._acheivements_repo = None
         self.is_loaded = False
+
+    def change_game(self, game_id):
+        self._reviewing_controller = self._build_reviewing_controller(game_id)
+
+    def toggle_auto_switch_game(self, should_auto_switch_game):
+        pass
 
     @ensure_loaded
     def get_db_settings(self):
@@ -114,13 +125,6 @@ class ProfileController:
     def get_db_connection(self):
         return get_db_connection(self._db_settings)
 
-    def change_game(self, game_id):
-        self._reviewing_controller = ReviewingController(
-            store=self._stores_by_game_id[game_id],
-            achievements_repo=self._achievements_repo,
-            show_achievements=self._show_achievements
-        )
-
     @ensure_loaded
     def get_current_game_id(self):
         with get_db_connection(self._db_settings) as db_connection:
@@ -135,12 +139,13 @@ class ProfileController:
         with get_db_connection(self._db_settings) as db_connection:
             return SettingsRepository(db_connection=db_connection)
 
-    def toggle_auto_switch_game(self, should_auto_switch_game):
-        pass
 
-
-
-def call_on_object_from_factory_func(method, factory_function, *args, **kwargs):
+def call_method_on_object_from_factory_function(
+    method,
+    factory_function,
+    *args,
+    **kwargs
+):
     """
     This function takes a factory method, and then calls the passed method
     on the created object with the passed arguments. This lets us not delegate

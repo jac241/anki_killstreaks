@@ -185,4 +185,11 @@ class SettingsRepository:
         )
 
     def toggle_auto_switch_game(self):
-        return True
+        cursor = self.conn.execute(
+            "UPDATE settings SET should_auto_switch_game = NOT should_auto_switch_game"
+        )
+
+    @property
+    def should_auto_switch_game(self):
+        cursor = self.conn.execute("SELECT should_auto_switch_game FROM settings;")
+        return cursor.fetchone()[0]

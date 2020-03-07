@@ -201,7 +201,6 @@ class Store:
         ]
 
 
-
 class QuestionShownState:
     def __init__(
         self,

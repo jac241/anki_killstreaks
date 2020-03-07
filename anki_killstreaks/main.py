@@ -33,7 +33,7 @@ from anki_killstreaks.controllers import (
     ProfileController,
     ReviewingController,
     build_on_answer_wrapper,
-    call_on_object_from_factory_func,
+    call_method_on_object_from_factory_function,
 )
 from anki_killstreaks.menu import connect_menu
 from anki_killstreaks.persistence import day_start_time, min_datetime
@@ -54,9 +54,6 @@ def show_tool_tip_if_medals(displayable_medals):
 
 def _get_profile_folder_path(profile_manager=mw.pm):
     folder = profile_manager.profileFolder()
-    # not sure when addons are loaded
-    assert folder
-
     return Path(folder)
 
 
@@ -82,23 +79,23 @@ def _wrap_anki_objects(profile_controller):
     made a decorator that I'll decorate any method that uses the profile
     controller to make sure it's loaded
     """
-    addHook("unloadProfile", _profile_controller.unload_profile)
+    addHook("unloadProfile", profile_controller.unload_profile)
 
     # Need to make sure we call these methods on the current reviewing controller.
-    # Reviewing controller can change.
-    call_on_reviewing_controller = partial(
-        call_on_object_from_factory_func,
+    # Reviewing controller instance changes when profile changes.
+    call_method_on_reviewing_controller = partial(
+        call_method_on_object_from_factory_function,
         factory_function=profile_controller.get_reviewing_controller,
     )
 
-    addHook("showQuestion", call_on_reviewing_controller('on_show_question'))
-    addHook("showAnswer", call_on_reviewing_controller('on_show_answer'))
+    addHook("showQuestion", call_method_on_reviewing_controller('on_show_question'))
+    addHook("showAnswer", call_method_on_reviewing_controller('on_show_answer'))
 
     Reviewer._answerCard = wrap(
         Reviewer._answerCard,
         partial(
             build_on_answer_wrapper,
-            on_answer=call_on_reviewing_controller('on_answer')
+            on_answer=call_method_on_reviewing_controller('on_answer')
         ),
         'before',
     )

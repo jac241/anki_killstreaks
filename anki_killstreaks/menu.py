@@ -5,6 +5,7 @@ from anki_killstreaks.game import (
     load_current_game_id,
     set_current_game_id,
     toggle_auto_switch_game,
+    load_auto_switch_game_status,
 )
 
 
@@ -78,7 +79,10 @@ def connect_menu(main_window, profile_controller):
         partial(
             set_check_for_auto_switch_game,
             action=auto_switch_game_action,
-            load_auto_switch_game_status=lambda: None
+            load_auto_switch_game_status=partial(
+                load_auto_switch_game_status,
+                get_settings_repo=profile_controller.get_settings_repo,
+            )
         )
     )
 
@@ -96,6 +100,6 @@ def check_correct_game_in_menu(menu_actions_by_game_id, load_current_game_id):
 
 
 def set_check_for_auto_switch_game(action, load_auto_switch_game_status):
-    action.setChecked(False)
+    action.setChecked(load_auto_switch_game_status())
 
 

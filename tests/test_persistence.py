@@ -175,6 +175,18 @@ def test_SettingsRepository_current_game_id_should_be_able_to_be_saved(settings_
     settings_repo.current_game_id = "new_game"
     assert settings_repo.current_game_id == "new_game"
 
+
 def test_SettingsRepository_toggle_auto_switch_game_should_do_what_it_says(settings_repo):
-    result = settings_repo.toggle_auto_switch_game()
-    assert result
+    settings_repo.conn.execute("UPDATE settings SET should_auto_switch_game = ?", (True,))
+    settings_repo.toggle_auto_switch_game()
+    assert settings_repo.should_auto_switch_game == False
+
+
+def test_SettingsRepository_auto_switch_game_status_should_return_stored_status(settings_repo):
+    settings_repo.conn.execute("UPDATE settings SET should_auto_switch_game = ?", (True,))
+    assert settings_repo.should_auto_switch_game == True
+
+
+def test_SettingsRepository_should_auto_switch_games_defaults_to_false(settings_repo):
+    assert settings_repo.should_auto_switch_game == False
+
