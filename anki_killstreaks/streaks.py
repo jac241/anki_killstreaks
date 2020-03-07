@@ -688,7 +688,7 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=4),
     KillingSpreeMedalState(
         id_='halo_5_killing_spree',
-        medal_image=image_path('halo_5/killing_Spree.png'),
+        medal_image=image_path('halo_5/killing_spree.png'),
         name='Killing Spree',
         game_id='halo_5',
         rank=5
@@ -699,7 +699,7 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=9),
     KillingSpreeMedalState(
         id_='halo_5_killing_frenzy',
-        medal_image=image_path('halo_5/killing_Frenzy.png'),
+        medal_image=image_path('halo_5/killing_frenzy.png'),
         name='Killing Frenzy',
         game_id='halo_5',
         rank=10
