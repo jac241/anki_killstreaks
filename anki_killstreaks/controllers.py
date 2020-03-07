@@ -12,6 +12,7 @@ from functools import wraps, partial
 
 from anki_killstreaks._vendor import attr
 
+from anki_killstreaks.game import set_current_game_id
 from anki_killstreaks.persistence import (
     migrate_database,
     DbSettings,
@@ -104,13 +105,22 @@ class ProfileController:
             return AllMedalsAcheivedNotifier(
                 controller=new_controller,
                 remaining_medals=new_controller.all_displayable_medals,
-                notify=partial(
-                    self.change_game,
-                    game_id=get_next_game_id(current_game_id=game_id),
-                ),
+                notify=self._game_changer
             )
         else:
             return new_controller
+
+    @property
+    def _game_changer(self):
+        return partial(
+            set_current_game_id,
+            game_id=get_next_game_id(
+                current_game_id=self.get_settings_repo().current_game_id
+            ),
+            get_settings_repo=self.get_settings_repo,
+            on_game_changed=self.change_game,
+        ),
+
 
     def unload_profile(self):
         self._db_settings = None
@@ -125,18 +135,12 @@ class ProfileController:
         )
 
     def on_auto_switch_game_toggled(self):
-        settings_repo = self.get_settings_repo()
 
         if settings_repo.should_auto_switch_game:
             self._reviewing_controller = AllMedalsAcheivedNotifier(
                 controller=self._reviewing_controller,
                 remaining_medals=self._reviewing_controller.all_displayable_medals,
-                notify=partial(
-                    self.change_game,
-                    game_id=get_next_game_id(
-                        current_game_id=settings_repo.current_game_id
-                    ),
-                ),
+                notify=self._game_changer
             )
         else:
             # reviewing controller will actually be the notifier
