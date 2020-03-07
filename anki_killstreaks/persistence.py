@@ -185,7 +185,7 @@ class SettingsRepository:
         )
 
     def toggle_auto_switch_game(self):
-        cursor = self.conn.execute(
+        self.conn.execute(
             "UPDATE settings SET should_auto_switch_game = NOT should_auto_switch_game"
         )
 

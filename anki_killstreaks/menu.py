@@ -71,7 +71,7 @@ def connect_menu(main_window, profile_controller):
         partial(
             toggle_auto_switch_game,
             get_settings_repo=profile_controller.get_settings_repo,
-            on_auto_switch_game_toggled=profile_controller.toggle_auto_switch_game,
+            on_auto_switch_game_toggled=profile_controller.on_auto_switch_game_toggled,
         )
     )
 

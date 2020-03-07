@@ -115,7 +115,7 @@ class ProfileController:
     def unload_profile(self):
         self._db_settings = None
         self._reviewing_controller = None
-        self._acheivements_repo = None
+        self._achievements_repo = None
         self.is_loaded = False
 
     def change_game(self, game_id):
@@ -124,8 +124,23 @@ class ProfileController:
             should_auto_switch_game=self.get_settings_repo().should_auto_switch_game
         )
 
-    def toggle_auto_switch_game(self, should_auto_switch_game):
-        pass
+    def on_auto_switch_game_toggled(self):
+        settings_repo = self.get_settings_repo()
+
+        if settings_repo.should_auto_switch_game:
+            self._reviewing_controller = AllMedalsAcheivedNotifier(
+                controller=self._reviewing_controller,
+                remaining_medals=self._reviewing_controller.all_displayable_medals,
+                notify=partial(
+                    self.change_game,
+                    game_id=get_next_game_id(
+                        current_game_id=settings_repo.current_game_id
+                    ),
+                ),
+            )
+        else:
+            # reviewing controller will actually be the notifier
+            self._reviewing_controller = self._reviewing_controller.controller
 
     @ensure_loaded
     def get_db_settings(self):
@@ -160,8 +175,6 @@ class ProfileController:
 def call_method_on_object_from_factory_function(
     method,
     factory_function,
-    *args,
-    **kwargs
 ):
     """
     This function takes a factory method, and then calls the passed method
@@ -218,12 +231,12 @@ def build_on_answer_wrapper(reviewer, ease, on_answer):
 
 @attr.s
 class AllMedalsAcheivedNotifier:
-    _controller = attr.ib()
+    controller = attr.ib()
     _remaining_medals = attr.ib(type=frozenset)
     _notify = attr.ib()
 
     def on_answer(self, *args, **kwargs):
-        earned_medals = self._controller.on_answer(*args, **kwargs)
+        earned_medals = self.controller.on_answer(*args, **kwargs)
         self._remaining_medals -= frozenset(earned_medals)
 
         if len(self._remaining_medals) == 0:
@@ -232,4 +245,4 @@ class AllMedalsAcheivedNotifier:
         return earned_medals
 
     def __getattr__(self, attr):
-        return getattr(self._controller, attr)
+        return getattr(self.controller, attr)
