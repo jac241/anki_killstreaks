@@ -11,7 +11,6 @@ This pattern has worked alright so far for this simple application.
 from functools import wraps, partial
 
 from anki_killstreaks._vendor import attr
-
 from anki_killstreaks.game import set_current_game_id
 from anki_killstreaks.persistence import (
     migrate_database,
@@ -23,11 +22,6 @@ from anki_killstreaks.persistence import (
 from anki_killstreaks.streaks import (
     did_card_pass,
     NewAchievement,
-    Store,
-    InitialStreakState,
-    HALO_MULTIKILL_STATES,
-    HALO_KILLING_SPREE_STATES,
-    get_stores_by_game_id,
     get_next_game_id,
 )
 
@@ -102,7 +96,7 @@ class ProfileController:
         )
 
         if should_auto_switch_game:
-            return AllMedalsAcheivedNotifier(
+            return AllMedalsAchievedNotifier(
                 controller=new_controller,
                 remaining_medals=new_controller.all_displayable_medals,
                 notify=partial(
@@ -131,7 +125,7 @@ class ProfileController:
         settings_repo = self.get_settings_repo()
 
         if settings_repo.should_auto_switch_game:
-            self._reviewing_controller = AllMedalsAcheivedNotifier(
+            self._reviewing_controller = AllMedalsAchievedNotifier(
                 controller=self._reviewing_controller,
                 remaining_medals=self._reviewing_controller.all_displayable_medals,
                 notify=partial(
@@ -236,7 +230,7 @@ def build_on_answer_wrapper(reviewer, ease, on_answer):
 
 
 @attr.s
-class AllMedalsAcheivedNotifier:
+class AllMedalsAchievedNotifier:
     controller = attr.ib()
     _remaining_medals = attr.ib(type=frozenset)
     _notify = attr.ib()

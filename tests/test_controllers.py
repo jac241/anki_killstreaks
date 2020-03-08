@@ -10,7 +10,7 @@ from unittest.mock import Mock
 import pytest
 from tests.test_streaks import question_shown_state
 
-from anki_killstreaks.controllers import ReviewingController, AllMedalsAcheivedNotifier
+from anki_killstreaks.controllers import ReviewingController, AllMedalsAchievedNotifier
 from anki_killstreaks.persistence import AchievementsRepository
 from anki_killstreaks.streaks import Store
 
@@ -94,7 +94,7 @@ def test_AllMedalsAcheivedNotifier_should_call_callback_when_all_medals_acheived
         nonlocal flag
         flag = True
 
-    notifier = AllMedalsAcheivedNotifier(
+    notifier = AllMedalsAchievedNotifier(
         controller=reviewing_controller,
         remaining_medals=reviewing_controller.all_displayable_medals,
         notify=notify
