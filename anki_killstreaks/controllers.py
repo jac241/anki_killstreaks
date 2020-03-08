@@ -81,7 +81,6 @@ class ProfileController:
 
         with get_db_connection(self._db_settings) as db_connection:
             settings_repo = SettingsRepository(db_connection)
-            store = self._stores_by_game_id[settings_repo.current_game_id]
 
             self._achievements_repo = AchievementsRepository(
                 db_connection=db_connection,

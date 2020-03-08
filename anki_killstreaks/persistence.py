@@ -36,10 +36,6 @@ class DbSettings:
         return f"sqlite:///{self.db_path}"
 
 
-this_addon_path = Path(__file__).parent.absolute()
-# default_settings = DbSettings.from_addon_path(this_addon_path)
-
-
 def migrate_database(settings):
     backend = get_backend(settings.db_uri)
     migrations = read_migrations(str(settings.migration_dir_path))
@@ -88,7 +84,6 @@ class AchievementsRepository:
             for medal, persisted_achievement
             in matches
         ]
-
 
     def todays_achievements(self, day_start_time):
         return self.count_by_medal_id(created_at_gt=day_start_time)
