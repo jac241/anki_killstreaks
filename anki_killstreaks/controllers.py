@@ -12,6 +12,7 @@ from functools import wraps, partial
 
 from anki_killstreaks._vendor import attr
 
+from anki_killstreaks.game import set_current_game_id
 from anki_killstreaks.persistence import (
     migrate_database,
     DbSettings,
@@ -31,7 +32,7 @@ from anki_killstreaks.streaks import (
 )
 
 
-# Dirty hack that we need because profileLoaded hook called after DeckBrowser shown
+# Hack that we need because profileLoaded hook called after DeckBrowser shown
 def ensure_loaded(f):
     @wraps(f)
     def new_method(self, *args, **kwargs):
@@ -105,8 +106,10 @@ class ProfileController:
                 controller=new_controller,
                 remaining_medals=new_controller.all_displayable_medals,
                 notify=partial(
-                    self.change_game,
+                    set_current_game_id,
                     game_id=get_next_game_id(current_game_id=game_id),
+                    get_settings_repo=self.get_settings_repo,
+                    on_game_changed=self.change_game
                 ),
             )
         else:
@@ -132,10 +135,10 @@ class ProfileController:
                 controller=self._reviewing_controller,
                 remaining_medals=self._reviewing_controller.all_displayable_medals,
                 notify=partial(
-                    self.change_game,
-                    game_id=get_next_game_id(
-                        current_game_id=settings_repo.current_game_id
-                    ),
+                    set_current_game_id,
+                    game_id=get_next_game_id(settings_repo.current_game_id),
+                    get_settings_repo=self.get_settings_repo,
+                    on_game_changed=self.change_game
                 ),
             )
         else:
@@ -178,8 +181,11 @@ def call_method_on_object_from_factory_function(
 ):
     """
     This function takes a factory method, and then calls the passed method
-    on the created object with the passed arguments. This lets us not delegate
-    to the reviewing controller within the ProfileController.
+    on the created object with the passed arguments. This makes it
+    possible to keep delegation to the reviewing controller
+    out of the ProfileController, even though in main we need to make sure that
+    we are calling the current instance of the ReviewingController, which
+    changes whenever you switch profiles, or game types, etc.
     """
     def call_method(*args, **kwargs):
         return getattr(factory_function(), method)(*args, **kwargs)

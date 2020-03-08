@@ -264,7 +264,6 @@ def show_medals_overview(
     get_achievements_repo,
     get_current_game_id,
 ):
-    # if self.wholeCollection:
     current_deck = self.col.decks.current()["name"]
 
     header_text = _get_stats_header(
