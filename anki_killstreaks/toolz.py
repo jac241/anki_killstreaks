@@ -2,8 +2,9 @@ import operator
 import collections
 
 
-no_default = '__no__default__'
-iteritems = operator.methodcaller('items')
+no_default = "__no__default__"
+iteritems = operator.methodcaller("items")
+
 
 def groupby(key, seq):
     """ Group a collection by a key function
@@ -52,8 +53,14 @@ def getter(index):
         return operator.itemgetter(index)
 
 
-def join(leftkey, leftseq, rightkey, rightseq,
-         left_default=no_default, right_default=no_default):
+def join(
+    leftkey,
+    leftseq,
+    rightkey,
+    rightseq,
+    left_default=no_default,
+    right_default=no_default,
+):
     """ Join two sequences on common attributes
 
     This is a semi-streaming operation.  The LEFT sequence is fully evaluated
@@ -114,7 +121,7 @@ def join(leftkey, leftseq, rightkey, rightseq,
     d = groupby(leftkey, leftseq)
     seen_keys = set()
 
-    left_default_is_no_default = (left_default == no_default)
+    left_default_is_no_default = left_default == no_default
     for item in rightseq:
         key = rightkey(item)
         seen_keys.add(key)

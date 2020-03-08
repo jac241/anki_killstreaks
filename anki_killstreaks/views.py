@@ -10,11 +10,14 @@ from anki_killstreaks._vendor import jinja2
 
 
 def MedalsOverviewHTML(achievements, header_text, current_game_id):
-    return MedalsOverview(
-        medal_types=medal_types(achievements),
-        header_text=header_text,
-        current_game_id=current_game_id,
-    ) + MedalsOverviewScript()
+    return (
+        MedalsOverview(
+            medal_types=medal_types(achievements),
+            header_text=header_text,
+            current_game_id=current_game_id,
+        )
+        + MedalsOverviewScript()
+    )
 
 
 def MedalsOverviewScript():
@@ -55,18 +58,17 @@ def medal_types_by_game_id(medal_types, game_ids):
     return medal_types
 
 
-
 def medal_types(achievement_count_by_medal_id: dict):
     medal_count_pairs = join(
         leftseq=get_all_displayable_medals(),
         rightseq=achievement_count_by_medal_id.items(),
         leftkey=lambda dm: dm.id_,
-        rightkey=lambda ac: ac[0]
+        rightkey=lambda ac: ac[0],
     )
 
     sorted_medals_with_counts = sorted(
         medal_count_pairs,
-        key=lambda medal_count_pairs: medal_count_pairs[0].rank
+        key=lambda medal_count_pairs: medal_count_pairs[0].rank,
     )
 
     return [
@@ -76,14 +78,13 @@ def medal_types(achievement_count_by_medal_id: dict):
             img_src=medal.medal_image,
             count=count,
         )
-        for medal, (medal_id, count)
-        in sorted_medals_with_counts
+        for medal, (medal_id, count) in sorted_medals_with_counts
     ]
 
 
 @attr.s(frozen=True)
 class MedalType:
-    medal= attr.ib()
+    medal = attr.ib()
     name = attr.ib()
     img_src = attr.ib()
     count = attr.ib()
@@ -100,19 +101,19 @@ class MedalType:
         return self.medal.game_id
 
 
-_templates_dir = Path(__file__).parent / 'templates'
+_templates_dir = Path(__file__).parent / "templates"
 _template_loader = jinja2.FileSystemLoader(searchpath=_templates_dir)
 _template_env = jinja2.Environment(loader=_template_loader)
 
 
 def MedalsOverview(
-    medal_types,
-    current_game_id,
-    header_text="Medals earned this session:",
+    medal_types, current_game_id, header_text="Medals earned this session:",
 ):
-    template = _template_env.get_template('medals_overview.html')
+    template = _template_env.get_template("medals_overview.html")
     return template.render(
-        medal_types_by_game_id=medal_types_by_game_id(medal_types, all_game_ids),
+        medal_types_by_game_id=medal_types_by_game_id(
+            medal_types, all_game_ids
+        ),
         header_text=header_text,
         game_names_by_id=dict(
             halo_3="Halo 3",
@@ -122,10 +123,9 @@ def MedalsOverview(
         selected_game_id=current_game_id,
     )
 
+
 def js_content(filename):
-    js_file = Path(__file__).parent / 'js' / filename
-    with open(js_file, 'r') as f:
+    js_file = Path(__file__).parent / "js" / filename
+    with open(js_file, "r") as f:
         js = f.read()
-    return js.replace("\n","")
-
-
+    return js.replace("\n", "")

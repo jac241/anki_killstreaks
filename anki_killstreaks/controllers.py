@@ -60,6 +60,7 @@ class ProfileController:
     Get placed in front of accessors to let you know they rely on profile
     dependent state that changes when you switch profiles.
     """
+
     # required attributes for class
     _local_conf = attr.ib()
     _show_achievements = attr.ib()
@@ -97,7 +98,7 @@ class ProfileController:
         new_controller = ReviewingController(
             store=self._stores_by_game_id[game_id],
             achievements_repo=self._achievements_repo,
-            show_achievements=self._show_achievements
+            show_achievements=self._show_achievements,
         )
 
         if should_auto_switch_game:
@@ -108,7 +109,7 @@ class ProfileController:
                     set_current_game_id,
                     game_id=get_next_game_id(current_game_id=game_id),
                     get_settings_repo=self.get_settings_repo,
-                    on_game_changed=self.change_game
+                    on_game_changed=self.change_game,
                 ),
             )
         else:
@@ -123,7 +124,7 @@ class ProfileController:
     def change_game(self, game_id):
         self._reviewing_controller = self._build_reviewing_controller(
             game_id=game_id,
-            should_auto_switch_game=self.get_settings_repo().should_auto_switch_game
+            should_auto_switch_game=self.get_settings_repo().should_auto_switch_game,
         )
 
     def on_auto_switch_game_toggled(self):
@@ -137,7 +138,7 @@ class ProfileController:
                     set_current_game_id,
                     game_id=get_next_game_id(settings_repo.current_game_id),
                     get_settings_repo=self.get_settings_repo,
-                    on_game_changed=self.change_game
+                    on_game_changed=self.change_game,
                 ),
             )
         else:
@@ -175,8 +176,7 @@ class ProfileController:
 
 
 def call_method_on_object_from_factory_function(
-    method,
-    factory_function,
+    method, factory_function,
 ):
     """
     This function takes a factory method, and then calls the passed method
@@ -186,8 +186,10 @@ def call_method_on_object_from_factory_function(
     we are calling the current instance of the ReviewingController, which
     changes whenever you switch profiles, or game types, etc.
     """
+
     def call_method(*args, **kwargs):
         return getattr(factory_function(), method)(*args, **kwargs)
+
     return call_method
 
 
@@ -210,8 +212,7 @@ class ReviewingController:
         self.achievements_repo.create_all(
             [
                 NewAchievement(medal=medal, deck_id=deck_id)
-                for medal
-                in self.store.current_displayable_medals
+                for medal in self.store.current_displayable_medals
             ]
         )
 
@@ -230,7 +231,7 @@ class ReviewingController:
 
 
 def build_on_answer_wrapper(reviewer, ease, on_answer):
-    deck_id = reviewer.mw.col.decks.current()['id']
+    deck_id = reviewer.mw.col.decks.current()["id"]
     on_answer(ease=ease, deck_id=deck_id)
 
 

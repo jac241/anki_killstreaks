@@ -12,37 +12,37 @@ from anki_killstreaks.game import (
 def connect_menu(main_window, profile_controller):
     # probably overdoing it with partial functions here... but none of these
     # need to be classes honestly
-    top_menu = QMenu('Killstreaks', main_window)
-    game_menu = QMenu('Select Game', main_window)
+    top_menu = QMenu("Killstreaks", main_window)
+    game_menu = QMenu("Select Game", main_window)
 
-    halo_3_action = game_menu.addAction('Halo 3')
+    halo_3_action = game_menu.addAction("Halo 3")
     halo_3_action.setCheckable(True)
     halo_3_action.triggered.connect(
         partial(
             set_current_game_id,
-            game_id='halo_3',
+            game_id="halo_3",
             get_settings_repo=profile_controller.get_settings_repo,
             on_game_changed=profile_controller.change_game,
         )
     )
 
-    mw2_action = game_menu.addAction('Call of Duty: Modern Warfare 2')
+    mw2_action = game_menu.addAction("Call of Duty: Modern Warfare 2")
     mw2_action.setCheckable(True)
     mw2_action.triggered.connect(
         partial(
             set_current_game_id,
-            game_id='mw2',
+            game_id="mw2",
             get_settings_repo=profile_controller.get_settings_repo,
             on_game_changed=profile_controller.change_game,
         )
     )
 
-    halo_5_action = game_menu.addAction('Halo 5')
+    halo_5_action = game_menu.addAction("Halo 5")
     halo_5_action.setCheckable(True)
     halo_5_action.triggered.connect(
         partial(
             set_current_game_id,
-            game_id='halo_5',
+            game_id="halo_5",
             get_settings_repo=profile_controller.get_settings_repo,
             on_game_changed=profile_controller.change_game,
         )
@@ -54,18 +54,16 @@ def connect_menu(main_window, profile_controller):
         partial(
             check_correct_game_in_menu,
             menu_actions_by_game_id=dict(
-                halo_3=halo_3_action,
-                mw2=mw2_action,
-                halo_5=halo_5_action,
+                halo_3=halo_3_action, mw2=mw2_action, halo_5=halo_5_action,
             ),
             load_current_game_id=partial(
                 load_current_game_id,
-                get_settings_repo=profile_controller.get_settings_repo
+                get_settings_repo=profile_controller.get_settings_repo,
             ),
         )
     )
 
-    auto_switch_game_action = top_menu.addAction('Automatically Switch Games')
+    auto_switch_game_action = top_menu.addAction("Automatically Switch Games")
     auto_switch_game_action.setCheckable(True)
     auto_switch_game_action.triggered.connect(
         partial(
@@ -82,7 +80,7 @@ def connect_menu(main_window, profile_controller):
             load_auto_switch_game_status=partial(
                 load_auto_switch_game_status,
                 get_settings_repo=profile_controller.get_settings_repo,
-            )
+            ),
         )
     )
 
@@ -101,5 +99,3 @@ def check_correct_game_in_menu(menu_actions_by_game_id, load_current_game_id):
 
 def set_check_for_auto_switch_game(action, load_auto_switch_game_status):
     action.setChecked(load_auto_switch_game_status())
-
-

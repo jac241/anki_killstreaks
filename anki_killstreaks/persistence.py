@@ -12,7 +12,9 @@ from anki_killstreaks.streaks import get_all_displayable_medals
 
 
 this_addon_path = Path(__file__).parent.absolute()
-min_datetime = datetime(year=2019, month=12, day=25) # day I started making the addon :-)
+min_datetime = datetime(
+    year=2019, month=12, day=25
+)  # day I started making the addon :-)
 
 
 @attr.s(frozen=True)
@@ -22,13 +24,11 @@ class DbSettings:
 
     @classmethod
     def from_profile_folder_path(
-        cls,
-        profile_folder_path,
-        addon_path=this_addon_path
+        cls, profile_folder_path, addon_path=this_addon_path
     ):
         return cls(
-            db_path=profile_folder_path / 'anki_killstreaks.db',
-            migration_dir_path=addon_path / 'migrations'
+            db_path=profile_folder_path / "anki_killstreaks.db",
+            migration_dir_path=addon_path / "migrations",
         )
 
     @property
@@ -57,7 +57,7 @@ class AchievementsRepository:
     def create_all(self, new_achievements):
         self.conn.executemany(
             "INSERT INTO achievements(medal_id, deck_id) VALUES (?, ?)",
-            ((a.medal_id, a.deck_id) for a in new_achievements)
+            ((a.medal_id, a.deck_id) for a in new_achievements),
         )
 
     # only used by tests, should eliminate
@@ -65,9 +65,7 @@ class AchievementsRepository:
         cursor = self.conn.execute("SELECT * FROM achievements")
 
         loaded_achievements = [
-            PersistedAchievement(*row, medal=None)
-            for row
-            in cursor
+            PersistedAchievement(*row, medal=None) for row in cursor
         ]
 
         # will probably become a performance issue, move to
@@ -76,13 +74,12 @@ class AchievementsRepository:
             leftseq=get_all_displayable_medals(),
             rightseq=loaded_achievements,
             leftkey=lambda dm: dm.id_,
-            rightkey=lambda la: la.medal_id
+            rightkey=lambda la: la.medal_id,
         )
 
         return [
             persisted_achievement.with_medal(medal)
-            for medal, persisted_achievement
-            in matches
+            for medal, persisted_achievement in matches
         ]
 
     def todays_achievements(self, day_start_time):
@@ -96,15 +93,14 @@ class AchievementsRepository:
             WHERE created_at > ?
             GROUP BY medal_id
             """,
-            (created_at_gt.astimezone(timezone.utc),)
+            (created_at_gt.astimezone(timezone.utc),),
         )
 
         return dict(row for row in cursor)
 
     def todays_achievements_for_deck_ids(self, day_start_time, deck_ids):
         return self.achievements_for_deck_ids_since(
-            deck_ids=deck_ids,
-            since_datetime=day_start_time
+            deck_ids=deck_ids, since_datetime=day_start_time
         )
 
     def achievements_for_deck_ids_since(self, deck_ids, since_datetime):
@@ -116,7 +112,7 @@ class AchievementsRepository:
                 deck_id in ({','.join('?' for i in deck_ids)})
             GROUP BY medal_id
             """,
-            (since_datetime.astimezone(timezone.utc), *deck_ids)
+            (since_datetime.astimezone(timezone.utc), *deck_ids),
         )
 
         return dict(row for row in cursor)
@@ -129,7 +125,7 @@ class AchievementsRepository:
             WHERE created_at > ?
             GROUP BY medal_id
             """,
-            (since_datetime.astimezone(timezone.utc),)
+            (since_datetime.astimezone(timezone.utc),),
         )
 
         return dict(row for row in cursor)
@@ -174,10 +170,7 @@ class SettingsRepository:
 
     @current_game_id.setter
     def current_game_id(self, game_id):
-        self.conn.execute(
-            "UPDATE settings SET current_game_id = ?",
-            (game_id,)
-        )
+        self.conn.execute("UPDATE settings SET current_game_id = ?", (game_id,))
 
     def toggle_auto_switch_game(self):
         self.conn.execute(
@@ -186,5 +179,7 @@ class SettingsRepository:
 
     @property
     def should_auto_switch_game(self):
-        cursor = self.conn.execute("SELECT should_auto_switch_game FROM settings;")
+        cursor = self.conn.execute(
+            "SELECT should_auto_switch_game FROM settings;"
+        )
         return cursor.fetchone()[0]

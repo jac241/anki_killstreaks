@@ -12,6 +12,6 @@
 import os
 
 try:
-    os.environ['IN_TEST_SUITE']
+    os.environ["IN_TEST_SUITE"]
 except KeyError:
     from . import main

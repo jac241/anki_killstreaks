@@ -21,13 +21,16 @@ defaults_path = os.path.join(addon_path, "config.json")
 meta_path = os.path.join(addon_path, "meta.json")
 
 if anki21:
+
     def getConfig():
         return mw.addonManager.getConfig(__name__)
 
     def writeConfig(config):
         mw.addonManager.writeConfig(__name__, config)
 
+
 else:
+
     def _addonMeta():
         """Get meta dictionary
 
@@ -68,10 +71,14 @@ else:
 
         """
 
-        with io.open(meta_path, 'w', encoding="utf-8") as f:
-            f.write(unicode(json.dumps(meta, indent=4,
-                                       sort_keys=True,
-                                       ensure_ascii=False)))
+        with io.open(meta_path, "w", encoding="utf-8") as f:
+            f.write(
+                unicode(
+                    json.dumps(
+                        meta, indent=4, sort_keys=True, ensure_ascii=False
+                    )
+                )
+            )
 
     def _addonConfigDefaults():
         """Get default config dictionary
@@ -124,5 +131,6 @@ else:
         """
 
         _writeAddonMeta({"config": config})
+
 
 local_conf = getConfig()

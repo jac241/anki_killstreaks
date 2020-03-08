@@ -88,16 +88,18 @@ def _wrap_anki_objects(profile_controller):
         factory_function=profile_controller.get_reviewing_controller,
     )
 
-    addHook("showQuestion", call_method_on_reviewing_controller('on_show_question'))
-    addHook("showAnswer", call_method_on_reviewing_controller('on_show_answer'))
+    addHook(
+        "showQuestion", call_method_on_reviewing_controller("on_show_question")
+    )
+    addHook("showAnswer", call_method_on_reviewing_controller("on_show_answer"))
 
     Reviewer._answerCard = wrap(
         Reviewer._answerCard,
         partial(
             build_on_answer_wrapper,
-            on_answer=call_method_on_reviewing_controller('on_answer')
+            on_answer=call_method_on_reviewing_controller("on_answer"),
         ),
-        'before',
+        "before",
     )
 
     todays_medals_injector = partial(
@@ -108,14 +110,10 @@ def _wrap_anki_objects(profile_controller):
     )
 
     DeckBrowser.refresh = wrap(
-        old=DeckBrowser.refresh,
-        new=todays_medals_injector,
-        pos="after"
+        old=DeckBrowser.refresh, new=todays_medals_injector, pos="after"
     )
     DeckBrowser.show = wrap(
-        old=DeckBrowser.show,
-        new=todays_medals_injector,
-        pos="after"
+        old=DeckBrowser.show, new=todays_medals_injector, pos="after"
     )
 
     Overview.refresh = wrap(
@@ -125,7 +123,7 @@ def _wrap_anki_objects(profile_controller):
             get_achievements_repo=profile_controller.get_achievements_repo,
             get_current_game_id=profile_controller.get_current_game_id,
         ),
-        pos="after"
+        pos="after",
     )
 
     CollectionStats.todayStats = wrap(
@@ -135,7 +133,7 @@ def _wrap_anki_objects(profile_controller):
             get_achievements_repo=profile_controller.get_achievements_repo,
             get_current_game_id=profile_controller.get_current_game_id,
         ),
-        pos="around"
+        pos="around",
     )
 
 
@@ -145,20 +143,26 @@ _tooltipLabel = None
 
 def showToolTip(medals, period=local_conf["duration"]):
     global _tooltipTimer, _tooltipLabel
+
     class CustomLabel(QLabel):
         def mousePressEvent(self, evt):
             evt.accept()
             self.hide()
+
     closeTooltip()
-    medals_html = '\n'.join(medal_html(m) for m in medals)
+    medals_html = "\n".join(medal_html(m) for m in medals)
 
     aw = mw.app.activeWindow() or mw
-    lab = CustomLabel("""\
+    lab = CustomLabel(
+        """\
 <table cellpadding=10>
 <tr>
 %s
 </tr>
-</table>""" % (medals_html), aw)
+</table>"""
+        % (medals_html),
+        aw,
+    )
     lab.setFrameStyle(QFrame.Panel)
     lab.setLineWidth(2)
     lab.setWindowFlags(Qt.ToolTip)
@@ -167,11 +171,9 @@ def showToolTip(medals, period=local_conf["duration"]):
     p.setColor(QPalette.WindowText, QColor("#f7f7f7"))
     lab.setPalette(p)
     vdiff = (local_conf["image_height"] - 128) / 2
-    lab.move(
-        aw.mapToGlobal(QPoint(0, -260-vdiff + aw.height())))
+    lab.move(aw.mapToGlobal(QPoint(0, -260 - vdiff + aw.height())))
     lab.show()
-    _tooltipTimer = mw.progress.timer(
-        period, closeTooltip, False)
+    _tooltipTimer = mw.progress.timer(period, closeTooltip, False)
     _tooltipLabel = lab
 
 
@@ -196,32 +198,26 @@ def medal_html(medal):
             <center><b>{call}!</b><br></center>
         </td>
     """.format(
-        img_src=medal.medal_image,
-        call=medal.call,
+        img_src=medal.medal_image, call=medal.call,
     )
 
 
 def inject_medals_with_js(
-    self: Overview,
-    get_achievements_repo,
-    get_current_game_id,
-    view
+    self: Overview, get_achievements_repo, get_current_game_id, view
 ):
     self.mw.web.eval(
         view(
             achievements=get_achievements_repo().todays_achievements(
                 cutoff_datetime(self)
             ),
-            current_game_id=get_current_game_id()
+            current_game_id=get_current_game_id(),
         )
     )
-    self.mw.web.eval(js_content('medals_overview.js'))
+    self.mw.web.eval(js_content("medals_overview.js"))
 
 
 def inject_medals_for_deck_overview(
-    self: Overview,
-    get_achievements_repo,
-    get_current_game_id,
+    self: Overview, get_achievements_repo, get_current_game_id,
 ):
     decks = get_current_deck_and_children(deck_manager=self.mw.col.decks)
     deck_ids = [d.id_ for d in decks]
@@ -229,14 +225,13 @@ def inject_medals_for_deck_overview(
     self.mw.web.eval(
         TodaysMedalsForDeckJS(
             achievements=get_achievements_repo().todays_achievements_for_deck_ids(
-                day_start_time=cutoff_datetime(self),
-                deck_ids=deck_ids
+                day_start_time=cutoff_datetime(self), deck_ids=deck_ids
             ),
             deck=decks[0],
-            current_game_id=get_current_game_id()
+            current_game_id=get_current_game_id(),
         )
     )
-    self.mw.web.eval(js_content('medals_overview.js'))
+    self.mw.web.eval(js_content("medals_overview.js"))
 
 
 @attr.s
@@ -248,28 +243,24 @@ class Deck:
 def get_current_deck_and_children(deck_manager):
     current_deck_attrs = deck_manager.current()
 
-    current_deck = Deck(current_deck_attrs['id'], current_deck_attrs['name'])
+    current_deck = Deck(current_deck_attrs["id"], current_deck_attrs["name"])
     children = [
         Deck(name=name_id_pair[0], id_=name_id_pair[1])
-        for name_id_pair
-        in deck_manager.children(current_deck.id_)
+        for name_id_pair in deck_manager.children(current_deck.id_)
     ]
 
     return [current_deck, *children]
 
 
 def show_medals_overview(
-    self: CollectionStats,
-    _old,
-    get_achievements_repo,
-    get_current_game_id,
+    self: CollectionStats, _old, get_achievements_repo, get_current_game_id,
 ):
     current_deck = self.col.decks.current()["name"]
 
     header_text = _get_stats_header(
         deck_name=current_deck,
         scope_is_whole_collection=self.wholeCollection,
-        period=self.type
+        period=self.type,
     )
 
     deck_ids = [d.id_ for d in get_current_deck_and_children(self.col.decks)]
@@ -278,20 +269,26 @@ def show_medals_overview(
         deck_ids=deck_ids,
         scope_is_whole_collection=self.wholeCollection,
         achievements_repo=get_achievements_repo(),
-        start_datetime=_get_start_datetime_for_period(self.type)
+        start_datetime=_get_start_datetime_for_period(self.type),
     )
 
     return _old(self) + MedalsOverviewHTML(
         achievements=achievements,
         header_text=header_text,
-        current_game_id=get_current_game_id()
+        current_game_id=get_current_game_id(),
     )
 
 
 def _get_stats_header(deck_name, scope_is_whole_collection, period):
-    scope_name = "your whole collection" if scope_is_whole_collection else f'deck "{deck_name}"'
+    scope_name = (
+        "your whole collection"
+        if scope_is_whole_collection
+        else f'deck "{deck_name}"'
+    )
     time_period_description = _get_time_period_description(period)
-    return f"Medals earned while reviewing {scope_name} {time_period_description}:"
+    return (
+        f"Medals earned while reviewing {scope_name} {time_period_description}:"
+    )
 
 
 PERIOD_MONTH = 0
@@ -317,10 +314,7 @@ def _get_start_datetime_for_period(period):
 
 
 def _get_achievements_scoped_to_deck_or_collection(
-    deck_ids,
-    scope_is_whole_collection,
-    achievements_repo,
-    start_datetime
+    deck_ids, scope_is_whole_collection, achievements_repo, start_datetime
 ):
     if scope_is_whole_collection:
         return achievements_repo.achievements_for_whole_collection_since(
@@ -328,8 +322,7 @@ def _get_achievements_scoped_to_deck_or_collection(
         )
     else:
         return achievements_repo.achievements_for_deck_ids_since(
-            deck_ids=deck_ids,
-            since_datetime=start_datetime
+            deck_ids=deck_ids, since_datetime=start_datetime
         )
 
 
