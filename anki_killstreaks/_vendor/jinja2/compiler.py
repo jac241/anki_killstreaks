@@ -5,8 +5,8 @@ from functools import update_wrapper
 from itertools import chain
 from keyword import iskeyword as is_python_keyword
 
-from anki_killstreaks._vendor.markupsafe import escape
-from anki_killstreaks._vendor.markupsafe import Markup
+from ..markupsafe import escape
+from ..markupsafe import Markup
 
 from . import nodes
 from ._compat import imap
@@ -714,13 +714,12 @@ class CodeGenerator(NodeVisitor):
         eval_ctx = EvalContext(self.environment, self.name)
 
         from .runtime import exported
-
         self.writeline("from __future__ import %s" % ", ".join(code_features))
-        self.writeline("from anki_killstreaks._vendor.jinja2.runtime import " + ", ".join(exported))
+        self.writeline("from ..._vendor.jinja2.runtime import " + ", ".join(exported))
 
         if self.environment.is_async:
             self.writeline(
-                "from anki_killstreaks._vendor.jinja2.asyncsupport import auto_await, "
+                "from .asyncsupport import auto_await, "
                 "auto_aiter, AsyncLoopContext"
             )
 

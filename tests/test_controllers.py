@@ -8,7 +8,7 @@ import itertools
 from unittest.mock import Mock
 
 import pytest
-from tests.test_streaks import question_shown_state
+from .test_streaks import question_shown_state
 
 from anki_killstreaks.controllers import ReviewingController, AllMedalsAchievedNotifier
 from anki_killstreaks.persistence import AchievementsRepository

@@ -9,17 +9,16 @@
 """Parse SQL statements."""
 
 # Setup namespace
-from anki_killstreaks._vendor.sqlparse import sql
-from anki_killstreaks._vendor.sqlparse import cli
-from anki_killstreaks._vendor.sqlparse import engine
-from anki_killstreaks._vendor.sqlparse import tokens
-from anki_killstreaks._vendor.sqlparse import filters
-from anki_killstreaks._vendor.sqlparse import formatter
+from . import sql
+from . import engine
+from . import tokens
+from . import filters
+from . import formatter
 
-from anki_killstreaks._vendor.sqlparse.compat import text_type
+from .compat import text_type
 
 __version__ = '0.3.0'
-__all__ = ['engine', 'filters', 'formatter', 'sql', 'tokens', 'cli']
+__all__ = ['engine', 'filters', 'formatter', 'sql', 'tokens']
 
 
 def parse(sql, encoding=None):

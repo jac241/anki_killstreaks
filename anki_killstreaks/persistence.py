@@ -2,11 +2,11 @@ import sqlite3
 from datetime import datetime, timedelta, timezone, time
 from pathlib import Path
 
-from anki_killstreaks._vendor import attr
-from anki_killstreaks._vendor.yoyo import get_backend
-from anki_killstreaks._vendor.yoyo import read_migrations
-from anki_killstreaks.streaks import get_all_displayable_medals
-from anki_killstreaks.toolz import join
+from ._vendor import attr
+from ._vendor.yoyo import get_backend
+from ._vendor.yoyo import read_migrations
+from .streaks import get_all_displayable_medals
+from .toolz import join
 
 this_addon_path = Path(__file__).parent.absolute()
 min_datetime = datetime(

@@ -3,8 +3,8 @@
 non-XML syntax that supports inline expressions and an optional
 sandboxed environment.
 """
-from anki_killstreaks._vendor.markupsafe import escape
-from anki_killstreaks._vendor.markupsafe import Markup
+from ..markupsafe import escape
+from ..markupsafe import Markup
 
 from .bccache import BytecodeCache
 from .bccache import FileSystemBytecodeCache

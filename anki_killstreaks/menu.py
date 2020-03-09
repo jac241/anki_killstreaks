@@ -1,7 +1,7 @@
 from functools import partial
 from aqt.qt import QMenu
 
-from anki_killstreaks.game import (
+from .game import (
     load_current_game_id,
     set_current_game_id,
     toggle_auto_switch_game,

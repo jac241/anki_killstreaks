@@ -28,23 +28,23 @@ from aqt.overview import Overview
 from anki.hooks import addHook, wrap
 from anki.stats import CollectionStats
 
-from anki_killstreaks.config import local_conf
-from anki_killstreaks.controllers import (
+from .config import local_conf
+from .controllers import (
     ProfileController,
     ReviewingController,
     build_on_answer_wrapper,
     call_method_on_object_from_factory_function,
 )
-from anki_killstreaks.menu import connect_menu
-from anki_killstreaks.persistence import day_start_time, min_datetime
-from anki_killstreaks.streaks import get_stores_by_game_id
-from anki_killstreaks.views import (
+from .menu import connect_menu
+from .persistence import day_start_time, min_datetime
+from .streaks import get_stores_by_game_id
+from .views import (
     MedalsOverviewHTML,
     TodaysMedalsJS,
     TodaysMedalsForDeckJS,
     js_content,
 )
-from anki_killstreaks._vendor import attr
+from ._vendor import attr
 
 
 def show_tool_tip_if_medals(displayable_medals):
@@ -65,6 +65,9 @@ _profile_controller = ProfileController(
     get_profile_folder_path=_get_profile_folder_path,
     stores_by_game_id=_stores_by_game_id,
 )
+
+# for debugging
+mw.killstreaks_profile_controller = _profile_controller
 
 
 def main():

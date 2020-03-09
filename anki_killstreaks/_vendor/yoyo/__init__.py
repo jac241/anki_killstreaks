@@ -24,14 +24,14 @@ __all__ = [
     "transaction",
 ]
 
-from anki_killstreaks._vendor.yoyo.connections import get_backend
-from anki_killstreaks._vendor.yoyo.migrations import ancestors
-from anki_killstreaks._vendor.yoyo.migrations import default_migration_table
-from anki_killstreaks._vendor.yoyo.migrations import descendants
-from anki_killstreaks._vendor.yoyo.migrations import group
-from anki_killstreaks._vendor.yoyo.migrations import logger
-from anki_killstreaks._vendor.yoyo.migrations import read_migrations
-from anki_killstreaks._vendor.yoyo.migrations import step
-from anki_killstreaks._vendor.yoyo.migrations import transaction
+from .connections import get_backend
+from .migrations import ancestors
+from .migrations import default_migration_table
+from .migrations import descendants
+from .migrations import group
+from .migrations import logger
+from .migrations import read_migrations
+from .migrations import step
+from .migrations import transaction
 
 __version__ = "7.0.0"

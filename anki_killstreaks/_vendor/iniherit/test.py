@@ -12,7 +12,7 @@ import textwrap
 
 import six
 
-from anki_killstreaks._vendor.iniherit.parser import Loader, ConfigParser, SafeConfigParser
+from .parser import Loader, ConfigParser, SafeConfigParser
 
 #------------------------------------------------------------------------------
 class ByteLoader(Loader):

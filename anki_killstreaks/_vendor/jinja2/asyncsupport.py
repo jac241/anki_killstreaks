@@ -6,7 +6,7 @@ import asyncio
 import inspect
 from functools import update_wrapper
 
-from anki_killstreaks._vendor.markupsafe import Markup
+from ..markupsafe import Markup
 
 from .environment import TemplateModule
 from .runtime import LoopContext

@@ -8,9 +8,9 @@
 
 """filter"""
 
-from anki_killstreaks._vendor.sqlparse import lexer
-from anki_killstreaks._vendor.sqlparse.engine import grouping
-from anki_killstreaks._vendor.sqlparse.engine.statement_splitter import StatementSplitter
+from .. import lexer
+from ..engine import grouping
+from ..engine.statement_splitter import StatementSplitter
 
 
 class FilterStack(object):

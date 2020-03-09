@@ -4,7 +4,7 @@ import pprint
 import re
 from sys import version_info
 
-from anki_killstreaks._vendor.markupsafe import Markup
+from ..markupsafe import Markup
 
 from . import nodes
 from ._compat import iteritems

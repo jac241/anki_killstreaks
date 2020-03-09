@@ -6,9 +6,9 @@
 # This module is part of python-sqlparse and is released under
 # the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
-from anki_killstreaks._vendor.sqlparse import sql
-from anki_killstreaks._vendor.sqlparse import tokens as T
-from anki_killstreaks._vendor.sqlparse.utils import recurse, imt
+from .. import sql
+from .. import tokens as T
+from ..utils import recurse, imt
 
 T_NUMERICAL = (T.Number, T.Number.Integer, T.Number.Float)
 T_STRING = (T.String, T.String.Single, T.String.Symbol)

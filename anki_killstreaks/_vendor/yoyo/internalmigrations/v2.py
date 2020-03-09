@@ -3,7 +3,7 @@ Version 2 schema.
 
 Compatible with yoyo-migrations >=  6.0
 """
-from anki_killstreaks._vendor.yoyo.migrations import get_migration_hash
+from ..migrations import get_migration_hash
 
 
 def upgrade(backend):

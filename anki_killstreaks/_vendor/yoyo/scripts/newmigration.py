@@ -25,12 +25,12 @@ import subprocess
 import sys
 import traceback
 
-from anki_killstreaks._vendor.text_unidecode import unidecode
+from ...text_unidecode import unidecode
 
-from anki_killstreaks._vendor.yoyo import default_migration_table
-from anki_killstreaks._vendor.yoyo.config import CONFIG_NEW_MIGRATION_COMMAND_KEY
-from anki_killstreaks._vendor.yoyo.migrations import read_migrations, heads, Migration
-from anki_killstreaks._vendor.yoyo import utils
+from .. import default_migration_table
+from ..config import CONFIG_NEW_MIGRATION_COMMAND_KEY
+from ..migrations import read_migrations, heads, Migration
+from .. import utils
 from .main import InvalidArgument
 
 from os import path, stat, unlink, rename
@@ -45,7 +45,7 @@ migration_template = dedent(
     {message}
     """
 
-    from anki_killstreaks._vendor.yoyo import step
+    from ._vendor.yoyo import step
 
     __depends__ = {{{depends}}}
 

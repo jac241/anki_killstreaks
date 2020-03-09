@@ -13,10 +13,10 @@
 # It's separated from the rest of pygments to increase performance
 # and to allow some customizations.
 
-from anki_killstreaks._vendor.sqlparse import tokens
-from anki_killstreaks._vendor.sqlparse.keywords import SQL_REGEX
-from anki_killstreaks._vendor.sqlparse.compat import text_type, file_types
-from anki_killstreaks._vendor.sqlparse.utils import consume
+from . import tokens
+from .keywords import SQL_REGEX
+from .compat import text_type, file_types
+from .utils import consume
 
 
 class Lexer(object):

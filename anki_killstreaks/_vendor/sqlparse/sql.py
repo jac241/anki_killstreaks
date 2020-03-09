@@ -11,9 +11,9 @@ from __future__ import print_function
 
 import re
 
-from anki_killstreaks._vendor.sqlparse import tokens as T
-from anki_killstreaks._vendor.sqlparse.compat import string_types, text_type, unicode_compatible
-from anki_killstreaks._vendor.sqlparse.utils import imt, remove_quotes
+from . import tokens as T
+from .compat import string_types, text_type, unicode_compatible
+from .utils import imt, remove_quotes
 
 
 @unicode_compatible

@@ -6,7 +6,7 @@ to normalize nodes.
 import operator
 from collections import deque
 
-from anki_killstreaks._vendor.markupsafe import Markup
+from ..markupsafe import Markup
 
 from ._compat import izip
 from ._compat import PY2

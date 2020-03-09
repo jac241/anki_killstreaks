@@ -4,9 +4,9 @@ import sys
 from itertools import chain
 from types import MethodType
 
-from anki_killstreaks._vendor.markupsafe import escape  # noqa: F401
-from anki_killstreaks._vendor.markupsafe import Markup
-from anki_killstreaks._vendor.markupsafe import soft_unicode
+from ..markupsafe import escape  # noqa: F401
+from ..markupsafe import Markup
+from ..markupsafe import soft_unicode
 
 from ._compat import abc
 from ._compat import imap

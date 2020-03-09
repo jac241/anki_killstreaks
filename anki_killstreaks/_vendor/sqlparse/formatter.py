@@ -8,8 +8,8 @@
 
 """SQL formatter"""
 
-from anki_killstreaks._vendor.sqlparse import filters
-from anki_killstreaks._vendor.sqlparse.exceptions import SQLParseError
+from . import filters
+from .exceptions import SQLParseError
 
 
 def validate_options(options):

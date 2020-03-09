@@ -46,7 +46,7 @@ class BaseLoader(object):
     A very basic example for a loader that looks up templates on the file
     system could look like this::
 
-        from anki_killstreaks._vendor.jinja2 import BaseLoader, TemplateNotFound
+        from . import BaseLoader, TemplateNotFound
         from os.path import join, exists, getmtime
 
         class MyLoader(BaseLoader):

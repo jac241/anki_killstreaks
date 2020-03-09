@@ -8,8 +8,8 @@ import warnings
 from collections import deque
 from string import Formatter
 
-from anki_killstreaks._vendor.markupsafe import EscapeFormatter
-from anki_killstreaks._vendor.markupsafe import Markup
+from ..markupsafe import EscapeFormatter
+from ..markupsafe import Markup
 
 from ._compat import abc
 from ._compat import PY2
@@ -197,7 +197,7 @@ def is_internal_attribute(obj, attr):
     python objects.  This is useful if the environment method
     :meth:`~SandboxedEnvironment.is_safe_attribute` is overridden.
 
-    >>> from anki_killstreaks._vendor.jinja2.sandbox import is_internal_attribute
+    >>> from .sandbox import is_internal_attribute
     >>> is_internal_attribute(str, "mro")
     True
     >>> is_internal_attribute(str, "upper")

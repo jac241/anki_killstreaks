@@ -38,10 +38,10 @@ import textwrap
 import weakref
 
 import pkg_resources
-from anki_killstreaks._vendor import sqlparse
+from .. import sqlparse
 
-from anki_killstreaks._vendor.yoyo import exceptions
-from anki_killstreaks._vendor.yoyo.utils import plural
+from . import exceptions
+from .utils import plural
 
 logger = getLogger("yoyo.migrations")
 default_migration_table = "_yoyo_migration"
@@ -55,7 +55,7 @@ def _is_migration_file(path):
     """
     Return True if the given path matches a migration file pattern
     """
-    from anki_killstreaks._vendor.yoyo.scripts import newmigration
+    from .scripts import newmigration
 
     _, extension = os.path.splitext(path)
     return extension in {".py", ".sql"} and not path.startswith(
@@ -174,6 +174,7 @@ class Migration(object):
             return
 
         collector = _collectors[self.path] = StepCollector(migration=self)
+
         if self.is_raw_sql():
             self.module = types.ModuleType(self.path)
         else:

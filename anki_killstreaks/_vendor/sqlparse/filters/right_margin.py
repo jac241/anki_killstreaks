@@ -8,8 +8,8 @@
 
 import re
 
-from anki_killstreaks._vendor.sqlparse import sql, tokens as T
-from anki_killstreaks._vendor.sqlparse.compat import text_type
+from .. import sql, tokens as T
+from ..compat import text_type
 
 
 # FIXME: Doesn't work

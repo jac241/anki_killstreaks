@@ -8,9 +8,9 @@ from collections import namedtuple
 from itertools import chain
 from itertools import groupby
 
-from anki_killstreaks._vendor.markupsafe import escape
-from anki_killstreaks._vendor.markupsafe import Markup
-from anki_killstreaks._vendor.markupsafe import soft_unicode
+from ..markupsafe import escape
+from ..markupsafe import Markup
+from ..markupsafe import soft_unicode
 
 from ._compat import abc
 from ._compat import imap

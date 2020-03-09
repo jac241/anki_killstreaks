@@ -16,7 +16,7 @@
 Handle config file and argument parsing
 """
 import os
-from anki_killstreaks._vendor import iniherit
+from .. import iniherit
 import sys
 
 CONFIG_FILENAME = "yoyo.ini"

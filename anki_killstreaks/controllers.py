@@ -10,16 +10,16 @@ This pattern has worked alright so far for this simple application.
 """
 from functools import wraps, partial
 
-from anki_killstreaks._vendor import attr
-from anki_killstreaks.game import set_current_game_id
-from anki_killstreaks.persistence import (
+from ._vendor import attr
+from .game import set_current_game_id
+from .persistence import (
     migrate_database,
     DbSettings,
     get_db_connection,
     AchievementsRepository,
     SettingsRepository,
 )
-from anki_killstreaks.streaks import (
+from .streaks import (
     did_card_pass,
     NewAchievement,
     get_next_game_id,

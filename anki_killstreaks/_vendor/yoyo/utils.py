@@ -20,7 +20,7 @@ import re
 import string
 import sys
 
-from anki_killstreaks._vendor.yoyo.config import CONFIG_EDITOR_KEY
+from .config import CONFIG_EDITOR_KEY
 
 try:
     import termios

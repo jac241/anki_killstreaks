@@ -8,7 +8,7 @@
 
 import re
 
-from anki_killstreaks._vendor.sqlparse import tokens
+from . import tokens
 
 
 def is_keyword(value):

@@ -6,8 +6,8 @@
 # This module is part of python-sqlparse and is released under
 # the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
-from anki_killstreaks._vendor.sqlparse import sql, tokens as T
-from anki_killstreaks._vendor.sqlparse.utils import split_unquoted_newlines
+from .. import sql, tokens as T
+from ..utils import split_unquoted_newlines
 
 
 class StripCommentsFilter(object):

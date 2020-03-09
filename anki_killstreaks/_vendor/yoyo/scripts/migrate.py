@@ -16,14 +16,14 @@ import argparse
 import re
 import warnings
 
-from anki_killstreaks._vendor.yoyo import (
+from .. import (
     read_migrations,
     default_migration_table,
     ancestors,
     descendants,
 )
-from anki_killstreaks._vendor.yoyo.scripts.main import InvalidArgument, get_backend
-from anki_killstreaks._vendor.yoyo import utils
+from .main import InvalidArgument, get_backend
+from .. import utils
 
 
 def install_argparsers(global_parser, subparsers):

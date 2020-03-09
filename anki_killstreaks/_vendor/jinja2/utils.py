@@ -8,8 +8,8 @@ from random import choice
 from random import randrange
 from threading import Lock
 
-from anki_killstreaks._vendor.markupsafe import escape
-from anki_killstreaks._vendor.markupsafe import Markup
+from ..markupsafe import escape
+from ..markupsafe import Markup
 
 from ._compat import abc
 from ._compat import string_types
@@ -716,7 +716,7 @@ except SyntaxError:
 
 
 def soft_unicode(s):
-    from anki_killstreaks._vendor.markupsafe import soft_unicode
+    from ..markupsafe import soft_unicode
 
     warnings.warn(
         "'jinja2.utils.soft_unicode' will be removed in version 3.0."

@@ -8,7 +8,7 @@ import weakref
 from functools import partial
 from functools import reduce
 
-from anki_killstreaks._vendor.markupsafe import Markup
+from ..markupsafe import Markup
 
 from . import nodes
 from ._compat import encode_filename
@@ -1035,7 +1035,11 @@ class Template(object):
         """Creates a template object from compiled code and the globals.  This
         is used by the loaders and environment to create a template object.
         """
-        namespace = {"environment": environment, "__file__": code.co_filename}
+        namespace = {
+            "environment": environment,
+            "__file__": code.co_filename,
+            "__name__": __name__
+        }
         exec(code, namespace)
         rv = cls._from_namespace(environment, namespace, globals)
         rv._uptodate = uptodate

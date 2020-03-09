@@ -19,15 +19,15 @@ import logging
 import os
 import sys
 
-from anki_killstreaks._vendor.yoyo import connections
-from anki_killstreaks._vendor.yoyo import default_migration_table
-from anki_killstreaks._vendor.yoyo import logger
-from anki_killstreaks._vendor.yoyo import utils
-from anki_killstreaks._vendor.yoyo.config import CONFIG_FILENAME
-from anki_killstreaks._vendor.yoyo.config import find_config
-from anki_killstreaks._vendor.yoyo.config import read_config
-from anki_killstreaks._vendor.yoyo.config import save_config
-from anki_killstreaks._vendor.yoyo.config import update_argparser_defaults
+from .. import connections
+from .. import default_migration_table
+from .. import logger
+from .. import utils
+from ..config import CONFIG_FILENAME
+from ..config import find_config
+from ..config import read_config
+from ..config import save_config
+from ..config import update_argparser_defaults
 
 verbosity_levels = {
     0: logging.ERROR,

@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import itertools
 from os.path import join, dirname
 
-from anki_killstreaks._vendor import attr
+from ._vendor import attr
 
 
 DEFAULT_GAME_ID = "halo_3"

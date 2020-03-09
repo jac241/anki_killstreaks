@@ -10,7 +10,7 @@ import itertools
 import re
 from collections import deque
 from contextlib import contextmanager
-from anki_killstreaks._vendor.sqlparse.compat import text_type
+from .compat import text_type
 
 # This regular expression replaces the home-cooked parser that was here before.
 # It is much faster, but requires an extra post-processing step to get the

@@ -6,21 +6,21 @@
 # This module is part of python-sqlparse and is released under
 # the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
-from anki_killstreaks._vendor.sqlparse.filters.others import SerializerUnicode
-from anki_killstreaks._vendor.sqlparse.filters.others import StripCommentsFilter
-from anki_killstreaks._vendor.sqlparse.filters.others import StripWhitespaceFilter
-from anki_killstreaks._vendor.sqlparse.filters.others import SpacesAroundOperatorsFilter
+from .others import SerializerUnicode
+from .others import StripCommentsFilter
+from .others import StripWhitespaceFilter
+from .others import SpacesAroundOperatorsFilter
 
-from anki_killstreaks._vendor.sqlparse.filters.output import OutputPHPFilter
-from anki_killstreaks._vendor.sqlparse.filters.output import OutputPythonFilter
+from .output import OutputPHPFilter
+from .output import OutputPythonFilter
 
-from anki_killstreaks._vendor.sqlparse.filters.tokens import KeywordCaseFilter
-from anki_killstreaks._vendor.sqlparse.filters.tokens import IdentifierCaseFilter
-from anki_killstreaks._vendor.sqlparse.filters.tokens import TruncateStringFilter
+from .tokens import KeywordCaseFilter
+from .tokens import IdentifierCaseFilter
+from .tokens import TruncateStringFilter
 
-from anki_killstreaks._vendor.sqlparse.filters.reindent import ReindentFilter
-from anki_killstreaks._vendor.sqlparse.filters.right_margin import RightMarginFilter
-from anki_killstreaks._vendor.sqlparse.filters.aligned_indent import AlignedIndentFilter
+from .reindent import ReindentFilter
+from .right_margin import RightMarginFilter
+from .aligned_indent import AlignedIndentFilter
 
 __all__ = [
     'SerializerUnicode',

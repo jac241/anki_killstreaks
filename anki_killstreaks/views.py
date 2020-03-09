@@ -4,9 +4,9 @@ from pathlib import Path
 import attr
 import base64
 
-from anki_killstreaks.toolz import unique, join, groupby
-from anki_killstreaks.streaks import get_all_displayable_medals, all_game_ids
-from anki_killstreaks._vendor import jinja2
+from ._vendor.jinja2 import Template
+from .toolz import unique, join, groupby
+from .streaks import get_all_displayable_medals, all_game_ids
 
 
 def MedalsOverviewHTML(achievements, header_text, current_game_id):
@@ -102,14 +102,14 @@ class MedalType:
 
 
 _templates_dir = Path(__file__).parent / "templates"
-_template_loader = jinja2.FileSystemLoader(searchpath=_templates_dir)
-_template_env = jinja2.Environment(loader=_template_loader)
 
 
 def MedalsOverview(
     medal_types, current_game_id, header_text="Medals earned this session:",
 ):
-    template = _template_env.get_template("medals_overview.html")
+    with open(_templates_dir /"medals_overview.html", 'r') as f:
+        template = Template(f.read())
+
     return template.render(
         medal_types_by_game_id=medal_types_by_game_id(
             medal_types, all_game_ids
