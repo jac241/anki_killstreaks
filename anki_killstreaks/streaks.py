@@ -278,6 +278,12 @@ class AnswerShownState:
             current_streak_index=self._current_streak_index,
         )
 
+
+    def on_show_answer(self):
+        """Can be triggered by edit field in review add-on"""
+        return self
+
+
     def _advancement_requirements_met(
         self, card_did_pass, question_answered_at
     ):

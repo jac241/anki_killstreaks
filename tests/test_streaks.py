@@ -218,6 +218,31 @@ def test_AnswerShownState_should_go_to_index_1_if_answer_was_correct_but_out_of_
     question_shown_state = answer_shown_state.on_answer(card_did_pass=True)
     assert question_shown_state.current_medal_state == states[1]
 
+def test_AnswerShownState_should_just_repeat_if_on_answer_shown_called():
+    states = [
+        MultikillStartingState(),
+        MultikillFirstAnswerState(),
+        MultikillMedalState(
+            id_='test',
+            name='test',
+            medal_image=None,
+            rank=2,
+            game_id='t',
+        ),
+        EndState(rank=3)
+    ]
+
+    answer_shown_state = AnswerShownState(
+        states=states,
+        question_shown_at=datetime.now(),
+        answer_shown_at=datetime.now() + timedelta(seconds=10),
+        interval_s=8,
+        current_streak_index=2
+    )
+
+    repeated_state = answer_shown_state.on_show_answer()
+    assert repeated_state == answer_shown_state
+
 def test_should_be_able_to_get_perfection_medal_after_50_kills():
     state = QuestionShownState(
         states=HALO_KILLING_SPREE_STATES,
