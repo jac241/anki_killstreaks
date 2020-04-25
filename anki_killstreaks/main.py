@@ -46,6 +46,16 @@ from .views import (
 )
 from ._vendor import attr
 
+try:
+    from aqt.sound import av_player
+    from anki.sound import SoundOrVideoTag
+
+    legacy_play = None
+except (ImportError, ModuleNotFoundError):
+    from anki.sound import play as legacy_play
+
+    av_player = Noneplay
+
 
 def show_tool_tip_if_medals(displayable_medals):
     if len(displayable_medals) > 0:
@@ -143,6 +153,18 @@ def _wrap_anki_objects(profile_controller):
 _tooltipTimer = None
 _tooltipLabel = None
 
+# from Glutanimate's hitmarkers addon
+def play_all(sounds):
+    for audio_path in sounds:
+        if Path(audio_path).is_file():
+            if av_player:
+                # Delay audio playback to prevent reviewer from stopping playback
+                # on showQuestion
+                mw.progress.timer(
+                    1, lambda: av_player.play_file(filename=audio_path), False
+                )
+            else:
+                legacy_play(audio_path)
 
 def showToolTip(medals, period=local_conf["duration"]):
     global _tooltipTimer, _tooltipLabel
@@ -154,7 +176,8 @@ def showToolTip(medals, period=local_conf["duration"]):
 
     closeTooltip()
     medals_html = "\n".join(medal_html(m) for m in medals)
-
+    medals_sounds = [m.medal_sound for m in medals]
+    
     aw = mw.app.activeWindow() or mw
     lab = CustomLabel(
         """\
@@ -176,6 +199,7 @@ def showToolTip(medals, period=local_conf["duration"]):
     vdiff = (local_conf["image_height"] - 128) / 2
     lab.move(aw.mapToGlobal(QPoint(0, -260 - vdiff + aw.height())))
     lab.show()
+    play_all(medals_sounds)
     _tooltipTimer = mw.progress.timer(period, closeTooltip, False)
     _tooltipLabel = lab
 
