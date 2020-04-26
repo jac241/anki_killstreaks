@@ -159,6 +159,7 @@ def give_sounds(sounds):
             yield audio_path
 
 def play_all(sounds):
+    # Note: sounds will not work if hitmarkers is active.
     if av_player:
         # Delay audio playback to prevent reviewer from stopping playback
         # on showQuestion
