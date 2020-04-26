@@ -153,17 +153,15 @@ def _wrap_anki_objects(profile_controller):
 _tooltipTimer = None
 _tooltipLabel = None
 
-# from Glutanimate's hitmarkers addon
-# still doesn't play multiple sounds, idk why
 def give_sounds(sounds):
     for audio_path in sounds:
         if Path(audio_path).is_file():
             yield audio_path
+
 def play_all(sounds):
     if av_player:
         # Delay audio playback to prevent reviewer from stopping playback
         # on showQuestion
-        # av_player.insert_file(filename=audio_path)
         mw.progress.timer(
             1, lambda: [av_player.insert_file(filename=audio_path) for audio_path in give_sounds(sounds)], False
         )
