@@ -163,8 +163,8 @@ def test_day_start_time_should_return_4_am_yesterday_if_it_is_before_4am_today()
 
 
 @pytest.fixture
-def settings_repo(db_connection):
-    return SettingsRepository(db_connection=db_connection)
+def settings_repo(get_db_connection):
+    return SettingsRepository(get_db_connection=get_db_connection)
 
 
 def test_SettingsRepository_current_game_id_should_return_default_game_id_on_first_run(settings_repo):
@@ -177,13 +177,15 @@ def test_SettingsRepository_current_game_id_should_be_able_to_be_saved(settings_
 
 
 def test_SettingsRepository_toggle_auto_switch_game_should_do_what_it_says(settings_repo):
-    settings_repo.conn.execute("UPDATE settings SET should_auto_switch_game = ?", (True,))
+    with settings_repo.get_db_connection() as conn:
+        conn.execute("UPDATE settings SET should_auto_switch_game = ?", (True,))
     settings_repo.toggle_auto_switch_game()
     assert settings_repo.should_auto_switch_game == False
 
 
 def test_SettingsRepository_auto_switch_game_status_should_return_stored_status(settings_repo):
-    settings_repo.conn.execute("UPDATE settings SET should_auto_switch_game = ?", (True,))
+    with settings_repo.get_db_connection() as conn:
+        conn.execute("UPDATE settings SET should_auto_switch_game = ?", (True,))
     assert settings_repo.should_auto_switch_game == True
 
 

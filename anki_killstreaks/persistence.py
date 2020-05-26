@@ -157,26 +157,30 @@ def day_start_time(rollover_hour, current_time=datetime.now()):
 
 
 class SettingsRepository:
-    def __init__(self, db_connection):
-        self.conn = db_connection
+    def __init__(self, get_db_connection):
+        self.get_db_connection = get_db_connection
 
     @property
     def current_game_id(self):
-        cursor = self.conn.execute("SELECT current_game_id FROM settings;")
-        return cursor.fetchone()[0]
+        with self.get_db_connection() as conn:
+            cursor = conn.execute("SELECT current_game_id FROM settings;")
+            return cursor.fetchone()[0]
 
     @current_game_id.setter
     def current_game_id(self, game_id):
-        self.conn.execute("UPDATE settings SET current_game_id = ?", (game_id,))
+        with self.get_db_connection() as conn:
+            conn.execute("UPDATE settings SET current_game_id = ?", (game_id,))
 
     def toggle_auto_switch_game(self):
-        self.conn.execute(
-            "UPDATE settings SET should_auto_switch_game = NOT should_auto_switch_game"
-        )
+        with self.get_db_connection() as conn:
+            conn.execute(
+                "UPDATE settings SET should_auto_switch_game = NOT should_auto_switch_game"
+            )
 
     @property
     def should_auto_switch_game(self):
-        cursor = self.conn.execute(
-            "SELECT should_auto_switch_game FROM settings;"
-        )
-        return cursor.fetchone()[0]
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                "SELECT should_auto_switch_game FROM settings;"
+            )
+            return cursor.fetchone()[0]

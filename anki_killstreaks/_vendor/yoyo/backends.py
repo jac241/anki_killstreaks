@@ -118,7 +118,7 @@ class DatabaseBackend(object):
     lock_table = "yoyo_lock"
     list_tables_sql = "SELECT table_name FROM information_schema.tables"
     version_table = "_yoyo_version"
-    migration_table = "_yoyo_migrations"
+    migration_table = "_yoyo_migration"
     is_applied_sql = """
         SELECT COUNT(1) FROM {0.migration_table_quoted}
         WHERE id=:id"""

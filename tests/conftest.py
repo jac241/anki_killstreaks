@@ -43,3 +43,9 @@ def db_connection(db_settings):
     migrate_database(settings=db_settings)
 
     return sqlite3.connect(str(db_settings.db_path), isolation_level=None)
+
+@pytest.fixture
+def get_db_connection(db_settings):
+    migrate_database(settings=db_settings)
+
+    return lambda: sqlite3.connect(str(db_settings.db_path), isolation_level=None)

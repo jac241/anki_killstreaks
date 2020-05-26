@@ -74,8 +74,10 @@ class ProfileController:
 
         migrate_database(settings=self._db_settings)
 
+        get_db_for_profile = partial(get_db_connection, self._db_settings)
+
         with get_db_connection(self._db_settings) as db_connection:
-            settings_repo = SettingsRepository(db_connection)
+            settings_repo = SettingsRepository(get_db_for_profile)
 
             self._achievements_repo = AchievementsRepository(
                 db_connection=db_connection,
@@ -156,8 +158,8 @@ class ProfileController:
 
     @ensure_loaded
     def get_current_game_id(self):
-        with get_db_connection(self._db_settings) as db_connection:
-            return SettingsRepository(db_connection).current_game_id
+        get_db_for_profile = partial(get_db_connection, self._db_settings)
+        return SettingsRepository(get_db_for_profile).current_game_id
 
     @ensure_loaded
     def get_reviewing_controller(self):
@@ -165,8 +167,8 @@ class ProfileController:
 
     @ensure_loaded
     def get_settings_repo(self):
-        with get_db_connection(self._db_settings) as db_connection:
-            return SettingsRepository(db_connection=db_connection)
+        get_db_for_profile = partial(get_db_connection, self._db_settings)
+        return SettingsRepository(get_db_for_profile)
 
 
 def call_method_on_object_from_factory_function(
