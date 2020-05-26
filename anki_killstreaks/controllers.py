@@ -76,17 +76,14 @@ class ProfileController:
 
         get_db_for_profile = partial(get_db_connection, self._db_settings)
 
-        with get_db_connection(self._db_settings) as db_connection:
-            settings_repo = SettingsRepository(get_db_for_profile)
+        settings_repo = SettingsRepository(get_db_for_profile)
 
-            self._achievements_repo = AchievementsRepository(
-                db_connection=db_connection,
-            )
+        self._achievements_repo = AchievementsRepository(get_db_for_profile)
 
-            self._reviewing_controller = self._build_reviewing_controller(
-                game_id=settings_repo.current_game_id,
-                should_auto_switch_game=settings_repo.should_auto_switch_game,
-            )
+        self._reviewing_controller = self._build_reviewing_controller(
+            game_id=settings_repo.current_game_id,
+            should_auto_switch_game=settings_repo.should_auto_switch_game,
+        )
 
         self.is_loaded = True
 

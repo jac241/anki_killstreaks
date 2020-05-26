@@ -48,22 +48,24 @@ def get_db_connection(db_settings):
 
 
 class AchievementsRepository:
-    def __init__(self, db_connection):
-        self.conn = db_connection
+    def __init__(self, get_db_connection):
+        self.get_db_connection = get_db_connection
 
     def create_all(self, new_achievements):
-        self.conn.executemany(
-            "INSERT INTO achievements(medal_id, deck_id) VALUES (?, ?)",
-            ((a.medal_id, a.deck_id) for a in new_achievements),
-        )
+        with self.get_db_connection() as conn:
+            conn.executemany(
+                "INSERT INTO achievements(medal_id, deck_id) VALUES (?, ?)",
+                ((a.medal_id, a.deck_id) for a in new_achievements),
+            )
 
     # only used by tests, should eliminate
     def all(self):
-        cursor = self.conn.execute("SELECT * FROM achievements")
+        with self.get_db_connection() as conn:
+            cursor = conn.execute("SELECT * FROM achievements")
 
-        loaded_achievements = [
-            PersistedAchievement(*row, medal=None) for row in cursor
-        ]
+            loaded_achievements = [
+                PersistedAchievement(*row, medal=None) for row in cursor
+            ]
 
         # will probably become a performance issue, move to
         # spot where we need this join.
@@ -83,17 +85,18 @@ class AchievementsRepository:
         return self.count_by_medal_id(created_at_gt=day_start_time)
 
     def count_by_medal_id(self, created_at_gt=min_datetime):
-        cursor = self.conn.execute(
-            """
-            SELECT medal_id, count(*)
-            FROM achievements
-            WHERE created_at > ?
-            GROUP BY medal_id
-            """,
-            (created_at_gt.astimezone(timezone.utc),),
-        )
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                """
+                SELECT medal_id, count(*)
+                FROM achievements
+                WHERE created_at > ?
+                GROUP BY medal_id
+                """,
+                (created_at_gt.astimezone(timezone.utc),),
+            )
 
-        return dict(row for row in cursor)
+            return dict(row for row in cursor)
 
     def todays_achievements_for_deck_ids(self, day_start_time, deck_ids):
         return self.achievements_for_deck_ids_since(
@@ -101,31 +104,33 @@ class AchievementsRepository:
         )
 
     def achievements_for_deck_ids_since(self, deck_ids, since_datetime):
-        cursor = self.conn.execute(
-            f"""
-            SELECT medal_id, count(*)
-            FROM achievements
-            WHERE created_at > ? AND
-                deck_id in ({','.join('?' for i in deck_ids)})
-            GROUP BY medal_id
-            """,
-            (since_datetime.astimezone(timezone.utc), *deck_ids),
-        )
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                f"""
+                SELECT medal_id, count(*)
+                FROM achievements
+                WHERE created_at > ? AND
+                    deck_id in ({','.join('?' for i in deck_ids)})
+                GROUP BY medal_id
+                """,
+                (since_datetime.astimezone(timezone.utc), *deck_ids),
+            )
 
-        return dict(row for row in cursor)
+            return dict(row for row in cursor)
 
     def achievements_for_whole_collection_since(self, since_datetime):
-        cursor = self.conn.execute(
-            f"""
-            SELECT medal_id, count(*)
-            FROM achievements
-            WHERE created_at > ?
-            GROUP BY medal_id
-            """,
-            (since_datetime.astimezone(timezone.utc),),
-        )
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                f"""
+                SELECT medal_id, count(*)
+                FROM achievements
+                WHERE created_at > ?
+                GROUP BY medal_id
+                """,
+                (since_datetime.astimezone(timezone.utc),),
+            )
 
-        return dict(row for row in cursor)
+            return dict(row for row in cursor)
 
 
 @attr.s

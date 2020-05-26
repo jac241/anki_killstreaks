@@ -23,10 +23,6 @@ def reviewing_controller(store, achievements_repo):
         achievements_repo=achievements_repo
     )
 
-@pytest.fixture
-def achievements_repo(db_connection):
-    return AchievementsRepository(db_connection=db_connection)
-
 
 @pytest.fixture
 def store(question_shown_state):

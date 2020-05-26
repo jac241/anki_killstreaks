@@ -12,8 +12,7 @@ os.environ['IN_TEST_SUITE'] = 'true'
 
 import pytest
 
-from anki_killstreaks.persistence import DbSettings, migrate_database
-
+from anki_killstreaks.persistence import DbSettings, migrate_database, AchievementsRepository
 
 
 @pytest.yield_fixture()
@@ -44,8 +43,16 @@ def db_connection(db_settings):
 
     return sqlite3.connect(str(db_settings.db_path), isolation_level=None)
 
+
 @pytest.fixture
 def get_db_connection(db_settings):
     migrate_database(settings=db_settings)
 
     return lambda: sqlite3.connect(str(db_settings.db_path), isolation_level=None)
+
+
+@pytest.fixture
+def achievements_repo(get_db_connection):
+    # return AchievementsRepository(db_connection=db_connection)
+    return AchievementsRepository(get_db_connection)
+

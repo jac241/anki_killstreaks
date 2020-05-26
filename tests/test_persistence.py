@@ -24,10 +24,6 @@ def test_migrate_database_creates_a_medals_database(db_settings):
 
 
 @pytest.fixture
-def achievements_repo(db_connection):
-    return AchievementsRepository(db_connection=db_connection)
-
-@pytest.fixture
 def a_new_achievement():
     return NewAchievement(
         medal=MultikillMedalState(
@@ -62,10 +58,11 @@ def test_AchievementsRepository_count_by_medal_id_returns_dict_of_counted_achiev
 def test_AchievementsRepository_todays_achievements_returns_achievements_grouped_by_medal_id_created_after_today(achievements_repo, a_new_achievement):
     achievements_repo.create_all([a_new_achievement])
 
-    achievements_repo.conn.execute(
-        "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
-        ("Double Kill", datetime.now().astimezone(timezone.utc) - timedelta(days=2), 0)
-    )
+    with achievements_repo.get_db_connection() as conn:
+        conn.execute(
+            "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+            ("Double Kill", datetime.now().astimezone(timezone.utc) - timedelta(days=2), 0)
+        )
 
     # I guess don't run this at 4am lol
     result = achievements_repo.todays_achievements(day_start_time(rollover_hour=4))
@@ -76,15 +73,16 @@ def test_AchievementsRepository_todays_achievements_returns_achievements_grouped
 def test_AchievementsRepository_todays_achievements_returns_achievements_for_today_scoped_by_deck_ids(achievements_repo, a_new_achievement):
     achievements_repo.create_all([a_new_achievement, a_new_achievement])
 
-    achievements_repo.conn.execute(
-        "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
-        ("Double Kill", datetime.now() - timedelta(days=2), 0)
-    )
+    with achievements_repo.get_db_connection() as conn:
+        conn.execute(
+            "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+            ("Double Kill", datetime.now() - timedelta(days=2), 0)
+        )
 
-    achievements_repo.conn.execute(
-        "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
-        ("Double Kill", datetime.now() - timedelta(days=2), 1)
-    )
+        conn.execute(
+            "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+            ("Double Kill", datetime.now() - timedelta(days=2), 1)
+        )
 
     day_start_time = datetime.combine(datetime.today().date(), datetime.min.time())
     result = achievements_repo.todays_achievements_for_deck_ids(
@@ -97,20 +95,21 @@ def test_AchievementsRepository_todays_achievements_returns_achievements_for_tod
 def test_AchievementsRepository_achievements_for_deck_ids_since_returns_correct_achievements(achievements_repo, a_new_achievement):
     achievements_repo.create_all([a_new_achievement, a_new_achievement])
 
-    achievements_repo.conn.execute(
-        "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
-        ("Double Kill", datetime.now() - timedelta(days=31), 0)
-    )
+    with achievements_repo.get_db_connection() as conn:
+        conn.execute(
+            "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+            ("Double Kill", datetime.now() - timedelta(days=31), 0)
+        )
 
-    achievements_repo.conn.execute(
-        "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
-        ("Double Kill", datetime.now() - timedelta(days=31), 1)
-    )
+        conn.execute(
+            "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+            ("Double Kill", datetime.now() - timedelta(days=31), 1)
+        )
 
-    achievements_repo.conn.execute(
-        "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
-        ("Double Kill", datetime.now(), 1)
-    )
+        conn.execute(
+            "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+            ("Double Kill", datetime.now(), 1)
+        )
 
     result = achievements_repo.achievements_for_deck_ids_since(
         deck_ids=[0],
@@ -122,19 +121,20 @@ def test_AchievementsRepository_achievements_for_deck_ids_since_returns_correct_
 
 def test_AchievementsRepository_achievements_for_whole_collection_since_returns_correct_achievements(achievements_repo, a_new_achievement):
     achievements_repo.create_all([a_new_achievement, a_new_achievement])
-    achievements_repo.conn.execute(
-        "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
-        ("Double Kill", datetime.now(), 1)
-    )
 
-    achievements_repo.conn.execute(
-        "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
-        ("Double Kill", datetime.now() - timedelta(days=31), 0)
-    )
-    achievements_repo.conn.execute(
-        "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
-        ("Double Kill", datetime.now() - timedelta(days=31), 1)
-    )
+    with achievements_repo.get_db_connection() as conn:
+        conn.execute(
+            "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+            ("Double Kill", datetime.now(), 1)
+        )
+        conn.execute(
+            "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+            ("Double Kill", datetime.now() - timedelta(days=31), 0)
+        )
+        conn.execute(
+            "INSERT INTO achievements(medal_id, created_at, deck_id) VALUES (?, ?, ?)",
+            ("Double Kill", datetime.now() - timedelta(days=31), 1)
+        )
 
     result = achievements_repo.achievements_for_whole_collection_since(
         since_datetime=datetime.now() - timedelta(days=30)
