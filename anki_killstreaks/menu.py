@@ -7,6 +7,7 @@ from .game import (
     toggle_auto_switch_game,
     load_auto_switch_game_status,
 )
+from .profile_settings import show_dialog
 
 
 def connect_menu(main_window, profile_controller):
@@ -83,6 +84,9 @@ def connect_menu(main_window, profile_controller):
             ),
         )
     )
+
+    profile_settings_action = top_menu.addAction("Profile settings...")
+    profile_settings_action.triggered.connect(lambda: show_dialog(main_window))
 
     main_window.form.menubar.addMenu(top_menu)
 
