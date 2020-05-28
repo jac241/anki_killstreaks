@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>307</width>
+    <height>226</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,6 +18,9 @@
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Log in to Killstreaks/Achievements leaderboard</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
@@ -34,26 +37,40 @@
       <widget class="QLineEdit" name="emailLineEdit"/>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="tokenLabel">
+      <widget class="QLabel" name="passwordLabel">
        <property name="text">
-        <string>Token</string>
+        <string>Password</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="tokenLineEdit"/>
+      <widget class="QLineEdit" name="passwordLineEdit">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QPushButton" name="verifyLoginButton">
+      <widget class="QPushButton" name="loginButton">
        <property name="text">
-        <string>Verify Login</string>
+        <string>Login</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="statusLabel">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLabel" name="statusLabel">
+      <widget class="QLabel" name="label_2">
        <property name="text">
-        <string/>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://ankiachievements.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0068da;&quot;&gt;Sign Up&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>

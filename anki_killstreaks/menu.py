@@ -10,7 +10,7 @@ from .game import (
 from .profile_settings import show_dialog
 
 
-def connect_menu(main_window, profile_controller):
+def connect_menu(main_window, profile_controller, network_thread):
     # probably overdoing it with partial functions here... but none of these
     # need to be classes honestly
     top_menu = QMenu("Killstreaks", main_window)
@@ -86,7 +86,9 @@ def connect_menu(main_window, profile_controller):
     )
 
     profile_settings_action = top_menu.addAction("Profile settings...")
-    profile_settings_action.triggered.connect(lambda: show_dialog(main_window))
+    profile_settings_action.triggered.connect(
+        lambda: show_dialog(main_window, network_thread)
+    )
 
     main_window.form.menubar.addMenu(top_menu)
 
