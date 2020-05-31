@@ -6,9 +6,10 @@ import json
 import requests
 from queue import Queue
 from functools import partial
+import webbrowser
 
 
-sra_base_url = "http://localhost:5000"
+sra_base_url = "https://ankiachievements.com"
 
 
 def show_dialog(parent, network_thread):
@@ -27,6 +28,7 @@ class ProfileSettingsDialog(QDialog):
         self._network_thread = network_thread
 
         self._connect_login_button()
+        self._connect_signup_button()
 
     def _connect_login_button(self):
         self.ui.loginButton.clicked.connect(self._verify_login)
@@ -55,6 +57,10 @@ class ProfileSettingsDialog(QDialog):
 
     def on_connection_error(self):
         self.ui.statusLabel.setText("Error connecting to server. Try again later.")
+
+    def _connect_signup_button(self):
+        signup_url = urljoin(sra_base_url, "users/sign_up")
+        self.ui.signupLabel.linkActivated.connect(lambda: webbrowser.open(signup_url))
 
 
 def verify_login_on_remote(email, password, listener):
