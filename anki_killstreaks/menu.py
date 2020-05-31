@@ -87,7 +87,7 @@ def connect_menu(main_window, profile_controller, network_thread):
 
     profile_settings_action = top_menu.addAction("Profile settings...")
     profile_settings_action.triggered.connect(
-        lambda: show_dialog(main_window, network_thread)
+        lambda: show_dialog(main_window, network_thread, profile_controller.get_user_repo())
     )
 
     main_window.form.menubar.addMenu(top_menu)

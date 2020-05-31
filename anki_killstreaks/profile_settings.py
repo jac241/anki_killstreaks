@@ -1,49 +1,50 @@
 from aqt.qt import QDialog, QThread
-from .ui.forms.profile_settings_dialog import Ui_ProfileSettingsDialog
-import urllib.request
-from urllib.parse import urljoin
-import json
-import requests
-from queue import Queue
+
 from functools import partial
+import json
+from queue import Queue
+from urllib.parse import urljoin
 import webbrowser
 
+from . import accounts
+from .networking import sra_base_url
+from .ui.forms.profile_settings_dialog import Ui_ProfileSettingsDialog
 
-sra_base_url = "https://ankiachievements.com"
 
-
-def show_dialog(parent, network_thread):
-    ProfileSettingsDialog(parent, network_thread).exec_()
+def show_dialog(parent, network_thread, user_repo):
+    ProfileSettingsDialog(parent, network_thread, user_repo).exec_()
 
 
 class ProfileSettingsDialog(QDialog):
     loginPageIndex = 0
     logoutPageIndex = 1
 
-    def __init__(self, parent, network_thread):
+    def __init__(self, parent, network_thread, user_repo):
         super().__init__(parent)
         self.ui = Ui_ProfileSettingsDialog()
         self.ui.setupUi(self)
 
         self._network_thread = network_thread
+        self._user_repo = user_repo
 
         self._connect_login_button()
         self._connect_signup_button()
 
     def _connect_login_button(self):
-        self.ui.loginButton.clicked.connect(self._verify_login)
+        self.ui.loginButton.clicked.connect(self._login)
 
-    def _verify_login(self):
+    def _login(self):
         email = self.ui.emailLineEdit.text()
         password = self.ui.passwordLineEdit.text()
 
-        job = partial(
-            verify_login_on_remote,
+        login_job = partial(
+            accounts.login,
             email,
             password,
-            self
+            listener=self,
+            user_repo=self._user_repo,
         )
-        self._network_thread.perform_later(job)
+        self._network_thread.perform_later(login_job)
 
     def on_successful_login(self, user_attrs):
         self._switchToLogoutPage(user_attrs)
@@ -62,31 +63,3 @@ class ProfileSettingsDialog(QDialog):
         signup_url = urljoin(sra_base_url, "users/sign_up")
         self.ui.signupLabel.linkActivated.connect(lambda: webbrowser.open(signup_url))
 
-
-def verify_login_on_remote(email, password, listener):
-    headers={
-        "user_email": "JimmyYoshi@gmail.com",
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-    }
-
-    body = dict(
-        email=email,
-        password=password,
-    )
-    url = urljoin(sra_base_url, "api/v1/auth/sign_in")
-
-    try:
-        response = requests.post(url, headers=headers, json=body)
-
-        print(response.status_code)
-        print(response.text)
-
-        if response.status_code == 200:
-            listener.on_successful_login(response.json()["data"])
-        elif response.status_code == 401:
-            listener.on_unauthorized(response.json())
-        else:
-            raise RuntimeError("Unhandled response status", response)
-    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-        listener.on_connection_error()

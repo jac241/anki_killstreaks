@@ -1,6 +1,9 @@
 from aqt.qt import QDialog, QThread
 
 
+sra_base_url = "https://ankiachievements.com"
+
+
 class NetworkThread(QThread):
     stop_sentinel = "__stop!__"
 

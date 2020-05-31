@@ -6,8 +6,13 @@ import pytest
 def user_repository(get_db_connection):
     return UserRepository(get_db_connection)
 
-def test_UserRepository_create_should_create_user_with_passed_attributes(user_repository):
-    user_repository.create(uid="JimmyYoshi@gmail.com", token="token")
+def test_UserRepository_save_should_user_with_passed_attributes(user_repository):
+    user_repository.save(
+        uid="JimmyYoshi@gmail.com",
+        token="token",
+        client="a client",
+        expiry="sometime",
+    )
 
     with user_repository.get_db_connection() as conn:
         cursor = conn.execute("SELECT * FROM users")
@@ -15,3 +20,5 @@ def test_UserRepository_create_should_create_user_with_passed_attributes(user_re
 
     assert saved_user[1] == "JimmyYoshi@gmail.com"
     assert saved_user[2] == "token"
+    assert saved_user[3] == "a client"
+    assert saved_user[4] == "expiry"

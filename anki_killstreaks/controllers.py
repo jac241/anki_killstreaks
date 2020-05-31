@@ -11,6 +11,7 @@ This pattern has worked alright so far for this simple application.
 from functools import wraps, partial
 
 from ._vendor import attr
+from .accounts import UserRepository
 from .game import set_current_game_id
 from .persistence import (
     migrate_database,
@@ -166,6 +167,12 @@ class ProfileController:
     def get_settings_repo(self):
         get_db_for_profile = partial(get_db_connection, self._db_settings)
         return SettingsRepository(get_db_for_profile)
+
+    @ensure_loaded
+    def get_user_repo(self):
+        get_db_for_profile = partial(get_db_connection, self._db_settings)
+        return UserRepository(get_db_for_profile)
+
 
 
 def call_method_on_object_from_factory_function(
