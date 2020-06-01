@@ -72,7 +72,7 @@ def store_auth_headers(user_repo, headers):
         expiry=headers["expiry"],
     )
 
-
+# TODO try catch for timeout, server down
 def logout(user_repo, listener, shared_headers=shared_headers):
     url = urljoin(sra_base_url, "api/v1/auth/sign_out")
 
@@ -87,6 +87,7 @@ def logout(user_repo, listener, shared_headers=shared_headers):
     )
 
     if response.status_code == 200:
+        _clear_auth_headers(user_repo)
         listener.logged_out.emit()
     elif response.status_code == 404:
         listener.logout_error.emit(response.json())
@@ -105,6 +106,36 @@ def load_auth_headers(user_repo):
     return headers
 
 
+def _clear_auth_headers(user_repo):
+    user_repo.save(
+        uid="",
+        token="",
+        client="",
+        expiry="",
+    )
+
+
 def check_user_logged_in(user_repo):
     user = user_repo.load()
     return user.token and user.uid
+
+
+# TODO try catch for timeout, server down
+def validate_token(user_repo, listener, shared_headers=shared_headers):
+    auth_headers = load_auth_headers(user_repo)
+
+    headers = shared_headers.copy()
+    headers.update(auth_headers)
+
+    response = requests.get(
+        url=urljoin(sra_base_url, "api/v1/auth/validate_token"),
+        headers=headers,
+    )
+
+    if response.status_code == 200:
+        store_auth_headers(user_repo, response.headers)
+    elif response.status_code == 401:
+        _clear_auth_headers(user_repo)
+        listener.token_invalidated.emit(response.json())
+    else:
+        raise RuntimeError("Unhandled response status", response)

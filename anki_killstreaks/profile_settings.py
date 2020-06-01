@@ -32,6 +32,8 @@ class ProfileSettingsDialog(QDialog):
     logged_out = pyqtSignal()
     logout_error = pyqtSignal(dict)
 
+    token_invalidated = pyqtSignal(dict)
+
     def __init__(self, parent, network_thread, user_repo, user_is_logged_in):
         super().__init__(parent)
         self.ui = Ui_ProfileSettingsDialog()
@@ -42,12 +44,14 @@ class ProfileSettingsDialog(QDialog):
 
         self._connect_login_signals()
         self._connect_logout_signals()
+        self._connect_token_validation_signals()
 
         self._connect_login_button()
         self._connect_logout_button()
         self._connect_signup_button()
 
         self._show_correct_auth_form(user_is_logged_in)
+        self._validate_token_if_logged_in(user_is_logged_in)
 
     def _connect_login_signals(self):
         self.logged_in.connect(self.on_successful_login)
@@ -56,6 +60,9 @@ class ProfileSettingsDialog(QDialog):
     def _connect_logout_signals(self):
         self.logged_out.connect(self.on_logout)
         self.logout_error.connect(self.on_logout_error)
+
+    def _connect_token_validation_signals(self):
+        self.token_invalidated.connect(self.on_token_invalidated)
 
     def _connect_login_button(self):
         self.ui.loginButton.clicked.connect(self._login)
@@ -123,3 +130,16 @@ class ProfileSettingsDialog(QDialog):
             self._switchToLogoutPage(user_attrs=attr.asdict(user))
         else:
             self._switchToLoginPage()
+
+    def _validate_token_if_logged_in(self, user_is_logged_in):
+        if user_is_logged_in:
+            job = partial(
+                accounts.validate_token,
+                self._user_repo,
+                listener=self,
+            )
+            self._network_thread.perform_later(job)
+
+    def on_token_invalidated(self, response):
+        self.ui.statusLabel.setText(response["errors"][0])
+        self._switchToLoginPage()
