@@ -59,9 +59,15 @@ class AchievementsRepository:
             )
 
     # only used by tests, should eliminate
-    def all(self):
+    def all(self, since_datetime=min_datetime):
         with self.get_db_connection() as conn:
-            cursor = conn.execute("SELECT * FROM achievements")
+            cursor = conn.execute(
+                """
+                SELECT * FROM achievements
+                WHERE created_at > ?
+                """,
+                (since_datetime, )
+            )
 
             loaded_achievements = [
                 PersistedAchievement(*row, medal=None) for row in cursor

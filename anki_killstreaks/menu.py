@@ -7,7 +7,7 @@ from .game import (
     toggle_auto_switch_game,
     load_auto_switch_game_status,
 )
-from .profile_settings import show_dialog
+from . import profile_settings
 
 
 def connect_menu(main_window, profile_controller, network_thread):
@@ -87,7 +87,7 @@ def connect_menu(main_window, profile_controller, network_thread):
 
     profile_settings_action = top_menu.addAction("Profile settings...")
     profile_settings_action.triggered.connect(
-        lambda: show_dialog(main_window, network_thread, profile_controller.get_user_repo())
+        lambda: profile_settings.show_dialog(main_window, network_thread, profile_controller.get_user_repo(), profile_controller.get_achievements_repo())
     )
 
     main_window.form.menubar.addMenu(top_menu)

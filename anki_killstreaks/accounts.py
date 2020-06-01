@@ -73,7 +73,6 @@ def store_auth_headers(user_repo, headers):
     )
 
 
-# TODO try catch for timeout, server down
 def logout(user_repo, listener, shared_headers=shared_headers):
     url = urljoin(sra_base_url, "api/v1/auth/sign_out")
 
@@ -124,7 +123,6 @@ def check_user_logged_in(user_repo):
     return user.token and user.uid
 
 
-# TODO try catch for timeout, server down
 def validate_token(user_repo, listener, shared_headers=shared_headers):
     auth_headers = load_auth_headers(user_repo)
 

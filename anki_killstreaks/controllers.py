@@ -10,6 +10,7 @@ This pattern has worked alright so far for this simple application.
 """
 from functools import wraps, partial
 
+from . import leaderboards
 from ._vendor import attr
 from .accounts import UserRepository
 from .game import set_current_game_id
@@ -61,6 +62,7 @@ class ProfileController:
     _show_achievements = attr.ib()
     _get_profile_folder_path = attr.ib()
     _stores_by_game_id = attr.ib()
+    _network_thread = attr.ib()
 
     # Attributes modified in load_profile
     is_loaded = attr.ib(default=False)
@@ -72,21 +74,24 @@ class ProfileController:
         self._db_settings = DbSettings.from_profile_folder_path(
             profile_folder_path=self._get_profile_folder_path()
         )
-
         migrate_database(settings=self._db_settings)
-
         get_db_for_profile = partial(get_db_connection, self._db_settings)
-
-        settings_repo = SettingsRepository(get_db_for_profile)
 
         self._achievements_repo = AchievementsRepository(get_db_for_profile)
 
+        settings_repo = SettingsRepository(get_db_for_profile)
         self._reviewing_controller = self._build_reviewing_controller(
             game_id=settings_repo.current_game_id,
             should_auto_switch_game=settings_repo.should_auto_switch_game,
         )
-
         self.is_loaded = True
+
+        # leaderboards.sync_if_logged_in(
+        #     self.get_user_repo(),
+        #     self._achievements_repo,
+        #     self._network_thread,
+        # )
+
 
     def _build_reviewing_controller(self, game_id, should_auto_switch_game):
         new_controller = ReviewingController(

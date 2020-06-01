@@ -61,15 +61,16 @@ def _get_profile_folder_path(profile_manager=mw.pm):
 
 _stores_by_game_id = get_stores_by_game_id(config=local_conf)
 
+_network_queue = Queue()
+_network_thread = NetworkThread(parent=mw, queue=_network_queue)
+
 _profile_controller = ProfileController(
     local_conf=local_conf,
     show_achievements=show_tool_tip_if_medals,
     get_profile_folder_path=_get_profile_folder_path,
     stores_by_game_id=_stores_by_game_id,
+    network_thread = _network_thread,
 )
-
-_network_queue = Queue()
-_network_thread = NetworkThread(parent=mw, queue=_network_queue)
 
 # for debugging
 mw.killstreaks_profile_controller = _profile_controller

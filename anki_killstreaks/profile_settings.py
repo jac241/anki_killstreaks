@@ -8,17 +8,18 @@ import webbrowser
 
 from ._vendor import attr
 
-from . import accounts
+from . import accounts, leaderboards
 from .networking import sra_base_url
 from .ui.forms.profile_settings_dialog import Ui_ProfileSettingsDialog
 
 
-def show_dialog(parent, network_thread, user_repo):
+def show_dialog(parent, network_thread, user_repo, achievements_repo):
     ProfileSettingsDialog(
         parent,
         network_thread,
         user_repo,
-        user_is_logged_in=accounts.check_user_logged_in(user_repo)
+        user_is_logged_in=accounts.check_user_logged_in(user_repo),
+        achievements_repo=achievements_repo,
     ).exec_()
 
 
@@ -36,13 +37,14 @@ class ProfileSettingsDialog(QDialog):
 
     connection_error = pyqtSignal()
 
-    def __init__(self, parent, network_thread, user_repo, user_is_logged_in):
+    def __init__(self, parent, network_thread, user_repo, user_is_logged_in, achievements_repo):
         super().__init__(parent)
         self.ui = Ui_ProfileSettingsDialog()
         self.ui.setupUi(self)
 
         self._network_thread = network_thread
         self._user_repo = user_repo
+        self._achievements_repo = achievements_repo
 
         self._connect_login_signals()
         self._connect_logout_signals()
@@ -58,6 +60,7 @@ class ProfileSettingsDialog(QDialog):
 
     def _connect_login_signals(self):
         self.logged_in.connect(self.on_successful_login)
+        self.logged_in.connect(self._start_sync_job)
         self.unauthorized_login.connect(self.on_unauthorized)
 
     def _connect_logout_signals(self):
@@ -97,6 +100,13 @@ class ProfileSettingsDialog(QDialog):
     def _clear_login_form(self):
         email = self.ui.emailLineEdit.setText("")
         password = self.ui.passwordLineEdit.setText("")
+
+    def _start_sync_job(self):
+        leaderboards.sync_if_logged_in(
+            user_repo=self._user_repo,
+            achievements_repo=self._achievements_repo,
+            network_thread=self._network_thread,
+        )
 
     def on_unauthorized(self, response):
         self.ui.statusLabel.setText(response["errors"][0])
