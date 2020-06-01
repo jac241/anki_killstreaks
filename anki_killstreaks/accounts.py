@@ -87,9 +87,9 @@ def logout(user_repo, listener, shared_headers=shared_headers):
     )
 
     if response.status_code == 200:
-        listener.on_logout()
+        listener.logged_out.emit()
     elif response.status_code == 404:
-        listener.on_logout_error(response.json())
+        listener.logout_error.emit(response.json())
     else:
         raise RuntimeError("Unhandled response status", response)
 

@@ -22,6 +22,9 @@ class ProfileSettingsDialog(QDialog):
     logged_in = pyqtSignal(dict)
     unauthorized_login = pyqtSignal(dict)
 
+    logged_out = pyqtSignal()
+    logout_error = pyqtSignal(dict)
+
     def __init__(self, parent, network_thread, user_repo):
         super().__init__(parent)
         self.ui = Ui_ProfileSettingsDialog()
@@ -31,6 +34,7 @@ class ProfileSettingsDialog(QDialog):
         self._user_repo = user_repo
 
         self._connect_login_signals()
+        self._connect_logout_signals()
 
         self._connect_login_button()
         self._connect_logout_button()
@@ -39,6 +43,10 @@ class ProfileSettingsDialog(QDialog):
     def _connect_login_signals(self):
         self.logged_in.connect(self.on_successful_login)
         self.unauthorized_login.connect(self.on_unauthorized)
+
+    def _connect_logout_signals(self):
+        self.logged_out.connect(self.on_logout)
+        self.logout_error.connect(self.on_logout_error)
 
     def _connect_login_button(self):
         self.ui.loginButton.clicked.connect(self._login)
