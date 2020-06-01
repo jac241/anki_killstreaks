@@ -61,7 +61,7 @@ def login(email, password, listener, user_repo, shared_headers=shared_headers):
         else:
             raise RuntimeError("Unhandled response status", response)
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-        listener.on_connection_error()
+        listener.connection_error.emit()
 
 
 def store_auth_headers(user_repo, headers):
@@ -72,6 +72,7 @@ def store_auth_headers(user_repo, headers):
         expiry=headers["expiry"],
     )
 
+
 # TODO try catch for timeout, server down
 def logout(user_repo, listener, shared_headers=shared_headers):
     url = urljoin(sra_base_url, "api/v1/auth/sign_out")
@@ -81,18 +82,21 @@ def logout(user_repo, listener, shared_headers=shared_headers):
     headers = shared_headers.copy()
     headers.update(auth_headers)
 
-    response = requests.delete(
-        url,
-        headers=headers
-    )
+    try:
+        response = requests.delete(
+            url,
+            headers=headers
+        )
 
-    if response.status_code == 200:
-        _clear_auth_headers(user_repo)
-        listener.logged_out.emit()
-    elif response.status_code == 404:
-        listener.logout_error.emit(response.json())
-    else:
-        raise RuntimeError("Unhandled response status", response)
+        if response.status_code == 200:
+            _clear_auth_headers(user_repo)
+            listener.logged_out.emit()
+        elif response.status_code == 404:
+            listener.logout_error.emit(response.json())
+        else:
+            raise RuntimeError("Unhandled response status", response)
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        listener.connection_error.emit()
 
 
 def load_auth_headers(user_repo):
@@ -127,15 +131,18 @@ def validate_token(user_repo, listener, shared_headers=shared_headers):
     headers = shared_headers.copy()
     headers.update(auth_headers)
 
-    response = requests.get(
-        url=urljoin(sra_base_url, "api/v1/auth/validate_token"),
-        headers=headers,
-    )
+    try:
+        response = requests.get(
+            url=urljoin(sra_base_url, "api/v1/auth/validate_token"),
+            headers=headers,
+        )
 
-    if response.status_code == 200:
-        store_auth_headers(user_repo, response.headers)
-    elif response.status_code == 401:
-        _clear_auth_headers(user_repo)
-        listener.token_invalidated.emit(response.json())
-    else:
-        raise RuntimeError("Unhandled response status", response)
+        if response.status_code == 200:
+            store_auth_headers(user_repo, response.headers)
+        elif response.status_code == 401:
+            _clear_auth_headers(user_repo)
+            listener.token_invalidated.emit(response.json())
+        else:
+            raise RuntimeError("Unhandled response status", response)
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        listener.connection_error.emit()

@@ -34,6 +34,8 @@ class ProfileSettingsDialog(QDialog):
 
     token_invalidated = pyqtSignal(dict)
 
+    connection_error = pyqtSignal()
+
     def __init__(self, parent, network_thread, user_repo, user_is_logged_in):
         super().__init__(parent)
         self.ui = Ui_ProfileSettingsDialog()
@@ -45,6 +47,7 @@ class ProfileSettingsDialog(QDialog):
         self._connect_login_signals()
         self._connect_logout_signals()
         self._connect_token_validation_signals()
+        self._connect_connection_error_signal()
 
         self._connect_login_button()
         self._connect_logout_button()
@@ -63,6 +66,9 @@ class ProfileSettingsDialog(QDialog):
 
     def _connect_token_validation_signals(self):
         self.token_invalidated.connect(self.on_token_invalidated)
+
+    def _connect_connection_error_signal(self):
+        self.connection_error.connect(self.on_connection_error)
 
     def _connect_login_button(self):
         self.ui.loginButton.clicked.connect(self._login)
@@ -96,7 +102,7 @@ class ProfileSettingsDialog(QDialog):
         self.ui.statusLabel.setText(response["errors"][0])
 
     def on_connection_error(self):
-        self.ui.statusLabel.setText("Error connecting to server. Try again later.")
+        self.ui.statusLabel.setText("Error connecting to server. Ensure you are connected to the internet.\nIf you are and the error persists, the server may be down. Try again later.")
 
     def _connect_logout_button(self):
         self.ui.logoutButton.clicked.connect(self._logout)
