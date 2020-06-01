@@ -1,4 +1,5 @@
 import codecs
+from datetime import datetime
 from functools import partial
 import json
 import requests
@@ -7,7 +8,7 @@ from urllib.parse import urljoin
 from . import accounts
 from ._vendor import attr
 from .networking import shared_headers, sra_base_url
-from .persistence import PersistedAchievement
+from .persistence import PersistedAchievement, min_datetime
 
 
 def sync_if_logged_in(user_repo, achievements_repo, network_thread):
@@ -24,7 +25,7 @@ def sync_achievements(user_repo, achievements_repo):
     since_datetime = get_latest_sync_date(user_repo)
     achievements_attrs = load_achievements_attrs_since(achievements_repo, since_datetime)
     compressed_attrs = compress_achievements_attrs(achievements_attrs)
-    
+
     response = post_compressed_achievements(user_repo, compressed_attrs)
     response.raise_for_status()
 
@@ -40,10 +41,15 @@ def get_latest_sync_date(user_repo, shared_headers=shared_headers):
         headers=headers,
     )
 
-    # TODO no syncs case
     if response.status_code == 200:
         syncs_attrs = response.json()
-        return syncs_attrs[-1]["created_at"]
+        if len(syncs_attrs) > 0:
+            return datetime.strptime(
+                syncs_attrs[-1]["created_at"],
+                '%Y-%m-%dT%H:%M:%S.%fZ'
+            )
+        else:
+            return min_datetime
     else:
         raise RuntimeError("Unhandled response status", response)
 
