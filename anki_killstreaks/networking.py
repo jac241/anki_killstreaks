@@ -2,6 +2,11 @@ from aqt.qt import QDialog, QThread
 
 
 sra_base_url = "https://ankiachievements.com"
+shared_headers = {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+}
+
 
 
 class NetworkThread(QThread):

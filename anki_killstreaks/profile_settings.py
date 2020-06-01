@@ -28,6 +28,7 @@ class ProfileSettingsDialog(QDialog):
         self._user_repo = user_repo
 
         self._connect_login_button()
+        self._connect_logout_button()
         self._connect_signup_button()
 
     def _connect_login_button(self):
@@ -58,6 +59,13 @@ class ProfileSettingsDialog(QDialog):
 
     def on_connection_error(self):
         self.ui.statusLabel.setText("Error connecting to server. Try again later.")
+
+    def _connect_logout_button(self):
+        self.ui.logoutButton.clicked.connect(self._logout)
+
+    def _logout(self):
+        logout_job = partial(accounts.logout, self._user_repo)
+        self._network_thread.perform_later(logout_job)
 
     def _connect_signup_button(self):
         signup_url = urljoin(sra_base_url, "users/sign_up")
