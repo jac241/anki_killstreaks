@@ -55,9 +55,9 @@ def login(email, password, listener, user_repo, shared_headers=shared_headers):
 
         if response.status_code == 200:
             store_auth_headers(user_repo, response.headers)
-            listener.on_successful_login(response.json()["data"])
+            listener.logged_in.emit(response.json()["data"])
         elif response.status_code == 401:
-            listener.on_unauthorized(response.json())
+            listener.unauthorized_login.emit(response.json())
         else:
             raise RuntimeError("Unhandled response status", response)
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):

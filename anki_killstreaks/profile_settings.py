@@ -1,4 +1,4 @@
-from aqt.qt import QDialog, QThread
+from aqt.qt import QDialog, QThread, pyqtSignal
 
 from functools import partial
 import json
@@ -19,6 +19,9 @@ class ProfileSettingsDialog(QDialog):
     loginPageIndex = 0
     logoutPageIndex = 1
 
+    logged_in = pyqtSignal(dict)
+    unauthorized_login = pyqtSignal(dict)
+
     def __init__(self, parent, network_thread, user_repo):
         super().__init__(parent)
         self.ui = Ui_ProfileSettingsDialog()
@@ -27,9 +30,15 @@ class ProfileSettingsDialog(QDialog):
         self._network_thread = network_thread
         self._user_repo = user_repo
 
+        self._connect_login_signals()
+
         self._connect_login_button()
         self._connect_logout_button()
         self._connect_signup_button()
+
+    def _connect_login_signals(self):
+        self.logged_in.connect(self.on_successful_login)
+        self.unauthorized_login.connect(self.on_unauthorized)
 
     def _connect_login_button(self):
         self.ui.loginButton.clicked.connect(self._login)
@@ -49,10 +58,15 @@ class ProfileSettingsDialog(QDialog):
 
     def on_successful_login(self, user_attrs):
         self._switchToLogoutPage(user_attrs)
+        self._clear_login_form()
 
     def _switchToLogoutPage(self, user_attrs):
         self.ui.userEmailLabel.setText(user_attrs["email"])
         self.ui.stackedWidget.setCurrentIndex(self.logoutPageIndex)
+
+    def _clear_login_form(self):
+        email = self.ui.emailLineEdit.setText("")
+        password = self.ui.passwordLineEdit.setText("")
 
     def on_unauthorized(self, response):
         self.ui.statusLabel.setText(response["errors"][0])
@@ -64,10 +78,15 @@ class ProfileSettingsDialog(QDialog):
         self.ui.logoutButton.clicked.connect(self._logout)
 
     def _logout(self):
-        logout_job = partial(accounts.logout, self._user_repo, listener=self)
+        logout_job = partial(
+            accounts.logout,
+            self._user_repo,
+             listener=self
+        )
         self._network_thread.perform_later(logout_job)
     
     def on_logout(self):
+        self.ui.statusLabel.setText("User logged out successfully.")
         self._switchToLoginPage()
     
     def on_logout_error(self, response):
