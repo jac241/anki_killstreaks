@@ -6,13 +6,20 @@ from queue import Queue
 from urllib.parse import urljoin
 import webbrowser
 
+from ._vendor import attr
+
 from . import accounts
 from .networking import sra_base_url
 from .ui.forms.profile_settings_dialog import Ui_ProfileSettingsDialog
 
 
 def show_dialog(parent, network_thread, user_repo):
-    ProfileSettingsDialog(parent, network_thread, user_repo).exec_()
+    ProfileSettingsDialog(
+        parent,
+        network_thread,
+        user_repo,
+        user_is_logged_in=accounts.check_user_logged_in(user_repo)
+    ).exec_()
 
 
 class ProfileSettingsDialog(QDialog):
@@ -25,7 +32,7 @@ class ProfileSettingsDialog(QDialog):
     logged_out = pyqtSignal()
     logout_error = pyqtSignal(dict)
 
-    def __init__(self, parent, network_thread, user_repo):
+    def __init__(self, parent, network_thread, user_repo, user_is_logged_in):
         super().__init__(parent)
         self.ui = Ui_ProfileSettingsDialog()
         self.ui.setupUi(self)
@@ -39,6 +46,8 @@ class ProfileSettingsDialog(QDialog):
         self._connect_login_button()
         self._connect_logout_button()
         self._connect_signup_button()
+
+        self._show_correct_auth_form(user_is_logged_in)
 
     def _connect_login_signals(self):
         self.logged_in.connect(self.on_successful_login)
@@ -69,7 +78,7 @@ class ProfileSettingsDialog(QDialog):
         self._clear_login_form()
 
     def _switchToLogoutPage(self, user_attrs):
-        self.ui.userEmailLabel.setText(user_attrs["email"])
+        self.ui.userEmailLabel.setText(user_attrs["uid"])
         self.ui.stackedWidget.setCurrentIndex(self.logoutPageIndex)
 
     def _clear_login_form(self):
@@ -108,3 +117,9 @@ class ProfileSettingsDialog(QDialog):
         signup_url = urljoin(sra_base_url, "users/sign_up")
         self.ui.signupLabel.linkActivated.connect(lambda: webbrowser.open(signup_url))
 
+    def _show_correct_auth_form(self, user_is_logged_in):
+        if user_is_logged_in:
+            user = self._user_repo.load()
+            self._switchToLogoutPage(user_attrs=attr.asdict(user))
+        else:
+            self._switchToLoginPage()

@@ -75,7 +75,7 @@ def store_auth_headers(user_repo, headers):
 
 def logout(user_repo, listener, shared_headers=shared_headers):
     url = urljoin(sra_base_url, "api/v1/auth/sign_out")
-    user = user_repo.load()
+
     auth_headers = load_auth_headers(user_repo)
 
     headers = shared_headers.copy()
@@ -103,3 +103,8 @@ def load_auth_headers(user_repo):
     del headers["id_"]
 
     return headers
+
+
+def check_user_logged_in(user_repo):
+    user = user_repo.load()
+    return user.token and user.uid
