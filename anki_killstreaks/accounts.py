@@ -6,8 +6,6 @@ from ._vendor import attr
 from .networking import sra_base_url, shared_headers
 
 
-
-
 class UserRepository:
     def __init__(self, get_db_connection):
         self.get_db_connection = get_db_connection
@@ -56,7 +54,7 @@ def login(email, password, listener, user_repo, shared_headers=shared_headers):
         print(response.text)
 
         if response.status_code == 200:
-            _store_auth_headers(user_repo, response.headers)
+            store_auth_headers(user_repo, response.headers)
             listener.on_successful_login(response.json()["data"])
         elif response.status_code == 401:
             listener.on_unauthorized(response.json())
@@ -66,7 +64,7 @@ def login(email, password, listener, user_repo, shared_headers=shared_headers):
         listener.on_connection_error()
 
 
-def _store_auth_headers(user_repo, headers):
+def store_auth_headers(user_repo, headers):
     user_repo.save(
         uid=headers["uid"],
         token=headers["access-token"],
@@ -75,10 +73,10 @@ def _store_auth_headers(user_repo, headers):
     )
 
 
-def logout(user_repo, shared_headers=shared_headers):
+def logout(user_repo, listener, shared_headers=shared_headers):
     url = urljoin(sra_base_url, "api/v1/auth/sign_out")
     user = user_repo.load()
-    auth_headers = _load_auth_headers(user_repo)
+    auth_headers = load_auth_headers(user_repo)
 
     headers = shared_headers.copy()
     headers.update(auth_headers)
@@ -88,10 +86,15 @@ def logout(user_repo, shared_headers=shared_headers):
         headers=headers
     )
 
-    response.raise_for_status()
+    if response.status_code == 200:
+        listener.on_logout()
+    elif response.status_code == 404:
+        listener.on_logout_error(response.json())
+    else:
+        raise RuntimeError("Unhandled response status", response)
 
 
-def _load_auth_headers(user_repo):
+def load_auth_headers(user_repo):
     user = user_repo.load()
     headers = attr.asdict(user)
 

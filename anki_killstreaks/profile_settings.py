@@ -64,8 +64,18 @@ class ProfileSettingsDialog(QDialog):
         self.ui.logoutButton.clicked.connect(self._logout)
 
     def _logout(self):
-        logout_job = partial(accounts.logout, self._user_repo)
+        logout_job = partial(accounts.logout, self._user_repo, listener=self)
         self._network_thread.perform_later(logout_job)
+    
+    def on_logout(self):
+        self._switchToLoginPage()
+    
+    def on_logout_error(self, response):
+        self.ui.statusLabel.setText(response["errors"][0])
+        self._switchToLoginPage()
+    
+    def _switchToLoginPage(self):
+        self.ui.stackedWidget.setCurrentIndex(self.loginPageIndex)
 
     def _connect_signup_button(self):
         signup_url = urljoin(sra_base_url, "users/sign_up")
