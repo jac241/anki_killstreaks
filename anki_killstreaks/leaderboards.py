@@ -18,16 +18,19 @@ def sync_if_logged_in(user_repo, achievements_repo, network_thread):
             user_repo,
             achievements_repo
         )
-        network_thread.perform_later(sync_job)
+        network_thread.put(sync_job)
 
 
 def sync_achievements(user_repo, achievements_repo):
-    since_datetime = get_latest_sync_date(user_repo)
-    achievements_attrs = load_achievements_attrs_since(achievements_repo, since_datetime)
-    compressed_attrs = compress_achievements_attrs(achievements_attrs)
+    try:
+        since_datetime = get_latest_sync_date(user_repo)
+        achievements_attrs = load_achievements_attrs_since(achievements_repo, since_datetime)
+        compressed_attrs = compress_achievements_attrs(achievements_attrs)
 
-    response = post_compressed_achievements(user_repo, compressed_attrs)
-    response.raise_for_status()
+        response = post_compressed_achievements(user_repo, compressed_attrs)
+        response.raise_for_status()
+    except requests.HTTPError as e:
+        print(e)
 
 
 def get_latest_sync_date(user_repo, shared_headers=shared_headers):
@@ -41,17 +44,16 @@ def get_latest_sync_date(user_repo, shared_headers=shared_headers):
         headers=headers,
     )
 
-    if response.status_code == 200:
-        syncs_attrs = response.json()
-        if len(syncs_attrs) > 0:
-            return datetime.strptime(
-                syncs_attrs[-1]["created_at"],
-                '%Y-%m-%dT%H:%M:%S.%fZ'
-            )
-        else:
-            return min_datetime
+    response.raise_for_status()
+
+    syncs_attrs = response.json()
+    if len(syncs_attrs) > 0:
+        return datetime.strptime(
+            syncs_attrs[-1]["created_at"],
+            '%Y-%m-%dT%H:%M:%S.%fZ'
+        )
     else:
-        raise RuntimeError("Unhandled response status", response)
+        return min_datetime
 
 
 def load_achievements_attrs_since(achievements_repo, since_datetime):
@@ -70,7 +72,7 @@ def compress_achievements_attrs(attrs):
 
 def post_compressed_achievements(user_repo, compressed_attrs):
     auth_headers = accounts.load_auth_headers(user_repo)
-    return requests.post(
+    response =  requests.post(
         url=urljoin(sra_base_url, "/api/v1/syncs"),
         data={
             "client_uuid": "fda4cb0d-b6e3-4e5f-b7b1-d338351ccead",
@@ -85,3 +87,7 @@ def post_compressed_achievements(user_repo, compressed_attrs):
         timeout=5,
         headers=auth_headers,
     )
+
+    response.raise_for_status()
+
+    return response

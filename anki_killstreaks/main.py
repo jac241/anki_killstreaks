@@ -37,7 +37,7 @@ from .controllers import (
     call_method_on_object_from_factory_function,
 )
 from .menu import connect_menu
-from .networking import stop_thread_on_app_close, NetworkThread
+from .networking import  process_queue, stop_thread_on_app_close
 from .persistence import day_start_time, min_datetime
 from .streaks import get_stores_by_game_id
 from .views import (
@@ -61,15 +61,17 @@ def _get_profile_folder_path(profile_manager=mw.pm):
 
 _stores_by_game_id = get_stores_by_game_id(config=local_conf)
 
-_network_queue = Queue()
-_network_thread = NetworkThread(parent=mw, queue=_network_queue)
+job_queue = Queue()
+_network_thread = Thread(target=process_queue, args=(job_queue,))
+stop_thread_on_app_close(app=QApplication.instance(), queue=job_queue)
+
 
 _profile_controller = ProfileController(
     local_conf=local_conf,
     show_achievements=show_tool_tip_if_medals,
     get_profile_folder_path=_get_profile_folder_path,
     stores_by_game_id=_stores_by_game_id,
-    network_thread = _network_thread,
+    network_thread = job_queue,
 )
 
 # for debugging
@@ -78,8 +80,7 @@ mw.killstreaks_profile_controller = _profile_controller
 
 def main():
     _wrap_anki_objects(_profile_controller)
-    connect_menu(main_window=mw, profile_controller=_profile_controller, network_thread=_network_thread)
-    stop_thread_on_app_close(app=QApplication.instance(), thread=_network_thread)
+    connect_menu(main_window=mw, profile_controller=_profile_controller, network_thread=job_queue)
     _network_thread.start()
 
 

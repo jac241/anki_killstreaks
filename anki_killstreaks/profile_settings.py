@@ -87,7 +87,7 @@ class ProfileSettingsDialog(QDialog):
             listener=self,
             user_repo=self._user_repo,
         )
-        self._network_thread.perform_later(login_job)
+        self._network_thread.put(login_job)
 
     def on_successful_login(self, user_attrs):
         self._switchToLogoutPage(user_attrs)
@@ -123,16 +123,16 @@ class ProfileSettingsDialog(QDialog):
             self._user_repo,
              listener=self
         )
-        self._network_thread.perform_later(logout_job)
-    
+        self._network_thread.put(logout_job)
+
     def on_logout(self):
         self.ui.statusLabel.setText("User logged out successfully.")
         self._switchToLoginPage()
-    
+
     def on_logout_error(self, response):
         self.ui.statusLabel.setText(response["errors"][0])
         self._switchToLoginPage()
-    
+
     def _switchToLoginPage(self):
         self.ui.stackedWidget.setCurrentIndex(self.loginPageIndex)
 
@@ -154,7 +154,7 @@ class ProfileSettingsDialog(QDialog):
                 self._user_repo,
                 listener=self,
             )
-            self._network_thread.perform_later(job)
+            self._network_thread.put(job)
 
     def on_token_invalidated(self, response):
         self.ui.statusLabel.setText(response["errors"][0])

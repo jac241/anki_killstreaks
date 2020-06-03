@@ -86,11 +86,11 @@ class ProfileController:
         )
         self.is_loaded = True
 
-        # leaderboards.sync_if_logged_in(
-        #     self.get_user_repo(),
-        #     self._achievements_repo,
-        #     self._network_thread,
-        # )
+        leaderboards.sync_if_logged_in(
+            self.get_user_repo(),
+            self._achievements_repo,
+            self._network_thread,
+        )
 
 
     def _build_reviewing_controller(self, game_id, should_auto_switch_game):
