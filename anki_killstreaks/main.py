@@ -71,7 +71,7 @@ _profile_controller = ProfileController(
     show_achievements=show_tool_tip_if_medals,
     get_profile_folder_path=_get_profile_folder_path,
     stores_by_game_id=_stores_by_game_id,
-    network_thread = job_queue,
+    job_queue=job_queue,
 )
 
 # for debugging

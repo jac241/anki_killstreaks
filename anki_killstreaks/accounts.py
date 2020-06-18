@@ -65,12 +65,13 @@ def login(email, password, listener, user_repo, shared_headers=shared_headers):
 
 
 def store_auth_headers(user_repo, headers):
-    user_repo.save(
-        uid=headers["uid"],
-        token=headers["access-token"],
-        client=headers["client"],
-        expiry=headers["expiry"],
-    )
+    if headers["access-token"]:
+        user_repo.save(
+            uid=headers["uid"],
+            token=headers["access-token"],
+            client=headers["client"],
+            expiry=headers["expiry"],
+        )
 
 
 def logout(user_repo, listener, shared_headers=shared_headers):
@@ -136,6 +137,8 @@ def validate_token(user_repo, listener, shared_headers=shared_headers):
         )
 
         if response.status_code == 200:
+            print(response.text)
+            print(response.headers)
             store_auth_headers(user_repo, response.headers)
         elif response.status_code == 401:
             _clear_auth_headers(user_repo)

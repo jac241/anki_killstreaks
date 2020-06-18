@@ -62,7 +62,7 @@ class ProfileController:
     _show_achievements = attr.ib()
     _get_profile_folder_path = attr.ib()
     _stores_by_game_id = attr.ib()
-    _network_thread = attr.ib()
+    _job_queue = attr.ib()
 
     # Attributes modified in load_profile
     is_loaded = attr.ib(default=False)
@@ -89,7 +89,7 @@ class ProfileController:
         leaderboards.sync_if_logged_in(
             self.get_user_repo(),
             self._achievements_repo,
-            self._network_thread,
+            self._job_queue,
         )
 
 

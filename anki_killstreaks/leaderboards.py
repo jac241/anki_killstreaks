@@ -28,6 +28,8 @@ def sync_achievements(user_repo, achievements_repo):
         compressed_attrs = compress_achievements_attrs(achievements_attrs)
 
         response = post_compressed_achievements(user_repo, compressed_attrs)
+        accounts.store_auth_headers(user_repo, response.headers)
+
         response.raise_for_status()
     except requests.HTTPError as e:
         print(e)
@@ -43,8 +45,8 @@ def get_latest_sync_date(user_repo, shared_headers=shared_headers):
         url=urljoin(sra_base_url, "/api/v1/syncs"),
         headers=headers,
     )
-
     response.raise_for_status()
+    accounts.store_auth_headers(user_repo, response.headers)
 
     syncs_attrs = response.json()
     if len(syncs_attrs) > 0:
@@ -72,6 +74,7 @@ def compress_achievements_attrs(attrs):
 
 def post_compressed_achievements(user_repo, compressed_attrs):
     auth_headers = accounts.load_auth_headers(user_repo)
+
     response =  requests.post(
         url=urljoin(sra_base_url, "/api/v1/syncs"),
         data={
@@ -88,6 +91,7 @@ def post_compressed_achievements(user_repo, compressed_attrs):
         headers=auth_headers,
     )
 
+    accounts.store_auth_headers(user_repo, response.headers)
     response.raise_for_status()
 
     return response

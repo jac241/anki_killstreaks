@@ -1,5 +1,6 @@
 from aqt.qt import QDialog, QThread
 from queue import Queue
+import traceback
 
 
 # sra_base_url = "https://ankiachievements.com"
@@ -21,9 +22,13 @@ def process_queue(queue):
             print("network thread stopped! :-)")
             break
 
-        job()
-
-        queue.task_done()
+        try:
+            job()
+        except Exception as e:
+            print("Exception encountered in killstreaks job thread:")
+            traceback.print_exc()
+        finally:
+            queue.task_done()
     return
 
 
