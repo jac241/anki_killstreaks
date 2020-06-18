@@ -29,6 +29,10 @@ class UserRepository:
             user_attrs = cursor.fetchone()
             return PersistedUser(*user_attrs)
 
+    def set_client_uuid(self, uuid):
+        with self.get_db_connection() as conn:
+            conn.execute("UPDATE users SET client_uuid = ?", (uuid,))
+
 
 @attr.s(frozen=True)
 class PersistedUser:
@@ -38,6 +42,7 @@ class PersistedUser:
     client = attr.ib()
     expiry = attr.ib()
     token_type = attr.ib()
+    client_uuid = attr.ib()
 
 
 def login(email, password, listener, user_repo, shared_headers=shared_headers):

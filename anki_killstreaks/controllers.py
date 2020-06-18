@@ -86,6 +86,8 @@ class ProfileController:
         )
         self.is_loaded = True
 
+        leaderboards.ensure_client_uuid_exists(self.get_user_repo())
+
         leaderboards.sync_if_logged_in(
             self.get_user_repo(),
             self._achievements_repo,

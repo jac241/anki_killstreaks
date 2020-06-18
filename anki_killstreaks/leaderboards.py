@@ -4,6 +4,7 @@ from functools import partial
 import json
 import requests
 from urllib.parse import urljoin
+import uuid
 
 from . import accounts
 from ._vendor import attr
@@ -11,23 +12,30 @@ from .networking import shared_headers, sra_base_url
 from .persistence import PersistedAchievement, min_datetime
 
 
+def ensure_client_uuid_exists(user_repo):
+    user = user_repo.load()
+
+    if not user.client_uuid:
+        user_repo.set_client_uuid(str(uuid.uuid4()))
+
+
 def sync_if_logged_in(user_repo, achievements_repo, network_thread):
     if accounts.check_user_logged_in(user_repo):
         sync_job = partial(
-            sync_achievements,
+            _sync_achievements,
             user_repo,
             achievements_repo
         )
         network_thread.put(sync_job)
 
 
-def sync_achievements(user_repo, achievements_repo):
+def _sync_achievements(user_repo, achievements_repo):
     try:
-        since_datetime = get_latest_sync_date(user_repo)
-        achievements_attrs = load_achievements_attrs_since(achievements_repo, since_datetime)
-        compressed_attrs = compress_achievements_attrs(achievements_attrs)
+        since_datetime = _get_latest_sync_date(user_repo)
+        achievements_attrs = _load_achievements_attrs_since(achievements_repo, since_datetime)
+        compressed_attrs = _compress_achievements_attrs(achievements_attrs)
 
-        response = post_compressed_achievements(user_repo, compressed_attrs)
+        response = _post_compressed_achievements(user_repo, compressed_attrs)
         accounts.store_auth_headers(user_repo, response.headers)
 
         response.raise_for_status()
@@ -35,7 +43,7 @@ def sync_achievements(user_repo, achievements_repo):
         print(e)
 
 
-def get_latest_sync_date(user_repo, shared_headers=shared_headers):
+def _get_latest_sync_date(user_repo, shared_headers=shared_headers):
     auth_headers = accounts.load_auth_headers(user_repo)
 
     headers = shared_headers.copy()
@@ -58,27 +66,28 @@ def get_latest_sync_date(user_repo, shared_headers=shared_headers):
         return min_datetime
 
 
-def load_achievements_attrs_since(achievements_repo, since_datetime):
+def _load_achievements_attrs_since(achievements_repo, since_datetime):
     return [
         attr.asdict(a, filter=attr.filters.exclude(attr.fields(PersistedAchievement).medal))
         for a in achievements_repo.all(since_datetime)
     ]
 
 
-def compress_achievements_attrs(attrs):
+def _compress_achievements_attrs(attrs):
     return codecs.encode(
         bytes(json.dumps(attrs), "utf-8"),
         "zlib",
     )
 
 
-def post_compressed_achievements(user_repo, compressed_attrs):
+def _post_compressed_achievements(user_repo, compressed_attrs):
     auth_headers = accounts.load_auth_headers(user_repo)
+    user = user_repo.load()
 
     response =  requests.post(
         url=urljoin(sra_base_url, "/api/v1/syncs"),
         data={
-            "client_uuid": "fda4cb0d-b6e3-4e5f-b7b1-d338351ccead",
+            "client_uuid": user.client_uuid,
         },
         files={
             'achievements_file': (
