@@ -53,10 +53,26 @@ class AchievementsRepository:
 
     def create_all(self, new_achievements):
         with self.get_db_connection() as conn:
-            conn.executemany(
-                "INSERT INTO achievements(medal_id, deck_id) VALUES (?, ?)",
-                ((a.medal_id, a.deck_id) for a in new_achievements),
+            row_ids = []
+
+            for new_a in new_achievements:
+                cursor = conn.execute(
+                    "INSERT INTO achievements(medal_id, deck_id) VALUES (?, ?)",
+                    (new_a.medal_id, new_a.deck_id),
+                )
+                row_ids.append(cursor.lastrowid)
+
+            in_placeholders = ",".join(["?"] * len(row_ids))
+            select_cursor = conn.execute(
+                f"""
+                SELECT *
+                FROM achievements
+                WHERE id in ({in_placeholders})
+                """,
+                tuple(row_ids)
             )
+
+            return [PersistedAchievement(*row, medal=None) for row in select_cursor]
 
     # only used by tests, should eliminate
     def all(self, since_datetime=min_datetime):

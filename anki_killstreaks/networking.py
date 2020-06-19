@@ -23,10 +23,11 @@ def process_queue(queue):
             break
 
         try:
+            print("Executing -", job)
             job()
         except Exception as e:
             print("Exception encountered in killstreaks job thread:")
-            traceback.print_exc()
+            print(traceback.format_exc())
         finally:
             queue.task_done()
     return

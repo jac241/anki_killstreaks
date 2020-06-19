@@ -41,6 +41,7 @@ def _sync_achievements(user_repo, achievements_repo):
         response.raise_for_status()
     except requests.HTTPError as e:
         print(e)
+        raise e
 
 
 def _get_latest_sync_date(user_repo, shared_headers=shared_headers):
@@ -104,3 +105,51 @@ def _post_compressed_achievements(user_repo, compressed_attrs):
     response.raise_for_status()
 
     return response
+
+
+@attr.s(frozen=True)
+class RemoteAchievementsRepository:
+    _local_repo = attr.ib()
+    _user_repo = attr.ib()
+    _job_queue = attr.ib()
+
+    def create_all(self, *args, **kwargs):
+        persisted_achievements = self._local_repo.create_all(*args, **kwargs)
+        if accounts.check_user_logged_in(self._user_repo):
+            for achievement in persisted_achievements:
+                job = partial(
+                    _post_achievement,
+                    user_repo=self._user_repo,
+                    achievement=achievement
+                )
+
+                self._job_queue.put(job)
+
+
+    def __getattr__(self, attr):
+        return getattr(self._local_repo, attr)
+
+
+def _post_achievement(user_repo, achievement, shared_headers=shared_headers):
+    auth_headers = accounts.load_auth_headers(user_repo)
+
+    headers = shared_headers.copy()
+    headers.update(auth_headers)
+
+    user = user_repo.load()
+
+    response = requests.post(
+        url=urljoin(sra_base_url, "/api/v1/achievements"),
+        headers=headers,
+        json=dict(
+            client_db_id=achievement.id_,
+            client_medal_id=achievement.medal_id,
+            client_deck_id=achievement.deck_id,
+            client_earned_at=achievement.created_at,
+            client_uuid=user.client_uuid,
+        ),
+    )
+
+    accounts.store_auth_headers(user_repo, response.headers)
+    response.raise_for_status()
+

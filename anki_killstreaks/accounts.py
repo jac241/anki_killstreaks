@@ -55,9 +55,6 @@ def login(email, password, listener, user_repo, shared_headers=shared_headers):
     try:
         response = requests.post(url, headers=shared_headers, json=body)
 
-        print(response.status_code)
-        print(response.text)
-
         if response.status_code == 200:
             store_auth_headers(user_repo, response.headers)
             listener.logged_in.emit(response.json()["data"])
@@ -142,8 +139,6 @@ def validate_token(user_repo, listener, shared_headers=shared_headers):
         )
 
         if response.status_code == 200:
-            print(response.text)
-            print(response.headers)
             store_auth_headers(user_repo, response.headers)
         elif response.status_code == 401:
             _clear_auth_headers(user_repo)

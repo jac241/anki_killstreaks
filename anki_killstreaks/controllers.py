@@ -14,6 +14,7 @@ from . import leaderboards
 from ._vendor import attr
 from .accounts import UserRepository
 from .game import set_current_game_id
+from .leaderboards import RemoteAchievementsRepository
 from .persistence import (
     migrate_database,
     DbSettings,
@@ -77,7 +78,11 @@ class ProfileController:
         migrate_database(settings=self._db_settings)
         get_db_for_profile = partial(get_db_connection, self._db_settings)
 
-        self._achievements_repo = AchievementsRepository(get_db_for_profile)
+        self._achievements_repo = RemoteAchievementsRepository(
+            local_repo=AchievementsRepository(get_db_for_profile),
+            user_repo=UserRepository(get_db_for_profile),
+            job_queue=self._job_queue,
+        )
 
         settings_repo = SettingsRepository(get_db_for_profile)
         self._reviewing_controller = self._build_reviewing_controller(
@@ -93,7 +98,6 @@ class ProfileController:
             self._achievements_repo,
             self._job_queue,
         )
-
 
     def _build_reviewing_controller(self, game_id, should_auto_switch_game):
         new_controller = ReviewingController(
