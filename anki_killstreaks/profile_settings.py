@@ -9,7 +9,7 @@ import webbrowser
 from ._vendor import attr
 
 from . import accounts, leaderboards
-from .networking import sra_base_url
+from .networking import sra_base_url, TokenAuthHttpClient
 from .ui.forms.profile_settings_dialog import Ui_ProfileSettingsDialog
 
 
@@ -106,6 +106,7 @@ class ProfileSettingsDialog(QDialog):
             user_repo=self._user_repo,
             achievements_repo=self._achievements_repo,
             network_thread=self._network_thread,
+            http_client=TokenAuthHttpClient(self._user_repo),
         )
 
     def on_unauthorized(self, response):

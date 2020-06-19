@@ -15,6 +15,7 @@ from ._vendor import attr
 from .accounts import UserRepository
 from .game import set_current_game_id
 from .leaderboards import RemoteAchievementsRepository
+from .networking import TokenAuthHttpClient
 from .persistence import (
     migrate_database,
     DbSettings,
@@ -78,10 +79,13 @@ class ProfileController:
         migrate_database(settings=self._db_settings)
         get_db_for_profile = partial(get_db_connection, self._db_settings)
 
+        user_repo = UserRepository(get_db_for_profile)
+        http_client = TokenAuthHttpClient(user_repo)
         self._achievements_repo = RemoteAchievementsRepository(
             local_repo=AchievementsRepository(get_db_for_profile),
-            user_repo=UserRepository(get_db_for_profile),
+            user_repo=user_repo,
             job_queue=self._job_queue,
+            http_client=http_client,
         )
 
         settings_repo = SettingsRepository(get_db_for_profile)
@@ -97,6 +101,7 @@ class ProfileController:
             self.get_user_repo(),
             self._achievements_repo,
             self._job_queue,
+            http_client,
         )
 
     def _build_reviewing_controller(self, game_id, should_auto_switch_game):

@@ -67,7 +67,7 @@ def login(email, password, listener, user_repo, shared_headers=shared_headers):
 
 
 def store_auth_headers(user_repo, headers):
-    if headers["access-token"]:
+    if headers.get("access-token", False):
         user_repo.save(
             uid=headers["uid"],
             token=headers["access-token"],
@@ -91,7 +91,7 @@ def logout(user_repo, listener, shared_headers=shared_headers):
         )
 
         if response.status_code == 200:
-            _clear_auth_headers(user_repo)
+            clear_auth_headers(user_repo)
             listener.logged_out.emit()
         elif response.status_code == 404:
             listener.logout_error.emit(response.json())
@@ -112,7 +112,7 @@ def load_auth_headers(user_repo):
     return headers
 
 
-def _clear_auth_headers(user_repo):
+def clear_auth_headers(user_repo):
     user_repo.save(
         uid="",
         token="",
@@ -141,7 +141,7 @@ def validate_token(user_repo, listener, shared_headers=shared_headers):
         if response.status_code == 200:
             store_auth_headers(user_repo, response.headers)
         elif response.status_code == 401:
-            _clear_auth_headers(user_repo)
+            clear_auth_headers(user_repo)
             listener.token_invalidated.emit(response.json())
         else:
             raise RuntimeError("Unhandled response status", response)

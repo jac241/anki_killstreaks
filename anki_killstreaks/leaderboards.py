@@ -19,23 +19,24 @@ def ensure_client_uuid_exists(user_repo):
         user_repo.set_client_uuid(str(uuid.uuid4()))
 
 
-def sync_if_logged_in(user_repo, achievements_repo, network_thread):
+def sync_if_logged_in(user_repo, achievements_repo, network_thread, http_client):
     if accounts.check_user_logged_in(user_repo):
         sync_job = partial(
             _sync_achievements,
             user_repo,
-            achievements_repo
+            achievements_repo,
+            http_client,
         )
         network_thread.put(sync_job)
 
 
-def _sync_achievements(user_repo, achievements_repo):
+def _sync_achievements(user_repo, achievements_repo, http_client):
     try:
-        since_datetime = _get_latest_sync_date(user_repo)
+        since_datetime = _get_latest_sync_date(user_repo, http_client)
         achievements_attrs = _load_achievements_attrs_since(achievements_repo, since_datetime)
         compressed_attrs = _compress_achievements_attrs(achievements_attrs)
 
-        response = _post_compressed_achievements(user_repo, compressed_attrs)
+        response = _post_compressed_achievements(user_repo, http_client, compressed_attrs)
         accounts.store_auth_headers(user_repo, response.headers)
 
         response.raise_for_status()
@@ -44,18 +45,10 @@ def _sync_achievements(user_repo, achievements_repo):
         raise e
 
 
-def _get_latest_sync_date(user_repo, shared_headers=shared_headers):
-    auth_headers = accounts.load_auth_headers(user_repo)
+def _get_latest_sync_date(user_repo, http_client, shared_headers=shared_headers):
+    response = http_client.get(url=urljoin(sra_base_url, "/api/v1/syncs"))
 
-    headers = shared_headers.copy()
-    headers.update(auth_headers)
-
-    response = requests.get(
-        url=urljoin(sra_base_url, "/api/v1/syncs"),
-        headers=headers,
-    )
     response.raise_for_status()
-    accounts.store_auth_headers(user_repo, response.headers)
 
     syncs_attrs = response.json()
     if len(syncs_attrs) > 0:
@@ -81,11 +74,10 @@ def _compress_achievements_attrs(attrs):
     )
 
 
-def _post_compressed_achievements(user_repo, compressed_attrs):
-    auth_headers = accounts.load_auth_headers(user_repo)
+def _post_compressed_achievements(user_repo, http_client, compressed_attrs):
     user = user_repo.load()
 
-    response =  requests.post(
+    response = http_client.post(
         url=urljoin(sra_base_url, "/api/v1/syncs"),
         data={
             "client_uuid": user.client_uuid,
@@ -98,10 +90,9 @@ def _post_compressed_achievements(user_repo, compressed_attrs):
             )
         },
         timeout=5,
-        headers=auth_headers,
+        skip_shared_headers=True
     )
 
-    accounts.store_auth_headers(user_repo, response.headers)
     response.raise_for_status()
 
     return response
@@ -112,6 +103,7 @@ class RemoteAchievementsRepository:
     _local_repo = attr.ib()
     _user_repo = attr.ib()
     _job_queue = attr.ib()
+    _http_client = attr.ib()
 
     def create_all(self, *args, **kwargs):
         persisted_achievements = self._local_repo.create_all(*args, **kwargs)
@@ -119,26 +111,19 @@ class RemoteAchievementsRepository:
             for achievement in persisted_achievements:
                 job = partial(
                     _post_achievement,
-                    user_repo=self._user_repo,
-                    achievement=achievement
+                    user=self._user_repo.load(),
+                    achievement=achievement,
+                    http_client=self._http_client,
                 )
 
                 self._job_queue.put(job)
-
 
     def __getattr__(self, attr):
         return getattr(self._local_repo, attr)
 
 
-def _post_achievement(user_repo, achievement, shared_headers=shared_headers):
-    auth_headers = accounts.load_auth_headers(user_repo)
-
-    headers = shared_headers.copy()
-    headers.update(auth_headers)
-
-    user = user_repo.load()
-
-    response = requests.post(
+def _post_achievement(user, http_client, achievement, shared_headers=shared_headers):
+    response = http_client.post(
         url=urljoin(sra_base_url, "/api/v1/achievements"),
         headers=headers,
         json=dict(
@@ -150,6 +135,5 @@ def _post_achievement(user_repo, achievement, shared_headers=shared_headers):
         ),
     )
 
-    accounts.store_auth_headers(user_repo, response.headers)
     response.raise_for_status()
 
