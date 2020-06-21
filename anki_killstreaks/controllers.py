@@ -15,7 +15,11 @@ from ._vendor import attr
 from .accounts import UserRepository
 from .game import set_current_game_id
 from .leaderboards import RemoteAchievementsRepository
-from .networking import TokenAuthHttpClient
+from .networking import (
+    TokenAuthHttpClient,
+    StatusListeningHttpClient,
+    show_logged_out_tooltip,
+)
 from .persistence import (
     migrate_database,
     DbSettings,
@@ -80,7 +84,11 @@ class ProfileController:
         get_db_for_profile = partial(get_db_connection, self._db_settings)
 
         user_repo = UserRepository(get_db_for_profile)
-        http_client = TokenAuthHttpClient(user_repo)
+        http_client = StatusListeningHttpClient(
+            http_client=TokenAuthHttpClient(user_repo),
+            status=401,
+            on_status=show_logged_out_tooltip
+        )
         self._achievements_repo = RemoteAchievementsRepository(
             local_repo=AchievementsRepository(get_db_for_profile),
             user_repo=user_repo,

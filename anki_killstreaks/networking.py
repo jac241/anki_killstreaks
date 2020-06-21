@@ -1,14 +1,14 @@
-from aqt.qt import QDialog, QThread, QObject
+from aqt.qt import QDialog, QThread, QObject, pyqtSignal
 from functools import partialmethod
 from queue import Queue
 import requests
 import traceback
 from ._vendor import attr
-from . import accounts
+from . import accounts, tooltips
 
 
-# sra_base_url = "https://ankiachievements.com"
-sra_base_url = "http://localhost:5000"
+sra_base_url = "https://ankiachievements.com"
+# sra_base_url = "http://localhost:5000"
 shared_headers = {
     "Accept": "application/json",
     "Content-Type": "application/json",
@@ -77,21 +77,36 @@ class TokenAuthHttpClient:
         return accounts.load_auth_headers(self._user_repo)
 
 
-# @attr.s
-# class StatusListeningHttpClient:
-    # _http_client = attr.ib()
-    # _status = attr.ib()
-    # _on_status = attr.ib()
+class StatusListeningHttpClient(QObject):
+    status_occurred = pyqtSignal(object)
 
-    # def _do_request(self, method, **kwargs):
-        # response = getattr(self._http_client, method)(**kwargs)
+    def __init__(self, http_client, status, on_status, parent=None):
+        super().__init__(parent)
+        self._http_client = http_client
+        self._status = status
 
-        # if response.status_code == self._status:
-            # self._on_status(response)
+        self.status_occurred.connect(on_status)
 
-        # return response
+    def _do_request(self, method, **kwargs):
+        response = getattr(self._http_client, method)(**kwargs)
 
-    # get = partialmethod(_do_request, 'get')
-    # post = partialmethod(_do_request, 'post')
-    # put = partialmethod(_do_request, 'put')
-    # delete = partialmethod(_do_request, 'delete')
+        if response.status_code == self._status:
+            self.status_occurred.emit(response)
+
+        return response
+
+    get = partialmethod(_do_request, 'get')
+    post = partialmethod(_do_request, 'post')
+    put = partialmethod(_do_request, 'put')
+    delete = partialmethod(_do_request, 'delete')
+
+
+def show_logged_out_tooltip():
+    message = (
+        "<td>Anki killstreaks tried to make a request to its server, "
+        "but you were no longer signed in. <br>"
+        "Sign in again to see your live progress. <br>"
+        "Medals earned while you are not signed in will be synced the next time "
+        "you sign in.</td>"
+    )
+    tooltips.showToolTip(html=message, period=10000)

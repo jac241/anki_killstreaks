@@ -8,7 +8,7 @@ import uuid
 
 from . import accounts
 from ._vendor import attr
-from .networking import shared_headers, sra_base_url
+from .networking import sra_base_url
 from .persistence import PersistedAchievement, min_datetime
 
 
@@ -45,7 +45,7 @@ def _sync_achievements(user_repo, achievements_repo, http_client):
         raise e
 
 
-def _get_latest_sync_date(user_repo, http_client, shared_headers=shared_headers):
+def _get_latest_sync_date(user_repo, http_client):
     response = http_client.get(url=urljoin(sra_base_url, "/api/v1/syncs"))
 
     response.raise_for_status()
@@ -122,10 +122,9 @@ class RemoteAchievementsRepository:
         return getattr(self._local_repo, attr)
 
 
-def _post_achievement(user, http_client, achievement, shared_headers=shared_headers):
+def _post_achievement(user, http_client, achievement):
     response = http_client.post(
         url=urljoin(sra_base_url, "/api/v1/achievements"),
-        headers=headers,
         json=dict(
             client_db_id=achievement.id_,
             client_medal_id=achievement.medal_id,
