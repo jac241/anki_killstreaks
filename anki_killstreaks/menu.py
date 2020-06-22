@@ -1,4 +1,5 @@
 from functools import partial
+import webbrowser
 from aqt.qt import QMenu
 
 from .game import (
@@ -7,13 +8,13 @@ from .game import (
     toggle_auto_switch_game,
     load_auto_switch_game_status,
 )
-from . import profile_settings
+from . import profile_settings, networking
 
 
 def connect_menu(main_window, profile_controller, network_thread):
     # probably overdoing it with partial functions here... but none of these
     # need to be classes honestly
-    top_menu = QMenu("Killstreaks", main_window)
+    top_menu = QMenu("&Killstreaks", main_window)
     game_menu = QMenu("Select Game", main_window)
 
     halo_3_action = game_menu.addAction("Halo 3")
@@ -64,7 +65,7 @@ def connect_menu(main_window, profile_controller, network_thread):
         )
     )
 
-    auto_switch_game_action = top_menu.addAction("Automatically Switch Games")
+    auto_switch_game_action = top_menu.addAction("&Automatically Switch Games")
     auto_switch_game_action.setCheckable(True)
     auto_switch_game_action.triggered.connect(
         partial(
@@ -84,8 +85,12 @@ def connect_menu(main_window, profile_controller, network_thread):
             ),
         )
     )
+    leaderboard_action = top_menu.addAction("&Leaderboards")
+    leaderboard_action.triggered.connect(
+        lambda: webbrowser.open(networking.sra_base_url)
+    )
 
-    profile_settings_action = top_menu.addAction("Profile settings...")
+    profile_settings_action = top_menu.addAction("&Profile settings...")
     profile_settings_action.triggered.connect(
         lambda: profile_settings.show_dialog(main_window, network_thread, profile_controller.get_user_repo(), profile_controller.get_achievements_repo())
     )
