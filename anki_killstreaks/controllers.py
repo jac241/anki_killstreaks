@@ -68,7 +68,7 @@ class ProfileController:
     _show_achievements = attr.ib()
     _get_profile_folder_path = attr.ib()
     _stores_by_game_id = attr.ib()
-    _job_queue = attr.ib()
+    job_queue = attr.ib()
 
     # Attributes modified in load_profile
     is_loaded = attr.ib(default=False)
@@ -92,7 +92,7 @@ class ProfileController:
         self._achievements_repo = RemoteAchievementsRepository(
             local_repo=AchievementsRepository(get_db_for_profile),
             user_repo=user_repo,
-            job_queue=self._job_queue,
+            job_queue=self.job_queue,
             http_client=http_client,
         )
 
@@ -108,7 +108,7 @@ class ProfileController:
         leaderboards.sync_if_logged_in(
             self.get_user_repo(),
             self._achievements_repo,
-            self._job_queue,
+            self.job_queue,
             http_client,
         )
 
@@ -196,7 +196,6 @@ class ProfileController:
     def get_user_repo(self):
         get_db_for_profile = partial(get_db_connection, self._db_settings)
         return UserRepository(get_db_for_profile)
-
 
 
 def call_method_on_object_from_factory_function(

@@ -1,0 +1,14 @@
+#rivalry {
+  position: fixed;
+  left: 0px;
+  bottom: 0px;
+  width: 100%;
+}
+
+#rivalry_user {
+  text-align: left;
+}
+
+#rivalry_rival {
+  text-align: right;
+}

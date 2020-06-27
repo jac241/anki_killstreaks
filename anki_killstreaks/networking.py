@@ -7,7 +7,8 @@ from ._vendor import attr
 from . import accounts, tooltips
 
 
-sra_base_url = "https://ankiachievements.com"
+sra_base_url = "http://192.168.200.192:5000/"
+# sra_base_url = "https://ankiachievements.com"
 # sra_base_url = "http://localhost:5000"
 shared_headers = {
     "Accept": "application/json",

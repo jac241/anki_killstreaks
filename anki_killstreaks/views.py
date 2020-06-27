@@ -129,3 +129,9 @@ def js_content(filename):
     with open(js_file, "r") as f:
         js = f.read()
     return js.replace("\n", "")
+
+
+def html_content(filename):
+    html_file = Path(__file__).parent / "web" / filename
+    with open(html_file, "r") as f:
+        return f.read()
