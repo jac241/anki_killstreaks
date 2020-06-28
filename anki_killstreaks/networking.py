@@ -3,7 +3,6 @@ from functools import partialmethod, partial
 import random
 from threading import Thread
 import time
-from timeit import default_timer as timer
 import requests
 import os
 import traceback
@@ -35,10 +34,8 @@ def process_queue(queue):
 
         try:
             print("Executing -", job)
-            start = timer()
             job()
-            end = timer()
-            print("Finished in", (end - start) * 1000, "ms.")
+            print("Finished.")
         except Exception as e:
             print("Exception encountered in killstreaks job thread:")
             print(traceback.format_exc())
