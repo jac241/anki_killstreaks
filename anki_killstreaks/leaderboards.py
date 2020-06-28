@@ -8,7 +8,7 @@ import uuid
 
 from . import accounts
 from ._vendor import attr
-from .networking import sra_base_url
+from .networking import sra_base_url, RequeuingJob
 from .persistence import PersistedAchievement, min_datetime
 
 
@@ -21,11 +21,15 @@ def ensure_client_uuid_exists(user_repo):
 
 def sync_if_logged_in(user_repo, achievements_repo, network_thread, http_client):
     if accounts.check_user_logged_in(user_repo):
-        sync_job = partial(
-            _sync_achievements,
-            user_repo,
-            achievements_repo,
-            http_client,
+        sync_job = RequeuingJob(
+            partial(
+                _sync_achievements,
+                user_repo,
+                achievements_repo,
+                http_client,
+            ),
+            job_queue=network_thread,
+            exception_to_retry_on=requests.exceptions.ConnectionError,
         )
         network_thread.put(sync_job)
 
@@ -109,13 +113,16 @@ class RemoteAchievementsRepository:
         persisted_achievements = self._local_repo.create_all(*args, **kwargs)
         if accounts.check_user_logged_in(self._user_repo):
             for achievement in persisted_achievements:
-                job = partial(
-                    _post_achievement,
-                    user=self._user_repo.load(),
-                    achievement=achievement,
-                    http_client=self._http_client,
+                job = RequeuingJob(
+                    partial(
+                        _post_achievement,
+                        user=self._user_repo.load(),
+                        achievement=achievement,
+                        http_client=self._http_client,
+                    ),
+                    job_queue=self._job_queue,
+                    exception_to_retry_on=requests.exceptions.ConnectionError,
                 )
-
                 self._job_queue.put(job)
 
     def __getattr__(self, attr):

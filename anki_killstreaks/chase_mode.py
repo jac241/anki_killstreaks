@@ -11,7 +11,7 @@ from .networking import (
     StatusListeningHttpClient,
     TokenAuthHttpClient,
     sra_base_url,
-    show_logged_out_tooltip,
+    show_logged_out_tooltip, RequeuingJob,
 )
 from .views import html_content
 
@@ -110,10 +110,15 @@ def _stop_timer_if_it_exists():
 
 
 def _show_chase_mode(http_client, chase_mode_context):
-    job = partial(
-        _fetch_and_display_chase_mode,
-        http_client,
-        chase_mode_context,
+    job = RequeuingJob(
+        exception_to_retry_on=requests.exceptions.ConnectionError,
+        job=partial(
+            _fetch_and_display_chase_mode,
+            http_client,
+            chase_mode_context,
+            reraise=True,
+        ),
+        job_queue=chase_mode_context.job_queue,
     )
     chase_mode_context.start_job(job)
 
@@ -127,20 +132,22 @@ def _start_chase_mode_timer(http_client, chase_mode_context):
     global _chase_mode_timer
     _chase_mode_timer = QTimer(chase_mode_context.main_window)
 
-    on_timer = partial(
+    job = partial(
         _fetch_and_display_chase_mode,
         http_client,
-        chase_mode_context
+        chase_mode_context,
+        reraise=False,
     )
+    enqueue_job = partial(chase_mode_context.start_job, job)
 
-    _chase_mode_timer.timeout.connect(on_timer)
+    _chase_mode_timer.timeout.connect(enqueue_job)
     _chase_mode_timer.start(_CHASE_MODE_INTERVAL_MS)
 
 
 _connection_error_message_shown = False
 
 
-def _fetch_and_display_chase_mode(http_client, chase_mode_context):
+def _fetch_and_display_chase_mode(http_client, chase_mode_context, reraise):
     global _connection_error_message_shown
 
     try:
@@ -152,6 +159,8 @@ def _fetch_and_display_chase_mode(http_client, chase_mode_context):
         print("Connection error while updating chase mode")
         render(chase_mode_context.webview, text="")
         _show_conn_err_tooltip_if_first_time()
+        if reraise:
+            raise e
 
 
 def render(webview, text):
