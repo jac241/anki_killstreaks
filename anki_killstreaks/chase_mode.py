@@ -11,7 +11,7 @@ from .networking import (
     StatusListeningHttpClient,
     TokenAuthHttpClient,
     sra_base_url,
-    show_logged_out_tooltip
+    show_logged_out_tooltip,
 )
 from .views import html_content
 
@@ -65,7 +65,6 @@ def setup_hooks(main_window, gui_hooks, Reviewer, profile_controller):
             )
 
             _initialize_if_logged_in(chase_mode_context)
-
             return (True, None)
         else:
             return handled
@@ -151,6 +150,7 @@ def _fetch_and_display_chase_mode(http_client, chase_mode_context):
         render(chase_mode_context.webview, response.text)
     except requests.exceptions.ConnectionError as e:
         print("Connection error while updating chase mode")
+        render(chase_mode_context.webview, text="")
         _show_conn_err_tooltip_if_first_time()
 
 
@@ -162,6 +162,6 @@ def _show_conn_err_tooltip_if_first_time():
     global _connection_error_message_shown
 
     if not _connection_error_message_shown:
-        tooltips.showToolTip(html=html_content("chase_mode/_connection_error.html"), period=8000)
+        tooltips.showToolTip(html=html_content("chase_mode/_connection_error_tooltip.html"), period=8000)
         _connection_error_message_shown = True
 

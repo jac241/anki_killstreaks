@@ -5,6 +5,7 @@ const waitForPycmd = () => {
   }
   else {
     if (count < 10) {
+      console.log("Waiting for pycmd")
       setTimeout(waitForPycmd, 100);
       count++;
     }
@@ -13,7 +14,6 @@ const waitForPycmd = () => {
     }
   }
 }
-waitForPycmd()
 
 const initializeChaseMode = () => {
   pycmd("chaseModeLoaded")
@@ -23,3 +23,7 @@ const setChaseModeHTML = (html) => {
   console.log(html)
   $("#chase_mode").html(html)
 }
+
+$(() => {
+  waitForPycmd()
+})
