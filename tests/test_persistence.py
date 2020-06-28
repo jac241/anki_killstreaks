@@ -192,3 +192,10 @@ def test_SettingsRepository_auto_switch_game_status_should_return_stored_status(
 def test_SettingsRepository_should_auto_switch_games_defaults_to_false(settings_repo):
     assert settings_repo.should_auto_switch_game == False
 
+
+def test_SettingsRepository_toggle_chase_mode_should_toggle_chase_mode(settings_repo):
+    with settings_repo.get_db_connection() as conn:
+        conn.execute("UPDATE settings SET should_show_chase_mode = ?", (True,))
+    settings_repo.toggle_chase_mode()
+    assert settings_repo.should_show_chase_mode is False
+

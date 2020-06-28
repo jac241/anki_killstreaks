@@ -211,3 +211,18 @@ class SettingsRepository:
                 "SELECT should_auto_switch_game FROM settings;"
             )
             return cursor.fetchone()[0]
+
+    def toggle_show_chase_mode(self):
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                "UPDATE settings SET should_show_chase_mode = NOT should_show_chase_mode"
+            )
+
+    @property
+    def should_show_chase_mode(self):
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                "SELECT should_show_chase_mode FROM settings;"
+            )
+            return cursor.fetchone()[0]
+

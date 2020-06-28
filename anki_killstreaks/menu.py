@@ -8,7 +8,7 @@ from .game import (
     toggle_auto_switch_game,
     load_auto_switch_game_status,
 )
-from . import profile_settings, networking
+from . import profile_settings, networking, chase_mode
 
 
 def connect_menu(main_window, profile_controller, network_thread):
@@ -95,6 +95,23 @@ def connect_menu(main_window, profile_controller, network_thread):
         lambda: profile_settings.show_dialog(main_window, network_thread, profile_controller.get_user_repo(), profile_controller.get_achievements_repo())
     )
 
+    chase_mode_action = top_menu.addAction("&Chase mode")
+    chase_mode_action.setCheckable(True)
+    chase_mode_action.triggered.connect(
+        partial(
+            chase_mode.toggle_chase_mode,
+            profile_controller=profile_controller,
+            main_window=main_window,
+        )
+    )
+    top_menu.aboutToShow.connect(
+        partial(
+            set_check_for_show_chase_mode,
+            action=chase_mode_action,
+            get_settings_repo=profile_controller.get_settings_repo
+        )
+    )
+
     main_window.form.menubar.addMenu(top_menu)
 
 
@@ -110,3 +127,7 @@ def check_correct_game_in_menu(menu_actions_by_game_id, load_current_game_id):
 
 def set_check_for_auto_switch_game(action, load_auto_switch_game_status):
     action.setChecked(load_auto_switch_game_status())
+
+
+def set_check_for_show_chase_mode(action, get_settings_repo):
+    action.setChecked(get_settings_repo().should_show_chase_mode)

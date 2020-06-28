@@ -37,6 +37,14 @@ class ChaseModeContext:
     def start_job(self, job):
         self.job_queue.put(job)
 
+    @property
+    def reviewer_is_being_show(self):
+        return self.main_window.state == "review"
+
+    @property
+    def should_show_chase_mode(self):
+        return self._profile_controller.get_settings_repo().should_show_chase_mode
+
 
 def setup_hooks(main_window, gui_hooks, Reviewer, profile_controller):
     def initialize_chase_mode_js(web_content, context=None):
@@ -64,18 +72,36 @@ def setup_hooks(main_window, gui_hooks, Reviewer, profile_controller):
                 main_window=main_window,
             )
 
-            _initialize_if_logged_in(chase_mode_context)
+            _initialize_if_appropriate(chase_mode_context)
             return (True, None)
         else:
             return handled
     gui_hooks.webview_did_receive_js_message.append(listen_for_chase_mode_loaded)
 
 
-def _initialize_if_logged_in(chase_mode_context):
-    if chase_mode_context.user_is_logged_in:
-        _initialize(chase_mode_context)
+def toggle_chase_mode(profile_controller, main_window):
+    settings_repo = profile_controller.get_settings_repo()
+    settings_repo.toggle_show_chase_mode()
+
+    chase_mode_context = ChaseModeContext(
+        profile_controller,
+        webview=main_window.web,
+        main_window=main_window,
+    )
+
+    if settings_repo.should_show_chase_mode:
+        _show_chase_mode_if_on_reviewer(chase_mode_context)
     else:
-        _render_not_logged_in(chase_mode_context.webview)
+        _stop_timer_if_it_exists()
+        _hide_chase_mode(chase_mode_context)
+
+
+def _initialize_if_appropriate(chase_mode_context):
+    if chase_mode_context.should_show_chase_mode:
+        if chase_mode_context.user_is_logged_in:
+            _initialize(chase_mode_context)
+        else:
+            _render_not_logged_in(chase_mode_context.webview)
 
 
 def _initialize(chase_mode_context):
@@ -174,3 +200,11 @@ def _show_conn_err_tooltip_if_first_time():
         tooltips.showToolTip(html=html_content("chase_mode/_connection_error_tooltip.html"), period=8000)
         _connection_error_message_shown = True
 
+
+def _show_chase_mode_if_on_reviewer(chase_mode_context):
+    if chase_mode_context.reviewer_is_being_show:
+        _initialize_if_appropriate(chase_mode_context)
+
+
+def _hide_chase_mode(chase_mode_context):
+    render(chase_mode_context.webview, text="")
