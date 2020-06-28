@@ -18,7 +18,7 @@ from .leaderboards import RemoteAchievementsRepository
 from .networking import (
     TokenAuthHttpClient,
     StatusListeningHttpClient,
-    show_logged_out_tooltip,
+    show_logged_out_tooltip, RetryingHttpClient,
 )
 from .persistence import (
     migrate_database,
@@ -84,10 +84,12 @@ class ProfileController:
         get_db_for_profile = partial(get_db_connection, self._db_settings)
 
         user_repo = UserRepository(get_db_for_profile)
-        http_client = StatusListeningHttpClient(
-            http_client=TokenAuthHttpClient(user_repo),
-            status=401,
-            on_status=show_logged_out_tooltip
+        http_client = RetryingHttpClient(
+            http_client=StatusListeningHttpClient(
+                http_client=TokenAuthHttpClient(user_repo),
+                status=401,
+                on_status=show_logged_out_tooltip
+            )
         )
         self._achievements_repo = RemoteAchievementsRepository(
             local_repo=AchievementsRepository(get_db_for_profile),

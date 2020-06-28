@@ -37,7 +37,7 @@ from .controllers import (
     call_method_on_object_from_factory_function,
 )
 from .menu import connect_menu
-from .networking import  process_queue, stop_thread_on_app_close
+from .networking import process_queue, stop_thread_on_app_close
 from .persistence import day_start_time, min_datetime
 from .streaks import get_stores_by_game_id
 from .views import (

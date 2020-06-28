@@ -3,12 +3,12 @@ from functools import partialmethod
 from queue import Queue
 import requests
 import traceback
-from ._vendor import attr
+from ._vendor import attr, backoff
 from . import accounts, tooltips
 
 
-sra_base_url = "https://ankiachievements.com"
-# sra_base_url = "http://localhost:5000"
+# sra_base_url = "https://ankiachievements.com"
+sra_base_url = "http://localhost:5000"
 shared_headers = {
     "Accept": "application/json",
     "Content-Type": "application/json",
@@ -99,6 +99,47 @@ class StatusListeningHttpClient(QObject):
     post = partialmethod(_do_request, 'post')
     put = partialmethod(_do_request, 'put')
     delete = partialmethod(_do_request, 'delete')
+
+
+@attr.s
+class RetryingHttpClient:
+    max_retry_time_in_s = 60 * 30
+    _http_client = attr.ib()
+
+    def _do_request(self, method, **kwargs):
+        http_func = getattr(self._http_client, method)
+        _ensure_func_has_a__name__(http_func)
+        make_req = self._backoff_decorator(http_func)
+        return make_req(**kwargs)
+
+    get = partialmethod(_do_request, 'get')
+    post = partialmethod(_do_request, 'post')
+    put = partialmethod(_do_request, 'put')
+    delete = partialmethod(_do_request, 'delete')
+
+    @property
+    def _backoff_decorator(self):
+        return backoff.on_exception(
+            backoff.expo,
+            exception=requests.exceptions.ConnectionError,
+            max_time=self.max_retry_time_in_s
+        )
+
+    def _on_backoff(self, details):
+        print(
+            "Connection Error encountered when making a request to {}. This was "
+            "attempt {} at {} / {} seconds".format(
+                sra_base_url,
+                details["tries"],
+                details["elapsed"],
+                self.max_retry_time_in_s,
+            )
+        )
+
+
+def _ensure_func_has_a__name__(partial_function):
+    if not getattr(partial_function, "__name__", False):
+        partial_function.__name__ = str(partial_function.func)
 
 
 def show_logged_out_tooltip():
