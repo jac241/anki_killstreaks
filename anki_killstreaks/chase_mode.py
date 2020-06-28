@@ -38,12 +38,15 @@ class ChaseModeContext:
         self.job_queue.put(job)
 
     @property
-    def reviewer_is_being_show(self):
-        return self.main_window.state == "review"
+    def should_show_chase_mode(self):
+        return (
+            self._profile_controller.get_settings_repo().should_show_chase_mode and
+            self.reviewer_is_being_show
+        )
 
     @property
-    def should_show_chase_mode(self):
-        return self._profile_controller.get_settings_repo().should_show_chase_mode
+    def reviewer_is_being_show(self):
+        return self.main_window.state == "review"
 
 
 def setup_hooks(main_window, gui_hooks, Reviewer, profile_controller):
@@ -90,7 +93,7 @@ def toggle_chase_mode(profile_controller, main_window):
     )
 
     if settings_repo.should_show_chase_mode:
-        _show_chase_mode_if_on_reviewer(chase_mode_context)
+        _initialize_if_appropriate(chase_mode_context)
     else:
         _stop_timer_if_it_exists()
         _hide_chase_mode(chase_mode_context)
@@ -199,11 +202,6 @@ def _show_conn_err_tooltip_if_first_time():
     if not _connection_error_message_shown:
         tooltips.showToolTip(html=html_content("chase_mode/_connection_error_tooltip.html"), period=8000)
         _connection_error_message_shown = True
-
-
-def _show_chase_mode_if_on_reviewer(chase_mode_context):
-    if chase_mode_context.reviewer_is_being_show:
-        _initialize_if_appropriate(chase_mode_context)
 
 
 def _hide_chase_mode(chase_mode_context):
