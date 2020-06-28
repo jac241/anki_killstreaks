@@ -7,9 +7,8 @@ _tooltipTimer = None
 _tooltipLabel = None
 
 
-def showToolTip(html, period=local_conf["duration"]):
+def _showToolTip(html, period):
     global _tooltipTimer, _tooltipLabel
-
     class CustomLabel(QLabel):
         def mousePressEvent(self, evt):
             evt.accept()
@@ -18,7 +17,7 @@ def showToolTip(html, period=local_conf["duration"]):
     closeTooltip()
     aw = mw.app.activeWindow() or mw
     lab = CustomLabel(
-        """\
+        r"""
 <table cellpadding=10>
 <tr>
 %s
@@ -53,3 +52,22 @@ def closeTooltip():
     if _tooltipTimer:
         _tooltipTimer.stop()
         _tooltipTimer = None
+
+
+class Tooltipper(QObject):
+    """Need this class to safely launch tooltips from different threads"""
+    show_tooltip = pyqtSignal(str, int)
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        self.show_tooltip.connect(_showToolTip)
+
+
+_tooltipper = Tooltipper(mw)
+
+
+def showToolTip(html, period=local_conf["duration"]):
+    _tooltipper.show_tooltip.emit(html, period)
+
+

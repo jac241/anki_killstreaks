@@ -150,35 +150,7 @@ def _wrap_anki_objects(profile_controller):
         ),
         pos="around",
     )
-
-    def initialize_chase_mode_js(web_content, context=None):
-        if isinstance(context, Reviewer):
-            addon_package = mw.addonManager.addonFromModule(__name__)
-
-            web_content.css.append(f"/_addons/{addon_package}/web/chase_mode.css")
-            web_content.css.append(f"/_addons/{addon_package}/web/spinner.css")
-            web_content.js.append(f"/_addons/{addon_package}/web/chase_mode.js")
-            web_content.body += html_content("chase_mode/initialize.html")
-
-    mw.addonManager.setWebExports(__name__, r"web/.*")
-    gui_hooks.webview_will_set_content.append(initialize_chase_mode_js)
-
-    def listen_for_chase_mode_loaded(handled, message, context):
-        if not isinstance(context, Reviewer):
-            # not reviewer, pass on message
-            return handled
-
-        if message == "chaseModeLoaded":
-            chase_mode.initialize(
-                webview=context.web,
-                get_user_repo=profile_controller.get_user_repo,
-                job_queue=profile_controller.job_queue
-            )
-            return (True, None)
-        else:
-            return handled
-
-    gui_hooks.webview_did_receive_js_message.append(listen_for_chase_mode_loaded)
+    chase_mode.setup_hooks(mw, gui_hooks, Reviewer, profile_controller)
 
 
 _tooltipTimer = None
