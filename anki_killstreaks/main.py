@@ -75,6 +75,7 @@ _profile_controller = ProfileController(
     get_profile_folder_path=_get_profile_folder_path,
     stores_by_game_id=_stores_by_game_id,
     job_queue=job_queue,
+    main_window=mw,
 )
 
 # for debugging

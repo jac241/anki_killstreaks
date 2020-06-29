@@ -10,7 +10,7 @@ This pattern has worked alright so far for this simple application.
 """
 from functools import wraps, partial
 
-from . import leaderboards
+from . import leaderboards, chase_mode
 from ._vendor import attr
 from .accounts import UserRepository
 from .game import set_current_game_id
@@ -69,6 +69,7 @@ class ProfileController:
     _get_profile_folder_path = attr.ib()
     _stores_by_game_id = attr.ib()
     job_queue = attr.ib()
+    _main_window = attr.ib()
 
     # Attributes modified in load_profile
     is_loaded = attr.ib(default=False)
@@ -144,6 +145,7 @@ class ProfileController:
             game_id=game_id,
             should_auto_switch_game=self.get_settings_repo().should_auto_switch_game,
         )
+        chase_mode.reinitialize_after_game_changed(self, self._main_window)
 
     def on_auto_switch_game_toggled(self):
         settings_repo = self.get_settings_repo()

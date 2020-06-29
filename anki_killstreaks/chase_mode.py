@@ -48,6 +48,10 @@ class ChaseModeContext:
     def reviewer_is_being_show(self):
         return self.main_window.state == "review"
 
+    @property
+    def current_game_id(self):
+        return self._profile_controller.get_settings_repo().current_game_id
+
 
 def setup_hooks(main_window, gui_hooks, Reviewer, profile_controller):
     def initialize_chase_mode_js(web_content, context=None):
@@ -122,6 +126,16 @@ def _initialize(chase_mode_context):
     _start_chase_mode_timer(http_client, chase_mode_context)
 
 
+def reinitialize_after_game_changed(profile_controller, main_window):
+    _initialize_if_appropriate(
+        chase_mode_context=ChaseModeContext(
+            profile_controller=profile_controller,
+            webview=main_window.web,
+            main_window=main_window,
+        )
+    )
+
+
 def _inform_user_they_are_not_logged_in(webview):
     show_logged_out_tooltip()
     _render_not_logged_in(webview)
@@ -178,9 +192,8 @@ _connection_error_message_shown = False
 
 def _fetch_and_display_chase_mode(http_client, chase_mode_context, reraise):
     global _connection_error_message_shown
-
     try:
-        response = http_client.get(url=urljoin(sra_base_url, "/api/v1/rivalries/halo-3"))
+        response = http_client.get(url=_rivalry_url_for(chase_mode_context.current_game_id))
         response.raise_for_status()
         _connection_error_message_shown = False
         render(chase_mode_context.webview, response.text)
@@ -191,6 +204,18 @@ def _fetch_and_display_chase_mode(http_client, chase_mode_context, reraise):
         if reraise:
             raise e
 
+
+def _rivalry_url_for(current_game_id):
+    return urljoin(sra_base_url, f"api/v1/rivalries/{_game_slug(current_game_id)}")
+
+_slugs_by_id = {
+    "halo_3": "halo-3",
+    "halo_5": "halo-5",
+    "mw2": "call-of-duty-modern-warfare-2",
+}
+
+def _game_slug(current_game_id):
+    return _slugs_by_id[current_game_id]
 
 def render(webview, text):
     webview.eval(fr"setChaseModeHTML(String.raw`{text}`)")
