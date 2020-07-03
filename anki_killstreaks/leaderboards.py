@@ -1,5 +1,5 @@
 import codecs
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import partial
 import json
 import requests
@@ -61,7 +61,7 @@ def _get_latest_sync_date(user_repo, http_client):
             '%Y-%m-%dT%H:%M:%S.%fZ'
         )
     else:
-        return min_datetime
+        return datetime.now() - timedelta(days=32)
 
 
 def _load_achievements_attrs_since(achievements_repo, since_datetime):

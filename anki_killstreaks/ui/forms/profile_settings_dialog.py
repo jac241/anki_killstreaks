@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'designer/profile_settings_dialog.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.2
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -13,23 +13,18 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ProfileSettingsDialog(object):
     def setupUi(self, ProfileSettingsDialog):
         ProfileSettingsDialog.setObjectName("ProfileSettingsDialog")
-        ProfileSettingsDialog.resize(485, 487)
+        ProfileSettingsDialog.resize(380, 487)
         ProfileSettingsDialog.setMinimumSize(QtCore.QSize(380, 0))
         self.gridLayout_2 = QtWidgets.QGridLayout(ProfileSettingsDialog)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.buttonBox = QtWidgets.QDialogButtonBox(ProfileSettingsDialog)
+        self.buttonBox.setEnabled(True)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Close)
+        self.buttonBox.setCenterButtons(False)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout_2.addWidget(self.buttonBox, 1, 0, 1, 1)
-        self.tabWidget = QtWidgets.QTabWidget(ProfileSettingsDialog)
-        self.tabWidget.setObjectName("tabWidget")
-        self.settingsTab = QtWidgets.QWidget()
-        self.settingsTab.setMinimumSize(QtCore.QSize(315, 0))
-        self.settingsTab.setObjectName("settingsTab")
-        self.gridLayout_3 = QtWidgets.QGridLayout(self.settingsTab)
-        self.gridLayout_3.setObjectName("gridLayout_3")
-        self.stackedWidget = QtWidgets.QStackedWidget(self.settingsTab)
+        self.stackedWidget = QtWidgets.QStackedWidget(ProfileSettingsDialog)
         self.stackedWidget.setObjectName("stackedWidget")
         self.loginPage = QtWidgets.QWidget()
         self.loginPage.setObjectName("loginPage")
@@ -91,15 +86,9 @@ class Ui_ProfileSettingsDialog(object):
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout_5.addItem(spacerItem1, 1, 0, 1, 1)
         self.stackedWidget.addWidget(self.logoutPage)
-        self.gridLayout_3.addWidget(self.stackedWidget, 0, 0, 1, 1)
-        self.tabWidget.addTab(self.settingsTab, "")
-        self.aboutTab = QtWidgets.QWidget()
-        self.aboutTab.setObjectName("aboutTab")
-        self.tabWidget.addTab(self.aboutTab, "")
-        self.gridLayout_2.addWidget(self.tabWidget, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.stackedWidget, 0, 0, 1, 1)
 
         self.retranslateUi(ProfileSettingsDialog)
-        self.tabWidget.setCurrentIndex(0)
         self.stackedWidget.setCurrentIndex(0)
         self.buttonBox.accepted.connect(ProfileSettingsDialog.accept)
         self.buttonBox.rejected.connect(ProfileSettingsDialog.reject)
@@ -107,7 +96,7 @@ class Ui_ProfileSettingsDialog(object):
 
     def retranslateUi(self, ProfileSettingsDialog):
         _translate = QtCore.QCoreApplication.translate
-        ProfileSettingsDialog.setWindowTitle(_translate("ProfileSettingsDialog", "Dialog"))
+        ProfileSettingsDialog.setWindowTitle(_translate("ProfileSettingsDialog", "Anki Killstreaks Profile Settings"))
         self.passwordLabel.setText(_translate("ProfileSettingsDialog", "Password"))
         self.signupLabel.setText(_translate("ProfileSettingsDialog", "<html><head/><body><p><a href=\"https://ankiachievements.com\"><span style=\" text-decoration: underline; color:#0068da;\">Sign Up</span></a></p></body></html>"))
         self.loginButton.setText(_translate("ProfileSettingsDialog", "Login"))
@@ -116,5 +105,3 @@ class Ui_ProfileSettingsDialog(object):
         self.userEmailLabel.setText(_translate("ProfileSettingsDialog", "user_email"))
         self.loggedInAsLabel.setText(_translate("ProfileSettingsDialog", "Logged in as:"))
         self.logoutButton.setText(_translate("ProfileSettingsDialog", "Log Out"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.settingsTab), _translate("ProfileSettingsDialog", "Settings"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.aboutTab), _translate("ProfileSettingsDialog", "About"))
