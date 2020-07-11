@@ -48,9 +48,6 @@
          <property name="sizeConstraint">
           <enum>QLayout::SetDefaultConstraint</enum>
          </property>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="emailLineEdit"/>
-         </item>
          <item row="3" column="1">
           <widget class="QLineEdit" name="passwordLineEdit">
            <property name="echoMode">
@@ -65,6 +62,30 @@
            </property>
           </widget>
          </item>
+         <item row="4" column="0" colspan="2">
+          <widget class="QPushButton" name="loginButton">
+           <property name="text">
+            <string>Login</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0" colspan="2">
+          <widget class="QLabel" name="statusLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="emailLabel">
+           <property name="text">
+            <string>Email</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="emailLineEdit"/>
+         </item>
          <item row="8" column="0" colspan="2">
           <spacer name="verticalSpacer">
            <property name="orientation">
@@ -77,23 +98,6 @@
             </size>
            </property>
           </spacer>
-         </item>
-         <item row="6" column="0" colspan="2">
-          <widget class="QLabel" name="signupLabel">
-           <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://ankiachievements.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0068da;&quot;&gt;Sign Up&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0" colspan="2">
-          <widget class="QPushButton" name="loginButton">
-           <property name="text">
-            <string>Login</string>
-           </property>
-          </widget>
          </item>
          <item row="1" column="0" colspan="2">
           <widget class="QLabel" name="loginLabel">
@@ -114,17 +118,29 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="emailLabel">
+         <item row="6" column="0" colspan="2">
+          <widget class="QLabel" name="signupLabel">
            <property name="text">
-            <string>Email</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://ankiachievements.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0068da;&quot;&gt;Sign Up&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
-         <item row="5" column="0" colspan="2">
-          <widget class="QLabel" name="statusLabel">
-           <property name="text">
-            <string/>
+         <item row="9" column="0" colspan="2">
+          <widget class="QTextBrowser" name="textBrowser">
+           <property name="html">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Anki Killstreaks © 2020 jac241.&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Links to source code: &lt;a href=&quot;https://github.com/jac241/anki_killstreaks&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Anki Killstreaks add-on source&lt;/span&gt;&lt;/a&gt;, &lt;a href=&quot;https://github.com/jac241/spaced_rep_achievements&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;AnkiAchievements.com source&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Report issues &lt;a href=&quot;https://github.com/jac241/anki_killstreaks/issues&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;here&lt;/span&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/jac241/spaced_rep_achievements&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
