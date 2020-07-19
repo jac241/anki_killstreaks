@@ -65,6 +65,7 @@ class TokenAuthHttpClient:
         )
 
         if response.status_code != 401:
+            print("Response headers:", response.headers)
             accounts.store_auth_headers(self._user_repo, response.headers)
         else:
             accounts.clear_auth_headers(self._user_repo)
@@ -79,6 +80,9 @@ class TokenAuthHttpClient:
     def _headers_for_request(self, skip_shared_headers):
         headers = dict() if skip_shared_headers else self._shared_headers.copy()
         headers.update(self._auth_headers)
+
+        print("Auth headers:", headers)
+
         return headers
 
     @property

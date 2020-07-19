@@ -1,4 +1,4 @@
-from aqt.qt import QDialog, QThread, pyqtSignal
+from aqt.qt import QDialog, QThread, pyqtSignal, Qt
 
 from functools import partial
 import json
@@ -57,6 +57,13 @@ class ProfileSettingsDialog(QDialog):
 
         self._show_correct_auth_form(user_is_logged_in)
         self._validate_token_if_logged_in(user_is_logged_in)
+
+    def keyPressEvent(self, event) -> None:
+        key = event.key()
+        if key == Qt.Key_Return or key == Qt.Key_Enter:
+            event.ignore()
+        else:
+            super().keyPressEvent(event)
 
     def _connect_login_signals(self):
         self.logged_in.connect(self.on_successful_login)

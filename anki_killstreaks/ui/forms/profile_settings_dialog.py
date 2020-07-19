@@ -97,6 +97,10 @@ class Ui_ProfileSettingsDialog(object):
         self.buttonBox.accepted.connect(ProfileSettingsDialog.accept)
         self.buttonBox.rejected.connect(ProfileSettingsDialog.reject)
         QtCore.QMetaObject.connectSlotsByName(ProfileSettingsDialog)
+        ProfileSettingsDialog.setTabOrder(self.emailLineEdit, self.passwordLineEdit)
+        ProfileSettingsDialog.setTabOrder(self.passwordLineEdit, self.loginButton)
+        ProfileSettingsDialog.setTabOrder(self.loginButton, self.textBrowser)
+        ProfileSettingsDialog.setTabOrder(self.textBrowser, self.logoutButton)
 
     def retranslateUi(self, ProfileSettingsDialog):
         _translate = QtCore.QCoreApplication.translate
