@@ -17,10 +17,12 @@ from datetime import datetime, timedelta
 from functools import partial, wraps
 import os
 from pathlib import Path
+from queue import Queue
 import random
 from threading import Thread
+from urllib.parse import urljoin
 
-from aqt import mw
+from aqt import mw, gui_hooks
 from aqt.qt import *
 from aqt.deckbrowser import DeckBrowser
 from aqt.reviewer import Reviewer
@@ -28,6 +30,7 @@ from aqt.overview import Overview
 from anki.hooks import addHook, wrap
 from anki.stats import CollectionStats
 
+from . import chase_mode
 from .config import local_conf
 from .controllers import (
     ProfileController,
@@ -36,6 +39,7 @@ from .controllers import (
     call_method_on_object_from_factory_function,
 )
 from .menu import connect_menu
+from .networking import process_queue, stop_thread_on_app_close
 from .persistence import day_start_time, min_datetime
 from .streaks import get_stores_by_game_id
 from .views import (
@@ -43,6 +47,7 @@ from .views import (
     TodaysMedalsJS,
     TodaysMedalsForDeckJS,
     js_content,
+    html_content,
 )
 from ._vendor import attr
 
@@ -69,11 +74,18 @@ def _get_profile_folder_path(profile_manager=mw.pm):
 
 _stores_by_game_id = get_stores_by_game_id(config=local_conf)
 
+job_queue = Queue()
+_network_thread = Thread(target=process_queue, args=(job_queue,))
+stop_thread_on_app_close(app=QApplication.instance(), queue=job_queue)
+
+
 _profile_controller = ProfileController(
     local_conf=local_conf,
     show_achievements=show_tool_tip_if_medals,
     get_profile_folder_path=_get_profile_folder_path,
     stores_by_game_id=_stores_by_game_id,
+    job_queue=job_queue,
+    main_window=mw,
 )
 
 # for debugging
@@ -82,7 +94,8 @@ mw.killstreaks_profile_controller = _profile_controller
 
 def main():
     _wrap_anki_objects(_profile_controller)
-    connect_menu(main_window=mw, profile_controller=_profile_controller)
+    connect_menu(main_window=mw, profile_controller=_profile_controller, network_thread=job_queue)
+    _network_thread.start()
 
 
 def _wrap_anki_objects(profile_controller):
@@ -148,6 +161,7 @@ def _wrap_anki_objects(profile_controller):
         ),
         pos="around",
     )
+    chase_mode.setup_hooks(mw, gui_hooks, Reviewer, profile_controller)
 
 
 _tooltipTimer = None

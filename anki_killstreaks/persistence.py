@@ -48,22 +48,46 @@ def get_db_connection(db_settings):
 
 
 class AchievementsRepository:
-    def __init__(self, db_connection):
-        self.conn = db_connection
+    def __init__(self, get_db_connection):
+        self.get_db_connection = get_db_connection
 
     def create_all(self, new_achievements):
-        self.conn.executemany(
-            "INSERT INTO achievements(medal_id, deck_id) VALUES (?, ?)",
-            ((a.medal_id, a.deck_id) for a in new_achievements),
-        )
+        with self.get_db_connection() as conn:
+            row_ids = []
+
+            for new_a in new_achievements:
+                cursor = conn.execute(
+                    "INSERT INTO achievements(medal_id, deck_id) VALUES (?, ?)",
+                    (new_a.medal_id, new_a.deck_id),
+                )
+                row_ids.append(cursor.lastrowid)
+
+            in_placeholders = ",".join(["?"] * len(row_ids))
+            select_cursor = conn.execute(
+                f"""
+                SELECT *
+                FROM achievements
+                WHERE id in ({in_placeholders})
+                """,
+                tuple(row_ids)
+            )
+
+            return [PersistedAchievement(*row, medal=None) for row in select_cursor]
 
     # only used by tests, should eliminate
-    def all(self):
-        cursor = self.conn.execute("SELECT * FROM achievements")
+    def all(self, since_datetime=min_datetime):
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                """
+                SELECT * FROM achievements
+                WHERE created_at > ?
+                """,
+                (since_datetime, )
+            )
 
-        loaded_achievements = [
-            PersistedAchievement(*row, medal=None) for row in cursor
-        ]
+            loaded_achievements = [
+                PersistedAchievement(*row, medal=None) for row in cursor
+            ]
 
         # will probably become a performance issue, move to
         # spot where we need this join.
@@ -83,17 +107,18 @@ class AchievementsRepository:
         return self.count_by_medal_id(created_at_gt=day_start_time)
 
     def count_by_medal_id(self, created_at_gt=min_datetime):
-        cursor = self.conn.execute(
-            """
-            SELECT medal_id, count(*)
-            FROM achievements
-            WHERE created_at > ?
-            GROUP BY medal_id
-            """,
-            (created_at_gt.astimezone(timezone.utc),),
-        )
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                """
+                SELECT medal_id, count(*)
+                FROM achievements
+                WHERE created_at > ?
+                GROUP BY medal_id
+                """,
+                (created_at_gt.astimezone(timezone.utc),),
+            )
 
-        return dict(row for row in cursor)
+            return dict(row for row in cursor)
 
     def todays_achievements_for_deck_ids(self, day_start_time, deck_ids):
         return self.achievements_for_deck_ids_since(
@@ -101,31 +126,33 @@ class AchievementsRepository:
         )
 
     def achievements_for_deck_ids_since(self, deck_ids, since_datetime):
-        cursor = self.conn.execute(
-            f"""
-            SELECT medal_id, count(*)
-            FROM achievements
-            WHERE created_at > ? AND
-                deck_id in ({','.join('?' for i in deck_ids)})
-            GROUP BY medal_id
-            """,
-            (since_datetime.astimezone(timezone.utc), *deck_ids),
-        )
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                f"""
+                SELECT medal_id, count(*)
+                FROM achievements
+                WHERE created_at > ? AND
+                    deck_id in ({','.join('?' for i in deck_ids)})
+                GROUP BY medal_id
+                """,
+                (since_datetime.astimezone(timezone.utc), *deck_ids),
+            )
 
-        return dict(row for row in cursor)
+            return dict(row for row in cursor)
 
     def achievements_for_whole_collection_since(self, since_datetime):
-        cursor = self.conn.execute(
-            f"""
-            SELECT medal_id, count(*)
-            FROM achievements
-            WHERE created_at > ?
-            GROUP BY medal_id
-            """,
-            (since_datetime.astimezone(timezone.utc),),
-        )
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                f"""
+                SELECT medal_id, count(*)
+                FROM achievements
+                WHERE created_at > ?
+                GROUP BY medal_id
+                """,
+                (since_datetime.astimezone(timezone.utc),),
+            )
 
-        return dict(row for row in cursor)
+            return dict(row for row in cursor)
 
 
 @attr.s
@@ -157,26 +184,45 @@ def day_start_time(rollover_hour, current_time=datetime.now()):
 
 
 class SettingsRepository:
-    def __init__(self, db_connection):
-        self.conn = db_connection
+    def __init__(self, get_db_connection):
+        self.get_db_connection = get_db_connection
 
     @property
     def current_game_id(self):
-        cursor = self.conn.execute("SELECT current_game_id FROM settings;")
-        return cursor.fetchone()[0]
+        with self.get_db_connection() as conn:
+            cursor = conn.execute("SELECT current_game_id FROM settings;")
+            return cursor.fetchone()[0]
 
     @current_game_id.setter
     def current_game_id(self, game_id):
-        self.conn.execute("UPDATE settings SET current_game_id = ?", (game_id,))
+        with self.get_db_connection() as conn:
+            conn.execute("UPDATE settings SET current_game_id = ?", (game_id,))
 
     def toggle_auto_switch_game(self):
-        self.conn.execute(
-            "UPDATE settings SET should_auto_switch_game = NOT should_auto_switch_game"
-        )
+        with self.get_db_connection() as conn:
+            conn.execute(
+                "UPDATE settings SET should_auto_switch_game = NOT should_auto_switch_game"
+            )
 
     @property
     def should_auto_switch_game(self):
-        cursor = self.conn.execute(
-            "SELECT should_auto_switch_game FROM settings;"
-        )
-        return cursor.fetchone()[0]
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                "SELECT should_auto_switch_game FROM settings;"
+            )
+            return cursor.fetchone()[0]
+
+    def toggle_show_chase_mode(self):
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                "UPDATE settings SET should_show_chase_mode = NOT should_show_chase_mode"
+            )
+
+    @property
+    def should_show_chase_mode(self):
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                "SELECT should_show_chase_mode FROM settings;"
+            )
+            return cursor.fetchone()[0]
+

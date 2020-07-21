@@ -11,7 +11,5 @@
 
 import os
 
-try:
-    os.environ["IN_TEST_SUITE"]
-except KeyError:
+if not os.environ.get("IN_TEST_SUITE", False):
     from . import main

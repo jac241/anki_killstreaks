@@ -1,0 +1,2 @@
+ALTER TABLE users
+ADD COLUMN client_uuid TEXT DEFAULT "" NOT NULL
