@@ -70,6 +70,7 @@ class ProfileController:
     _stores_by_game_id = attr.ib()
     job_queue = attr.ib()
     _main_window = attr.ib()
+    play_sounds = attr.ib()
 
     # Attributes modified in load_profile
     is_loaded = attr.ib(default=False)
@@ -164,6 +165,16 @@ class ProfileController:
         else:
             # reviewing controller will actually be the notifier
             self._reviewing_controller = self._reviewing_controller.controller
+
+    def on_sound_on_toggled(self):
+        settings_repo = self.get_settings_repo()
+
+        if settings_repo.should_sound_on:
+            # play sounds
+            self.play_sounds = True
+        else:
+            # don't play sounds
+            self.play_sounds = False
 
     @ensure_loaded
     def get_db_settings(self):

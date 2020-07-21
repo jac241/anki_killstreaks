@@ -178,7 +178,7 @@ def play_all(sounds):
         # Delay audio playback to prevent reviewer from stopping playback
         # on showQuestion
         mw.progress.timer(
-            1, lambda: [av_player.insert_file(filename=audio_path) for audio_path in give_sounds(sounds)], False
+            1.1, lambda: [av_player.insert_file(filename=audio_path) for audio_path in give_sounds(sounds)], False
         )
     else:
         for audio_path in give_sounds(sounds):
@@ -217,7 +217,8 @@ def showToolTip(medals, period=local_conf["duration"]):
     vdiff = (local_conf["image_height"] - 128) / 2
     lab.move(aw.mapToGlobal(QPoint(0, -260 - vdiff + aw.height())))
     lab.show()
-    play_all(medals_sounds)
+    if _profile_controller.play_sounds:
+        play_all(medals_sounds)
     _tooltipTimer = mw.progress.timer(period, closeTooltip, False)
     _tooltipLabel = lab
 

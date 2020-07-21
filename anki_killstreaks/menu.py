@@ -2,12 +2,7 @@ from functools import partial
 import webbrowser
 from aqt.qt import QMenu
 
-from .game import (
-    load_current_game_id,
-    set_current_game_id,
-    toggle_auto_switch_game,
-    load_auto_switch_game_status,
-)
+from .game import *
 from . import profile_settings, networking, chase_mode
 
 
@@ -73,6 +68,16 @@ def connect_menu(main_window, profile_controller, network_thread):
                 load_current_game_id,
                 get_settings_repo=profile_controller.get_settings_repo,
             ),
+        )
+    )
+
+    sound_on_action = top_menu.addAction("&Enable sounds")
+    sound_on_action.setCheckable(True)
+    sound_on_action.triggered.connect(
+        partial(
+            toggle_sound_on,
+            get_settings_repo=profile_controller.get_settings_repo,
+            on_sound_on_toggled=profile_controller.on_sound_on_toggled,
         )
     )
 
