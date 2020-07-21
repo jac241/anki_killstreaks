@@ -76,6 +76,16 @@ def connect_menu(main_window, profile_controller, network_thread):
         )
     )
 
+    sound_on_action = top_menu.addAction("&Enable sounds")
+    sound_on_action.setCheckable(True)
+    sound_on_action.triggered.connect(
+        partial(
+            toggle_sound_on,
+            get_settings_repo=profile_controller.get_settings_repo,
+            on_sound_on_toggled=profile_controller.on_sound_on_toggled,
+        )
+    )
+
     auto_switch_game_action = top_menu.addAction("&Automatically Switch Games")
     auto_switch_game_action.setCheckable(True)
     auto_switch_game_action.triggered.connect(

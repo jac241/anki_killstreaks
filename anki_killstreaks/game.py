@@ -7,6 +7,11 @@ def set_current_game_id(game_id, get_settings_repo, on_game_changed):
     on_game_changed(game_id=game_id)
 
 
+def toggle_sound_on(get_settings_repo, on_auto_switch_game_toggled):
+    get_settings_repo().toggle_sound_on()
+    on_sound_on_toggled()
+
+
 def toggle_auto_switch_game(get_settings_repo, on_auto_switch_game_toggled):
     get_settings_repo().toggle_auto_switch_game()
     on_auto_switch_game_toggled()
