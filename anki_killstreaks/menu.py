@@ -48,13 +48,24 @@ def connect_menu(main_window, profile_controller):
         )
     )
 
+    ca_action = game_menu.addAction("Combat Arms")
+    ca_action.setCheckable(True)
+    ca_action.triggered.connect(
+        partial(
+            set_current_game_id,
+            game_id="ca",
+            get_settings_repo=profile_controller.get_settings_repo,
+            on_game_changed=profile_controller.change_game,
+        )
+    )
+
     top_menu.addMenu(game_menu)
 
     game_menu.aboutToShow.connect(
         partial(
             check_correct_game_in_menu,
             menu_actions_by_game_id=dict(
-                halo_3=halo_3_action, mw2=mw2_action, halo_5=halo_5_action,
+                halo_3=halo_3_action, mw2=mw2_action, halo_5=halo_5_action, ca=ca_action,
             ),
             load_current_game_id=partial(
                 load_current_game_id,

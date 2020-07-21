@@ -13,7 +13,7 @@ from ._vendor import attr
 
 
 DEFAULT_GAME_ID = "halo_3"
-all_game_ids = ["halo_3", "mw2", "halo_5"]
+all_game_ids = ["halo_3", "mw2", "halo_5", "ca"]
 
 
 class MultikillMixin:
@@ -830,6 +830,52 @@ HALO_5_KILLING_SPREE_STATES = [
 ]
 
 
+CA_MULTIKILL_STATES = [
+    MultikillStartingState(),
+    MultikillFirstAnswerState(),
+    MultikillMedalState(
+        id_="Double Kill",
+        medal_image=image_path("ca/Double Kill.png"),
+        medal_sound=sound_path("ca/Double Kill.wav"),
+        name="Double Kill",
+        game_id="ca",
+        rank=2,
+    ),
+    MultikillMedalState(
+        id_="Multi Kill",
+        medal_image=image_path("ca/Multi Kill.png"),
+        medal_sound=sound_path("ca/Multi Kill.wav"),
+        name="Multi Kill",
+        game_id="ca",
+        rank=3,
+    ),
+    MultikillMedalState(
+        id_="Ultra Kill",
+        medal_image=image_path("ca/Ultra Kill.png"),
+        medal_sound=sound_path("ca/Ultra Kill.wav"),
+        name="Ultra Kill",
+        game_id="ca",
+        rank=4,
+    ),
+    MultikillMedalState(
+        id_="Fantastic",
+        medal_image=image_path("ca/Fantastic.png"),
+        medal_sound=sound_path("ca/Fantastic.wav"),
+        name="Fantastic",
+        game_id="ca",
+        rank=5,
+    ),
+    MultikillMedalState(
+        id_="Unbelievable",
+        medal_image=image_path("ca/Unbelievable.png"),
+        medal_sound=sound_path("ca/Unbelievable.wav"),
+        name="Unbelievable",
+        game_id="ca",
+        rank=6,
+    ),
+    EndState(rank=7),
+]
+
 def get_all_displayable_medals():
     all_medals = itertools.chain(
         HALO_MULTIKILL_STATES,
@@ -837,6 +883,7 @@ def get_all_displayable_medals():
         MW2_KILLSTREAK_STATES,
         HALO_5_MULTIKILL_STATES,
         HALO_5_KILLING_SPREE_STATES,
+        CA_MULTIKILL_STATES
     )
     return filter(lambda m: m.is_displayable_medal, all_medals)
 
@@ -873,6 +920,14 @@ def get_stores_by_game_id(config):
                     states=HALO_5_KILLING_SPREE_STATES,
                     interval_s=config["killing_spree_interval_s"],
                 ),
+            ]
+        ),
+        ca=Store(
+            state_machines=[
+                InitialStreakState(
+                    states=CA_MULTIKILL_STATES,
+                    interval_s=config["killing_spree_interval_s"],
+                )
             ]
         ),
     )
