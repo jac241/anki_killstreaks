@@ -195,7 +195,7 @@ def showToolTip(medals, period=local_conf["duration"]):
     closeTooltip()
     medals_html = "\n".join(medal_html(m) for m in medals)
     medals_sounds = [m.medal_sound for m in medals]
-    
+
     aw = mw.app.activeWindow() or mw
     lab = CustomLabel(
         """\

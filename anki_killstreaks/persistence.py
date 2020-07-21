@@ -215,9 +215,9 @@ class SettingsRepository:
     def toggle_sound_on():
         with self.get_db_connection() as conn:
             cursor = conn.execute(
-                "UPDATE settings SET should_sound_on = NOT should_sound_on"
+                "UPDATE settings SET should_sound_be_on = NOT should_sound_be_on"
             )
-    
+
     @property
     def should_sound_on(self):
         with self.get_db_connection() as conn:
