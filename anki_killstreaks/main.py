@@ -65,7 +65,7 @@ def _get_profile_folder_path(profile_manager=mw.pm):
 _stores_by_game_id = get_stores_by_game_id(config=local_conf)
 
 job_queue = Queue()
-_network_thread = Thread(target=process_queue, args=(job_queue,))
+_network_thread = Thread(target=process_queue, args=(job_queue,), daemon=True)
 stop_thread_on_app_close(app=QApplication.instance(), queue=job_queue)
 
 

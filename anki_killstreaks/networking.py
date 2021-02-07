@@ -10,6 +10,7 @@ from ._vendor import attr
 from . import accounts, tooltips
 
 sra_base_url = "http://192.168.200.192:5000/"
+# sra_base_url = "http://192.168.1.188:5000/"
 # sra_base_url = "http://localhost:5000"
 if not (os.environ.get("KILLSTREAKS_ENV", "production") == "development"):
     sra_base_url = "https://ankiachievements.com"

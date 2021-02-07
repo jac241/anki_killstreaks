@@ -167,8 +167,8 @@ def _show_chase_mode(http_client, chase_mode_context):
 
 
 _chase_mode_timer = None
-# _CHASE_MODE_INTERVAL_MS = 2 * 1000
-_CHASE_MODE_INTERVAL_MS = 45 * 1000
+_CHASE_MODE_INTERVAL_MS = 300 * 1000
+# _CHASE_MODE_INTERVAL_MS = 300
 
 
 def _start_chase_mode_timer(http_client, chase_mode_context):
@@ -206,7 +206,7 @@ def _fetch_and_display_chase_mode(http_client, chase_mode_context, reraise):
 
 
 def _rivalry_url_for(current_game_id):
-    return urljoin(sra_base_url, f"api/v1/rivalries/{_game_slug(current_game_id)}")
+    return urljoin(sra_base_url, f"api/v2/rivalries/{_game_slug(current_game_id)}")
 
 _slugs_by_id = {
     "halo_3": "halo-3",
