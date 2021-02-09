@@ -1,0 +1,2 @@
+ALTER TABLE achievements
+ADD COLUMN uuid TEXT DEFAULT "" NOT NULL

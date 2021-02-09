@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime, timedelta, timezone, time
 from pathlib import Path
+from uuid import uuid4
 
 from ._vendor import attr
 from ._vendor.yoyo import get_backend
@@ -57,8 +58,8 @@ class AchievementsRepository:
 
             for new_a in new_achievements:
                 cursor = conn.execute(
-                    "INSERT INTO achievements(medal_id, deck_id) VALUES (?, ?)",
-                    (new_a.medal_id, new_a.deck_id),
+                    "INSERT INTO achievements(medal_id, deck_id, uuid) VALUES (?, ?, ?)",
+                    (new_a.medal_id, new_a.deck_id, str(uuid4())),
                 )
                 row_ids.append(cursor.lastrowid)
 
@@ -161,6 +162,7 @@ class PersistedAchievement:
     medal_id = attr.ib()
     created_at = attr.ib()
     deck_id = attr.ib()
+    uuid = attr.ib()
     medal = attr.ib()
 
     def with_medal(self, medal):
