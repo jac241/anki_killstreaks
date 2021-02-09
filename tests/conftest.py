@@ -9,6 +9,7 @@ from pathlib import Path
 import sqlite3
 
 os.environ['IN_TEST_SUITE'] = 'true'
+os.environ['KILLSTREAKS_ENV'] = 'test'
 
 import pytest
 

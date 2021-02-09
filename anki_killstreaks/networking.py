@@ -1,11 +1,16 @@
-from aqt.qt import QObject, pyqtSignal
+import os
 from functools import partialmethod, partial
 import random
 from threading import Thread
 import time
 import requests
-import os
 import traceback
+
+if not (os.environ.get("KILLSTREAKS_ENV", "production") == "test"):
+    from aqt.qt import QObject, pyqtSignal
+else:
+    from PyQt5.Qt import QObject, pyqtSignal
+
 from ._vendor import attr
 from . import accounts, tooltips
 

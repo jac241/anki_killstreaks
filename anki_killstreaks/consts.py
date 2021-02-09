@@ -11,9 +11,13 @@ License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 
 import sys
 import os
-from anki import version
 
-anki21 = version.startswith("2.1.")
+anki21 = True
+
+if not (os.environ.get("KILLSTREAKS_ENV", "production") == "test"):
+    from anki import version
+    anki21 = version.startswith("2.1.")
+
 sys_encoding = sys.getfilesystemencoding()
 
 if anki21:

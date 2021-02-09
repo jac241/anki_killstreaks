@@ -12,8 +12,10 @@ License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 import os
 import io
 
-from aqt import mw
-from anki.utils import json
+
+if not (os.environ.get("KILLSTREAKS_ENV", "production") == "test"):
+    from aqt import mw
+    from anki.utils import json
 
 from .consts import *
 
@@ -133,4 +135,8 @@ else:
         _writeAddonMeta({"config": config})
 
 
-local_conf = getConfig()
+local_conf = {
+    'duration': 5000
+}
+if not (os.environ.get("KILLSTREAKS_ENV", "production") == "test"):
+    local_conf = getConfig()

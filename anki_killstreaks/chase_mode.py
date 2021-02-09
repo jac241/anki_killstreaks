@@ -1,7 +1,12 @@
 from functools import partial
 from urllib.parse import urljoin
+import os
 
-from aqt.qt import QTimer
+if not (os.environ.get("KILLSTREAKS_ENV", "production") == "test"):
+    from aqt.qt import QTimer
+else:
+    from PyQt5.QtCore import QTimer
+
 import requests
 
 from ._vendor import attr

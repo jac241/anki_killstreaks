@@ -21,4 +21,4 @@ def test_UserRepository_save_should_user_with_passed_attributes(user_repository)
     assert saved_user[1] == "JimmyYoshi@gmail.com"
     assert saved_user[2] == "token"
     assert saved_user[3] == "a client"
-    assert saved_user[4] == "expiry"
+    assert saved_user[4] == "sometime"
