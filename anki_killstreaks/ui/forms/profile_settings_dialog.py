@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'designer/profile_settings_dialog.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.14.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -114,9 +114,12 @@ class Ui_ProfileSettingsDialog(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Noto Sans\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Anki Killstreaks © 2020 jac241.</p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Anki Killstreaks © 2020-2021 jac241.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">It costs 20$/month to run the servers for chase mode and the leaderboards. Please consider <a href=\"https://cash.app/$jac241\"><span style=\" text-decoration: underline; color:#2980b9;\">donating</span></a> today. I really appreciate your contributions.</p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Links to source code: <a href=\"https://github.com/jac241/anki_killstreaks\"><span style=\" text-decoration: underline; color:#2980b9;\">Anki Killstreaks add-on source</span></a>, <a href=\"https://github.com/jac241/spaced_rep_achievements\"><span style=\" text-decoration: underline; color:#2980b9;\">AnkiAchievements.com source</span></a>.</p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Report issues <a href=\"https://github.com/jac241/anki_killstreaks/issues\"><span style=\" text-decoration: underline; color:#2980b9;\">here</span></a><a href=\"https://github.com/jac241/spaced_rep_achievements\"><span style=\" text-decoration: underline; color:#2980b9;\">.</span></a></p></body></html>"))
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Report issues <a href=\"https://github.com/jac241/anki_killstreaks/issues\"><span style=\" text-decoration: underline; color:#2980b9;\">here</span></a><a href=\"https://github.com/jac241/spaced_rep_achievements\"><span style=\" text-decoration: underline; color:#2980b9;\">.</span></a></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; text-decoration: underline; color:#2980b9;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.userEmailLabel.setText(_translate("ProfileSettingsDialog", "user_email"))
         self.loggedInAsLabel.setText(_translate("ProfileSettingsDialog", "Logged in as:"))
         self.logoutButton.setText(_translate("ProfileSettingsDialog", "Log Out"))

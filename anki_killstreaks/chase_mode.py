@@ -172,8 +172,7 @@ def _show_chase_mode(http_client, chase_mode_context):
 
 
 _chase_mode_timer = None
-_CHASE_MODE_INTERVAL_MS = 300 * 1000
-# _CHASE_MODE_INTERVAL_MS = 300
+_CHASE_MODE_INTERVAL_MS = 600 * 1000
 
 
 def _start_chase_mode_timer(http_client, chase_mode_context):

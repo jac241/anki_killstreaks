@@ -17,6 +17,16 @@ def connect_menu(main_window, profile_controller, network_thread):
     top_menu = QMenu("&Killstreaks", main_window)
     game_menu = QMenu("Select Game", main_window)
 
+    leaderboard_action = top_menu.addAction("&Donate with Cash App: $jac241")
+    leaderboard_action.triggered.connect(
+        lambda: webbrowser.open("https://cash.app/$jac241")
+    )
+
+    leaderboard_action = top_menu.addAction("&Donate with Venmo: @jac241")
+    leaderboard_action.triggered.connect(
+        lambda: webbrowser.open("https://venmo.com/jac241")
+    )
+
     halo_3_action = game_menu.addAction("Halo 3")
     halo_3_action.setCheckable(True)
     halo_3_action.triggered.connect(

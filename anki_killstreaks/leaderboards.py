@@ -134,6 +134,7 @@ def _post_achievement(user, http_client, achievement):
         url=urljoin(sra_base_url, "/api/v1/achievements"),
         json=dict(
             client_db_id=achievement.id_,
+            client_db_uuid=achievement.uuid,
             client_medal_id=achievement.medal_id,
             client_deck_id=achievement.deck_id,
             client_earned_at=achievement.created_at,
