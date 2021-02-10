@@ -1,16 +1,21 @@
-A Halo and Call of Duty inspired add-on that makes doing your reviews more bearable.
+A Halo and Call of Duty inspired add-on that makes doing your reviews more bearable. Pairs nicely with Glutanimates <a href="https://ankiweb.net/shared/info/1776869150" rel="nofollow">Hitmarkers add-on</a>.
 
 <b>Demo</b>
 
-<img src="https://user-images.githubusercontent.com/3792672/76172087-71164780-6168-11ea-8ab0-8962ec2b74c5.gif">
+<img src="https://user-images.githubusercontent.com/3792672/76172087-71164780-6168-11ea-8ab0-8962ec2b74c5.gif" alt="Killstreaks demo">
 
 <i>More screenshots available on [Github](<a href="https://github.com/jac241/anki_killstreaks" rel="nofollow">https://github.com/jac241/anki_killstreaks</a>)</i>
 
-<b>About The Addon</b>
+<b>About The Addon, v2.0.1</b>
 
 Everyone who has used Anki for studying knows it's big drawback, reviewing takes forever and is pretty boring. This add-on seeks to address this by given reinforcement and incentive to get through reviews quickly. As you answer cards within 8 seconds of each other, you will rack up "multikills". Double Kill, Triple Kill, etc. all the way up to Killionaire. The more cards you answer with good, easy, or hard in a row, the more progress you'll make towards the best killstreaks, Perfection (50 in a row) for the Halo games, and the Tactical Nuke (25 in a row) for MW2.
 
 One added feature in version 1.0.0 is the auto switch game setting. Once you've acheived all of the medals for a given game without closing Anki, it will advance you to the next game. This helps push you to focus and answer the cards correctly.
+
+In 2.0.0, I got jealous of the <a href="https://ankiweb.net/shared/info/41708974" rel="nofollow">Leaderboard</a> add-on and created my own leaderboards for Anki Killstreaks at <a href="https://AnkiAchievements.com" rel="nofollow">AnkiAchievements.com</a>. I also added a new optional feature that I call "Chase Mode" that shows you your current leaderboard rank, your score, and the score of the person 1 rank higher than you. I hope this will make it easier to stay motivated while reviewing!
+
+<b>Chase Mode</b>
+<img src="https://user-images.githubusercontent.com/3792672/87225074-40356180-c358-11ea-84fd-b43936c0c33a.png" alt="Chase mode demo">
 
 <b>Features:</b>
 <ul>
@@ -18,6 +23,8 @@ One added feature in version 1.0.0 is the auto switch game setting. Once you've 
   <li>See the medals you earned today for each game on the Deck Browser screen</li>
   <li>See the medals earned today for a given deck in the Deck Overview screen</li>
   <li>Browse all the medals you've earned within the Stats window</li>
+  <li>Leaderboards @ <a href="https://AnkiAchievements.com" rel="nofollow">AnkiAchievements.com</a>.</li>
+  <li>Chase mode</li>
 </ul>
 
 <b>Reporting Issues</b>
@@ -45,10 +52,17 @@ Anki Killstreaks is free and open-source software. The add-on code that runs wit
 
 Distributed WITHOUT ANY WARRANTY.
 
+<b>Change log</b>
+2.1.0 - Makes chase mode update in real time as you earn medals.
+2.0.1 - Improves UX of the Profile Settings dialog box.
+2.0.0 - Adds support for leaderboards @ <a href="https://AnkiAchievements.com" rel="nofollow">AnkiAchievements.com</a> and chase mode within Anki reviewer.
+1.0.2 - Fixes bug with edit field in review add-on
+
 <b>Known Issues</b>
 <ul>
   <li><b>Undoing and redoing a card will add to the streak</b> - The fix for this is outlined in the relevant python file. I just don't have time to implement it (Step 1 is looming)</li>
   <li><b>Pressing 2, 3, or 4 on question side of a card will add to the streak</b> - This happens due to support for the right hand reviews add-on, which adds ability to advance cards without showing the answer. If this one bugs you, you're free to submit a pull-request and I will merge it in. </li>
   <li><b>Medals don't sync between computers</b> - Not going to happen unless someone pays me lots of $$$
   </li><li>I chose the killstreaks for MW2, so if you really wanted Counter-UAV you're out of luck. You can change it and submit a pull request with an interface to choose them if you want.</li>
+<li>DOES NOT SUPPORT SPECIAL CHARACTERS IN PROFILE NAMES (#, $, ^, etc.)</li>
 </ul>
