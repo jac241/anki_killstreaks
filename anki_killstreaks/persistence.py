@@ -6,6 +6,7 @@ from uuid import uuid4
 from ._vendor import attr
 from ._vendor.yoyo import get_backend
 from ._vendor.yoyo import read_migrations
+from ._vendor.yoyo.exceptions import LockTimeout
 from .streaks import get_all_displayable_medals
 from .toolz import join
 
@@ -38,8 +39,11 @@ def migrate_database(settings):
     backend = get_backend(settings.db_uri)
     migrations = read_migrations(str(settings.migration_dir_path))
 
-    with backend.lock():
-        backend.apply_migrations(backend.to_apply(migrations))
+    try:
+        with backend.lock():
+            backend.apply_migrations(backend.to_apply(migrations))
+    except LockTimeout as e:
+        backend.break_lock()
 
     return settings
 
