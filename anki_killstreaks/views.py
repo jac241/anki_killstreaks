@@ -119,6 +119,7 @@ def MedalsOverview(
             halo_3="Halo 3",
             mw2="Call of Duty: Modern Warfare 2",
             halo_5="Halo 5",
+            ca="Combat Arms",
         ),
         selected_game_id=current_game_id,
     )

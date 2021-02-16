@@ -13,7 +13,7 @@ from ._vendor import attr
 
 
 DEFAULT_GAME_ID = "halo_3"
-all_game_ids = ["halo_3", "mw2", "halo_5"]
+all_game_ids = ["halo_3", "mw2", "halo_5", "ca"]
 
 
 class MultikillMixin:
@@ -65,6 +65,7 @@ class MultikillMedalState(MultikillMixin):
     id_ = attr.ib()
     name = attr.ib()
     medal_image = attr.ib()
+    medal_sound = attr.ib()
     rank = attr.ib()
     game_id = attr.ib()
     _call = attr.ib(default=None)
@@ -98,6 +99,7 @@ class KillingSpreeMedalState(KillingSpreeMixin):
     id_ = attr.ib()
     name = attr.ib()
     medal_image = attr.ib()
+    medal_sound = attr.ib()
     rank = attr.ib()
     game_id = attr.ib()
     _call = attr.ib(default=None)
@@ -318,10 +320,14 @@ class AnswerShownState:
 
 
 images_dir = join(dirname(__file__), "images")
+sounds_dir = join(dirname(__file__), "sounds")
 
 
 def image_path(filename):
     return join(images_dir, filename)
+
+def sound_path(filename):
+    return join(sounds_dir, filename)
 
 
 @attr.s(frozen=True)
@@ -348,6 +354,7 @@ HALO_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="Double Kill",
         medal_image=image_path("Doublekill_Medal.webp.png"),
+        medal_sound=sound_path("Double Kill.mp3"),
         name="Double Kill",
         game_id="halo_3",
         rank=2,
@@ -355,6 +362,7 @@ HALO_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="Triple Kill",
         medal_image=image_path("Triplekill_Medal.webp.png"),
+        medal_sound=sound_path("Triple Kill.mp3"),
         name="Triple Kill",
         game_id="halo_3",
         rank=3,
@@ -362,6 +370,7 @@ HALO_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="Overkill",
         medal_image=image_path("Overkill_Medal.png"),
+        medal_sound=sound_path("Overkill.mp3"),
         name="Overkill",
         game_id="halo_3",
         rank=4,
@@ -369,6 +378,7 @@ HALO_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="Killtacular",
         medal_image=image_path("Killtacular_Medal.webp.png"),
+        medal_sound=sound_path("Killtacular.mp3"),
         name="Killtacular",
         game_id="halo_3",
         rank=5,
@@ -376,6 +386,7 @@ HALO_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="Killtrocity",
         medal_image=image_path("Killtrocity_Medal.webp.png"),
+        medal_sound=sound_path("Killtrocity.mp3"),
         name="Killtrocity",
         game_id="halo_3",
         rank=6,
@@ -383,6 +394,7 @@ HALO_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="Killimanjaro",
         medal_image=image_path("Killimanjaro_Medal.webp.png"),
+        medal_sound=sound_path("Killimanjaro.mp3"),
         name="Killimanjaro",
         game_id="halo_3",
         rank=7,
@@ -390,6 +402,7 @@ HALO_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="Killtastrophe",
         medal_image=image_path("Killtastrophe_Medal.webp.png"),
+        medal_sound=sound_path("Killtastrophe.mp3"),
         name="Killtastrophe",
         game_id="halo_3",
         rank=8,
@@ -397,6 +410,7 @@ HALO_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="Killpocalypse",
         medal_image=image_path("Killpocalypse_Medal.webp.png"),
+        medal_sound=sound_path("Killpocalypse.mp3"),
         name="Killpocalypse",
         game_id="halo_3",
         rank=9,
@@ -404,6 +418,7 @@ HALO_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="Killionaire",
         medal_image=image_path("Killionaire_Medal.webp.png"),
+        medal_sound=sound_path("Killionaire.mp3"),
         name="Killionaire",
         game_id="halo_3",
         rank=10,
@@ -420,6 +435,7 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="Killing Spree",
         medal_image=image_path("Killing_Spree_Medal.png"),
+        medal_sound=sound_path("Killing Spree.mp3"),
         name="Killing Spree",
         game_id="halo_3",
         rank=5,
@@ -431,6 +447,7 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="Killing Frenzy",
         medal_image=image_path("Killing_Frenzy_Medal.webp.png"),
+        medal_sound=sound_path("Killing Frenzy.mp3"),
         name="Killing Frenzy",
         game_id="halo_3",
         rank=10,
@@ -442,6 +459,7 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="Running Riot",
         medal_image=image_path("Running_Riot_Medal.webp.png"),
+        medal_sound=sound_path("Running Riot.mp3"),
         name="Running Riot",
         game_id="halo_3",
         rank=15,
@@ -453,6 +471,7 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="Rampage",
         medal_image=image_path("Rampage_Medal.webp.png"),
+        medal_sound=sound_path("Rampage.mp3"),
         name="Rampage",
         game_id="halo_3",
         rank=20,
@@ -464,6 +483,7 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="Untouchable",
         medal_image=image_path("Untouchable_Medal.webp.png"),
+        medal_sound=sound_path("Untouchable.mp3"),
         name="Untouchable",
         game_id="halo_3",
         rank=25,
@@ -475,6 +495,7 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="Invincible",
         medal_image=image_path("Invincible_Medal.webp.png"),
+        medal_sound=sound_path("Invincible.mp3"),
         name="Invincible",
         game_id="halo_3",
         rank=30,
@@ -501,6 +522,7 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="Perfection",
         medal_image=image_path("Perfection_Medal.webp.png"),
+        medal_sound=sound_path("Perfection.mp3"),
         name="Perfection",
         game_id="halo_3",
         rank=50,
@@ -515,6 +537,7 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeMedalState(
         id_="mw2_uav",
         medal_image=image_path("mw2/uav.webp.png"),
+        medal_sound=sound_path("mw2/mp_killstrk_radar.wav"),
         name="UAV",
         game_id="mw2",
         call="UAV recon standing by",
@@ -523,6 +546,7 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeMedalState(
         id_="mw2_care_package",
         medal_image=image_path("mw2/care_package.webp.png"),
+        medal_sound=sound_path("mw2/mp_killstrk_carepackage.wav"),
         name="Care Package",
         game_id="mw2",
         call="Care package waiting for your mark",
@@ -531,6 +555,7 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeMedalState(
         id_="mw2_predator_missile",
         medal_image=image_path("mw2/predator_missile.webp.png"),
+        medal_sound=sound_path("mw2/mp_killstrk_hellfire.wav"),
         name="Predator Missile",
         game_id="mw2",
         call="Predator missile ready for launch",
@@ -539,6 +564,7 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeMedalState(
         id_="mw2_precision_airstrike",
         medal_image=image_path("mw2/precision_airstrike.webp.png"),
+        medal_sound=sound_path("mw2/mp_killstrk_jetstart.wav"),
         name="Precision Airstrike",
         game_id="mw2",
         call="Airstrike standing by",
@@ -547,6 +573,7 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeMedalState(
         id_="mw2_harrier_strike",
         medal_image=image_path("mw2/harrier_strike.webp.png"),
+        medal_sound=sound_path("mw2/mp_killstrk_harrierstrike.wav"),
         name="Harrier Strike",
         game_id="mw2",
         call="Harrier's waiting for your mark",
@@ -555,6 +582,7 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeMedalState(
         id_="mw2_emergency_airdrop",
         medal_image=image_path("mw2/emergency_airdrop.webp.png"),
+        medal_sound=sound_path("mw2/mp_killstrk_emergencyairdrop.wav"),
         name="Emergency Airdrop",
         game_id="mw2",
         call="Emergency airdrop, show us where you want it",
@@ -563,6 +591,7 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeMedalState(
         id_="mw2_pave_low",
         medal_image=image_path("mw2/pave_low.webp.png"),
+        medal_sound=sound_path("mw2/mp_killstrk_pavelow.wav"),
         name="Pave Low",
         game_id="mw2",
         call="Pave low ready for deployment",
@@ -572,6 +601,7 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeMedalState(
         id_="mw2_chopper_gunner",
         medal_image=image_path("mw2/chopper_gunner.webp.png"),
+        medal_sound=sound_path("mw2/mp_killstrk_choppergunner.wav"),
         name="Chopper Gunner",
         game_id="mw2",
         call="Chopper ready for deployment",
@@ -583,6 +613,7 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeMedalState(
         id_="mw2_emp",
         medal_image=image_path("mw2/emp.webp.png"),
+        medal_sound=sound_path("mw2/mp_killstrk_emp.wav"),
         name="EMP",
         game_id="mw2",
         call="EMP ready to go",
@@ -600,6 +631,7 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeMedalState(
         id_="mw2_tactical_nuke",
         medal_image=image_path("mw2/tactical_nuke.webp.png"),
+        medal_sound=sound_path("mw2/mp_killstrk_nuclearstrike.wav"),
         name="Tactical Nuke",
         game_id="mw2",
         call="Tactical nuke ready, turn the key",
@@ -614,6 +646,7 @@ HALO_5_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="halo_5_double_kill",
         medal_image=image_path("halo_5/double_kill.png"),
+        medal_sound=sound_path("halo_5/Double Kill.mp3"),
         name="Double Kill",
         game_id="halo_5",
         rank=2,
@@ -621,6 +654,7 @@ HALO_5_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="halo_5_triple_Kill",
         medal_image=image_path("halo_5/triple_kill.png"),
+        medal_sound=sound_path("halo_5/Triple Kill.mp3"),
         name="Triple Kill",
         game_id="halo_5",
         rank=3,
@@ -628,6 +662,7 @@ HALO_5_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="halo_5_overkill",
         medal_image=image_path("halo_5/overkill.png"),
+        medal_sound=sound_path("halo_5/Overkill.mp3"),
         name="Overkill",
         game_id="halo_5",
         rank=4,
@@ -635,6 +670,7 @@ HALO_5_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="halo_5_killtacular",
         medal_image=image_path("halo_5/killtacular.png"),
+        medal_sound=sound_path("halo_5/Killtacular.mp3"),
         name="Killtacular",
         game_id="halo_5",
         rank=5,
@@ -642,6 +678,7 @@ HALO_5_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="halo_5_killtrocity",
         medal_image=image_path("halo_5/killtrocity.png"),
+        medal_sound=sound_path("halo_5/Killtrocity.mp3"),
         name="Killtrocity",
         game_id="halo_5",
         rank=6,
@@ -649,6 +686,7 @@ HALO_5_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="halo_5_killimanjaro",
         medal_image=image_path("halo_5/killimanjaro.png"),
+        medal_sound=sound_path("halo_5/Killimanjaro.mp3"),
         name="Killimanjaro",
         game_id="halo_5",
         rank=7,
@@ -656,6 +694,7 @@ HALO_5_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="halo_5_killtastrophe",
         medal_image=image_path("halo_5/killtastrophe.png"),
+        medal_sound=sound_path("halo_5/Killtastrophe.mp3"),
         name="Killtastrophe",
         game_id="halo_5",
         rank=8,
@@ -663,6 +702,7 @@ HALO_5_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="halo_5_killpocalypse",
         medal_image=image_path("halo_5/killpocalypse.png"),
+        medal_sound=sound_path("halo_5/Killpocalypse.mp3"),
         name="Killpocalypse",
         game_id="halo_5",
         rank=9,
@@ -670,6 +710,7 @@ HALO_5_MULTIKILL_STATES = [
     MultikillMedalState(
         id_="halo_5_killionaire",
         medal_image=image_path("halo_5/killionaire.png"),
+        medal_sound=sound_path("halo_5/Killionaire.mp3"),
         name="Killionaire",
         game_id="halo_5",
         rank=10,
@@ -686,6 +727,7 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="halo_5_killing_spree",
         medal_image=image_path("halo_5/killing_spree.png"),
+        medal_sound=sound_path("halo_5/Killing Spree.mp3"),
         name="Killing Spree",
         game_id="halo_5",
         rank=5,
@@ -697,6 +739,7 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="halo_5_killing_frenzy",
         medal_image=image_path("halo_5/killing_frenzy.png"),
+        medal_sound=sound_path("halo_5/Killing Frenzy.mp3"),
         name="Killing Frenzy",
         game_id="halo_5",
         rank=10,
@@ -708,6 +751,7 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="halo_5_running_riot",
         medal_image=image_path("halo_5/running_riot.png"),
+        medal_sound=sound_path("halo_5/Running Riot.mp3"),
         name="Running Riot",
         game_id="halo_5",
         rank=15,
@@ -719,6 +763,7 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="halo_5_rampage",
         medal_image=image_path("halo_5/rampage.png"),
+        medal_sound=sound_path("halo_5/Rampage.mp3"),
         name="Rampage",
         game_id="halo_5",
         rank=20,
@@ -730,6 +775,7 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="halo_5_untouchable",
         medal_image=image_path("halo_5/untouchable.png"),
+        medal_sound=sound_path("halo_5/Untouchable.mp3"),
         name="Untouchable",
         game_id="halo_5",
         rank=25,
@@ -741,6 +787,7 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="halo_5_invincible",
         medal_image=image_path("halo_5/invincible.png"),
+        medal_sound=sound_path("halo_5/Invincible.mp3"),
         name="Invincible",
         game_id="halo_5",
         rank=30,
@@ -757,6 +804,7 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="halo_5_unfriggenbelievable",
         medal_image=image_path("halo_5/unfriggenbelievable.png"),
+        medal_sound=sound_path("halo_5/Unfriggenbelievable.mp3"),
         name="Unfriggen believable",
         game_id="halo_5",
         rank=40,
@@ -773,6 +821,7 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeMedalState(
         id_="halo_5_perfection",
         medal_image=image_path("halo_5/perfection.png"),
+        medal_sound=sound_path("halo_5/Perfection.mp3"),
         name="Perfection",
         game_id="halo_5",
         rank=50,
@@ -781,6 +830,52 @@ HALO_5_KILLING_SPREE_STATES = [
 ]
 
 
+CA_MULTIKILL_STATES = [
+    MultikillStartingState(),
+    MultikillFirstAnswerState(),
+    MultikillMedalState(
+        id_="Double Kill",
+        medal_image=image_path("ca/Double Kill.png"),
+        medal_sound=sound_path("ca/Double Kill.wav"),
+        name="Double Kill",
+        game_id="ca",
+        rank=2,
+    ),
+    MultikillMedalState(
+        id_="Multi Kill",
+        medal_image=image_path("ca/Multi Kill.png"),
+        medal_sound=sound_path("ca/Multi Kill.wav"),
+        name="Multi Kill",
+        game_id="ca",
+        rank=3,
+    ),
+    MultikillMedalState(
+        id_="Ultra Kill",
+        medal_image=image_path("ca/Ultra Kill.png"),
+        medal_sound=sound_path("ca/Ultra Kill.wav"),
+        name="Ultra Kill",
+        game_id="ca",
+        rank=4,
+    ),
+    MultikillMedalState(
+        id_="Fantastic",
+        medal_image=image_path("ca/Fantastic.png"),
+        medal_sound=sound_path("ca/Fantastic.wav"),
+        name="Fantastic",
+        game_id="ca",
+        rank=5,
+    ),
+    MultikillMedalState(
+        id_="Unbelievable",
+        medal_image=image_path("ca/Unbelievable.png"),
+        medal_sound=sound_path("ca/Unbelievable.wav"),
+        name="Unbelievable",
+        game_id="ca",
+        rank=6,
+    ),
+    EndState(rank=7),
+]
+
 def get_all_displayable_medals():
     all_medals = itertools.chain(
         HALO_MULTIKILL_STATES,
@@ -788,6 +883,7 @@ def get_all_displayable_medals():
         MW2_KILLSTREAK_STATES,
         HALO_5_MULTIKILL_STATES,
         HALO_5_KILLING_SPREE_STATES,
+        CA_MULTIKILL_STATES
     )
     return filter(lambda m: m.is_displayable_medal, all_medals)
 
@@ -824,6 +920,14 @@ def get_stores_by_game_id(config):
                     states=HALO_5_KILLING_SPREE_STATES,
                     interval_s=config["killing_spree_interval_s"],
                 ),
+            ]
+        ),
+        ca=Store(
+            state_machines=[
+                InitialStreakState(
+                    states=CA_MULTIKILL_STATES,
+                    interval_s=config["killing_spree_interval_s"],
+                )
             ]
         ),
     )

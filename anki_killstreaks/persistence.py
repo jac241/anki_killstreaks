@@ -218,6 +218,20 @@ class SettingsRepository:
             )
             return cursor.fetchone()[0]
 
+    def toggle_sound_on():
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                "UPDATE settings SET should_sound_be_on = NOT should_sound_be_on"
+            )
+
+    @property
+    def should_sound_on(self):
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                "SELECT should_sound_on FROM settings;"
+            )
+            return cursor.fetchone()[0]
+
     def toggle_show_chase_mode(self):
         with self.get_db_connection() as conn:
             cursor = conn.execute(
