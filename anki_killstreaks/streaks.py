@@ -47,7 +47,6 @@ class KillingSpreeMixin:
 # first just needs to be after minimum time
 class MultikillStartingState(KillingSpreeMixin):
     is_displayable_medal = False
-    num_states_to_advance_if_on_streak = 1
     rank = 0
 
     def next_streak_index(self, current_streak_index):
@@ -56,7 +55,6 @@ class MultikillStartingState(KillingSpreeMixin):
 
 class MultikillFirstAnswerState(MultikillMixin):
     is_displayable_medal = False
-    num_states_to_advance_if_on_streak = 1
     rank = 1
 
     def next_streak_index(self, current_streak_index):
@@ -66,7 +64,6 @@ class MultikillFirstAnswerState(MultikillMixin):
 @attr.s(frozen=True)
 class MultikillMedalState(MultikillMixin):
     is_displayable_medal = True
-    num_states_to_advance_if_on_streak = 1
 
     id_ = attr.ib()
     name = attr.ib()
@@ -97,7 +94,6 @@ class EndState(MultikillMixin):
 
 class KillingSpreeNoMedalState(KillingSpreeMixin):
     is_displayable_medal = False
-    num_states_to_advance_if_on_streak = 1
 
     def __init__(self, rank):
         self.rank = rank
@@ -109,7 +105,6 @@ class KillingSpreeNoMedalState(KillingSpreeMixin):
 @attr.s(frozen=True)
 class KillingSpreeMedalState(KillingSpreeMixin):
     is_displayable_medal = True
-    num_states_to_advance_if_on_streak = 1
 
     id_ = attr.ib()
     name = attr.ib()
@@ -128,7 +123,6 @@ class KillingSpreeMedalState(KillingSpreeMixin):
 
 class KillingSpreeEndState(KillingSpreeMixin):
     is_displayable_medal = False
-    num_states_to_advance_if_on_streak = 0
 
     def __init__(self, rank):
         self.rank = rank
