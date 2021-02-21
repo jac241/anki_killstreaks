@@ -293,17 +293,29 @@ def test_should_be_able_to_get_perfection_medal_after_50_kills():
     assert state.current_medal_state.name == 'Perfection'
 
 
-def test_current_index_of_state_should_return_to_zero_once_end_state_reached():
-    state = QuestionShownState(
-        states=HALO_KILLING_SPREE_STATES,
-        question_shown_at=datetime.now(),
-        interval_s=8,
-        current_streak_index=0,
-    )
+def test_killing_spree_states_should_return_to_index_one_after_all_medals_achieved():
+    for states in [HALO_KILLING_SPREE_STATES, HALO_5_KILLING_SPREE_STATES, MW2_KILLSTREAK_STATES]:
+        state = QuestionShownState(
+            states=states,
+            question_shown_at=datetime.now(),
+            interval_s=8,
+            current_streak_index=len(states) - 1,
+        )
 
-    for i in range(50):
         state = state.on_answer(card_did_pass=True)
-    assert state.current_medal_state.name == 'Perfection'
+        assert state.current_medal_state == states[1]
+
+def test_multikill_states_should_return_to_index_two_after_all_medals_achieved():
+    for states in [HALO_5_MULTIKILL_STATES, HALO_MULTIKILL_STATES]:
+        state = QuestionShownState(
+            states=states,
+            question_shown_at=datetime.now(),
+            interval_s=8,
+            current_streak_index=len(states) - 1,
+        )
+
+        state = state.on_answer(card_did_pass=True)
+        assert state.current_medal_state == states[2]
 
 
 def test_Store_on_show_question_should_delegate_to_composing_states(answer_shown_state):

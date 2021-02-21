@@ -521,14 +521,16 @@ HALO_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=47),
     KillingSpreeNoMedalState(rank=48),
     KillingSpreeNoMedalState(rank=49),
-    KillingSpreeMedalState(
-        id_="Perfection",
-        medal_image=image_path("Perfection_Medal.webp.png"),
-        name="Perfection",
-        game_id="halo_3",
-        rank=50,
+    EndState(
+        medal_state=KillingSpreeMedalState(
+            id_="Perfection",
+            medal_image=image_path("Perfection_Medal.webp.png"),
+            name="Perfection",
+            game_id="halo_3",
+            rank=50,
+        ),
+        index_to_return_to=1
     ),
-    KillingSpreeEndState(rank=51),
 ]
 
 MW2_KILLSTREAK_STATES = [
@@ -620,15 +622,17 @@ MW2_KILLSTREAK_STATES = [
     KillingSpreeNoMedalState(rank=22),
     KillingSpreeNoMedalState(rank=23),
     KillingSpreeNoMedalState(rank=24),
-    KillingSpreeMedalState(
-        id_="mw2_tactical_nuke",
-        medal_image=image_path("mw2/tactical_nuke.webp.png"),
-        name="Tactical Nuke",
-        game_id="mw2",
-        call="Tactical nuke ready, turn the key",
-        rank=25,
-    ),
-    KillingSpreeEndState(rank=26),
+    EndState(
+        medal_state=KillingSpreeMedalState(
+            id_="mw2_tactical_nuke",
+            medal_image=image_path("mw2/tactical_nuke.webp.png"),
+            name="Tactical Nuke",
+            game_id="mw2",
+            call="Tactical nuke ready, turn the key",
+            rank=25,
+        ),
+        index_to_return_to=1
+    )
 ]
 
 HALO_5_MULTIKILL_STATES = [
@@ -795,14 +799,16 @@ HALO_5_KILLING_SPREE_STATES = [
     KillingSpreeNoMedalState(rank=47),
     KillingSpreeNoMedalState(rank=48),
     KillingSpreeNoMedalState(rank=49),
-    KillingSpreeMedalState(
-        id_="halo_5_perfection",
-        medal_image=image_path("halo_5/perfection.png"),
-        name="Perfection",
-        game_id="halo_5",
-        rank=50,
+    EndState(
+        medal_state=KillingSpreeMedalState(
+            id_="halo_5_perfection",
+            medal_image=image_path("halo_5/perfection.png"),
+            name="Perfection",
+            game_id="halo_5",
+            rank=50,
+        ),
+        index_to_return_to=1
     ),
-    KillingSpreeEndState(rank=51),
 ]
 
 
