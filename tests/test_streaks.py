@@ -54,8 +54,10 @@ def test_states_requirements_met_should_return_true_if_within_interval():
     states = [
         MultikillStartingState(),
         MultikillFirstAnswerState(),
-        MultikillMedalState(id_='t', name='test', medal_image=None, rank=2, game_id='tg'),
-        EndState(rank=3)
+        EndState(
+            medal_state=MultikillMedalState(id_='t', name='test', medal_image=None, rank=2, game_id='tg'),
+            index_to_return_to=1
+        )
     ]
 
     for state in states:
@@ -98,8 +100,10 @@ def test_QuestionShownState_on_answer_should_advance():
     states = [
         MultikillStartingState(),
         MultikillFirstAnswerState(),
-        MultikillMedalState(id_='t', name='test', medal_image=None, rank=2, game_id='tg'),
-        EndState(rank=3)
+        EndState(
+            medal_state=MultikillMedalState(id_='t', name='test', medal_image=None, rank=2, game_id='tg'),
+            index_to_return_to=2
+        ),
     ]
 
     machine = QuestionShownState(
@@ -112,9 +116,11 @@ def test_QuestionShownState_on_answer_should_advance():
     result = machine.on_answer(card_did_pass=True)
     return result.current_medal_state == states[1]
 
+
 def test_multikill_flow_should_work():
     states = [
         MultikillStartingState(),
+        MultikillFirstAnswerState(),
         MultikillMedalState(
             id_='test',
             name='test',
@@ -122,21 +128,55 @@ def test_multikill_flow_should_work():
             rank=2,
             game_id='t',
         ),
-        EndState(rank=2)
     ]
 
-    machine = QuestionShownState(
+    multikill_machine = QuestionShownState(
         states,
         question_shown_at=datetime.now(),
         interval_s=8,
         current_streak_index=0
     )
 
-    question_shown_machine = machine.on_show_question()
+    question_shown_machine = multikill_machine.on_show_question()
     answer_shown_machine = question_shown_machine.on_show_answer()
     new_q_machine = answer_shown_machine.on_answer(card_did_pass=True)
 
-    assert new_q_machine.current_medal_state == states[1]
+    assert new_q_machine.current_medal_state == multikill_machine.states[1]
+
+
+def test_multikill_should_restart_streak_automatically_if_all_medals_achieved():
+    states = [
+        MultikillStartingState(),
+        MultikillFirstAnswerState(),
+        MultikillMedalState(
+            id_='test1',
+            name='test1',
+            medal_image=None,
+            rank=2,
+            game_id='t',
+        ),
+        EndState(
+            medal_state=MultikillMedalState(
+                id_='test2',
+                name='test2',
+                medal_image=None,
+                rank=3,
+                game_id='t',
+            ),
+            index_to_return_to=2,
+        ),
+    ]
+
+    multikill_machine = QuestionShownState(
+        states,
+        question_shown_at=datetime.now(),
+        interval_s=8,
+        current_streak_index=3
+    )
+
+    new_state = multikill_machine.on_answer(card_did_pass=True)
+    assert new_state.current_medal_state == states[2]
+
 
 
 def test_multikill_should_reset_when_again_pressed():
@@ -149,7 +189,6 @@ def test_multikill_should_reset_when_again_pressed():
             rank=2,
             game_id='t',
         ),
-        EndState(rank=2)
     ]
 
     question_shown_state = QuestionShownState(
@@ -176,7 +215,6 @@ def test_AnswerShownState_should_reset_to_QuestionShownState_when_recieves_on_sh
             rank=2,
             game_id='t',
         ),
-        EndState(rank=2)
     ]
 
     answer_shown_state = AnswerShownState(
@@ -204,7 +242,6 @@ def test_AnswerShownState_should_go_to_index_1_if_answer_was_correct_but_out_of_
             rank=2,
             game_id='t',
         ),
-        EndState(rank=3)
     ]
 
     answer_shown_state = AnswerShownState(
@@ -229,7 +266,6 @@ def test_AnswerShownState_should_just_repeat_if_on_answer_shown_called():
             rank=2,
             game_id='t',
         ),
-        EndState(rank=3)
     ]
 
     answer_shown_state = AnswerShownState(
@@ -243,7 +279,21 @@ def test_AnswerShownState_should_just_repeat_if_on_answer_shown_called():
     repeated_state = answer_shown_state.on_show_answer()
     assert repeated_state == answer_shown_state
 
+
 def test_should_be_able_to_get_perfection_medal_after_50_kills():
+    state = QuestionShownState(
+        states=HALO_KILLING_SPREE_STATES,
+        question_shown_at=datetime.now(),
+        interval_s=8,
+        current_streak_index=0,
+    )
+
+    for i in range(50):
+        state = state.on_answer(card_did_pass=True)
+    assert state.current_medal_state.name == 'Perfection'
+
+
+def test_current_index_of_state_should_return_to_zero_once_end_state_reached():
     state = QuestionShownState(
         states=HALO_KILLING_SPREE_STATES,
         question_shown_at=datetime.now(),

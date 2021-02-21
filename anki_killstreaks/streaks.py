@@ -50,11 +50,17 @@ class MultikillStartingState(KillingSpreeMixin):
     num_states_to_advance_if_on_streak = 1
     rank = 0
 
+    def next_streak_index(self, current_streak_index):
+        return current_streak_index + 1
+
 
 class MultikillFirstAnswerState(MultikillMixin):
     is_displayable_medal = False
     num_states_to_advance_if_on_streak = 1
     rank = 1
+
+    def next_streak_index(self, current_streak_index):
+        return current_streak_index + 1
 
 
 @attr.s(frozen=True)
@@ -73,13 +79,20 @@ class MultikillMedalState(MultikillMixin):
     def call(self):
         return self._call if self._call else self.name
 
+    def next_streak_index(self, current_streak_index):
+        return current_streak_index + 1
+
 
 class EndState(MultikillMixin):
-    is_displayable_medal = False
-    num_states_to_advance_if_on_streak = 0
+    def __init__(self, medal_state, index_to_return_to):
+        self._medal_state = medal_state
+        self._index_to_return_to = index_to_return_to
 
-    def __init__(self, rank):
-        self.rank = rank
+    def next_streak_index(self, _current_streak_index):
+        return self._index_to_return_to
+
+    def __getattr__(self, attr):
+        return getattr(self._medal_state, attr)
 
 
 class KillingSpreeNoMedalState(KillingSpreeMixin):
@@ -88,6 +101,9 @@ class KillingSpreeNoMedalState(KillingSpreeMixin):
 
     def __init__(self, rank):
         self.rank = rank
+
+    def next_streak_index(self, current_streak_index):
+        return current_streak_index + 1
 
 
 @attr.s(frozen=True)
@@ -106,6 +122,9 @@ class KillingSpreeMedalState(KillingSpreeMixin):
     def call(self):
         return self._call if self._call else self.name
 
+    def next_streak_index(self, current_streak_index):
+        return current_streak_index + 1
+
 
 class KillingSpreeEndState(KillingSpreeMixin):
     is_displayable_medal = False
@@ -113,6 +132,9 @@ class KillingSpreeEndState(KillingSpreeMixin):
 
     def __init__(self, rank):
         self.rank = rank
+
+    def next_streak_index(self, current_streak_index):
+        return 0
 
 
 class InitialStreakState:
@@ -300,8 +322,7 @@ class AnswerShownState:
             states=self.states,
             question_shown_at=datetime.now(),
             interval_s=self._interval_s,
-            current_streak_index=self._current_streak_index
-            + self.current_medal_state.num_states_to_advance_if_on_streak,
+            current_streak_index=self.current_medal_state.next_streak_index(self._current_streak_index),
         )
 
     def _reset_state_machine(self, new_index=0):
@@ -401,14 +422,16 @@ HALO_MULTIKILL_STATES = [
         game_id="halo_3",
         rank=9,
     ),
-    MultikillMedalState(
-        id_="Killionaire",
-        medal_image=image_path("Killionaire_Medal.webp.png"),
-        name="Killionaire",
-        game_id="halo_3",
-        rank=10,
+    EndState(
+        medal_state=MultikillMedalState(
+            id_="Killionaire",
+            medal_image=image_path("Killionaire_Medal.webp.png"),
+            name="Killionaire",
+            game_id="halo_3",
+            rank=10,
+        ),
+        index_to_return_to=2,
     ),
-    EndState(rank=11),
 ]
 
 HALO_KILLING_SPREE_STATES = [
@@ -667,14 +690,16 @@ HALO_5_MULTIKILL_STATES = [
         game_id="halo_5",
         rank=9,
     ),
-    MultikillMedalState(
-        id_="halo_5_killionaire",
-        medal_image=image_path("halo_5/killionaire.png"),
-        name="Killionaire",
-        game_id="halo_5",
-        rank=10,
+    EndState(
+        medal_state=MultikillMedalState(
+            id_="halo_5_killionaire",
+            medal_image=image_path("halo_5/killionaire.png"),
+            name="Killionaire",
+            game_id="halo_5",
+            rank=10,
+        ),
+        index_to_return_to=2
     ),
-    EndState(rank=11),
 ]
 
 HALO_5_KILLING_SPREE_STATES = [
