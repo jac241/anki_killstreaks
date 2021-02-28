@@ -9,8 +9,8 @@ from datetime import datetime, timedelta
 import itertools
 from os.path import join, dirname
 
+from . import addons
 from ._vendor import attr
-
 
 DEFAULT_GAME_ID = "halo_3"
 all_game_ids = ["halo_3", "mw2", "halo_5"]
@@ -220,12 +220,13 @@ class Store:
 
 class QuestionShownState:
     def __init__(
-        self, states, question_shown_at, interval_s=8, current_streak_index=0
+        self, states, question_shown_at, interval_s=8, current_streak_index=0, addon_is_installed_and_enabled=addons.is_installed_and_enabled
     ):
         self.states = states
         self._question_shown_at = question_shown_at
         self._interval_s = interval_s
         self._current_streak_index = current_streak_index
+        self._addon_is_installed_and_enabled = addon_is_installed_and_enabled
 
     def on_show_question(self):
         return QuestionShownState(
@@ -245,15 +246,18 @@ class QuestionShownState:
         )
 
     def on_answer(self, card_did_pass):
-        answer_state = AnswerShownState(
-            states=self.states,
-            question_shown_at=self._question_shown_at,
-            answer_shown_at=datetime.now(),
-            interval_s=self._interval_s,
-            current_streak_index=self._current_streak_index,
-        )
+        if self._addon_is_installed_and_enabled("Right Hand Reviews jkl"):
+            answer_state = AnswerShownState(
+                states=self.states,
+                question_shown_at=self._question_shown_at,
+                answer_shown_at=datetime.now(),
+                interval_s=self._interval_s,
+                current_streak_index=self._current_streak_index,
+            )
 
-        return answer_state.on_answer(card_did_pass)
+            return answer_state.on_answer(card_did_pass)
+        else:
+            return self
 
     @property
     def current_medal_state(self):

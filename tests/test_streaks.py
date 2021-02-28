@@ -6,8 +6,12 @@ License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 """
 
 from datetime import datetime
+from functools import partial
+from pathlib import Path
+
 import pytest
 
+from anki_killstreaks import addons
 from anki_killstreaks.streaks import *
 
 
@@ -115,6 +119,44 @@ def test_QuestionShownState_on_answer_should_advance():
 
     result = machine.on_answer(card_did_pass=True)
     return result.current_medal_state == states[1]
+
+
+def test_QuestionShownState_on_answer_should_only_advance_if_right_hand_reviews_is_installed(test_support_dir):
+    states = [
+        MultikillStartingState(),
+        MultikillFirstAnswerState(),
+        EndState(
+            medal_state=MultikillMedalState(id_='t', name='test', medal_image=None, rank=2, game_id='tg'),
+            index_to_return_to=2
+        ),
+    ]
+    machine_with_rhr = QuestionShownState(
+        states=states,
+        interval_s=10,
+        current_streak_index=0,
+        question_shown_at=datetime.now(),
+        addon_is_installed_and_enabled=partial(
+            addons.is_installed_and_enabled,
+            addons_dir_path=Path(test_support_dir, "sample_addons_dir_with_right_hand_reviews")
+        ),
+    )
+
+    result = machine_with_rhr.on_answer(card_did_pass=True)
+    assert result.current_medal_state == states[1]
+
+    machine_without_rhr = QuestionShownState(
+        states=states,
+        interval_s=10,
+        current_streak_index=0,
+        question_shown_at=datetime.now(),
+        addon_is_installed_and_enabled=partial(
+            addons.is_installed_and_enabled,
+            addons_dir_path=Path(test_support_dir, "sample_addons_dir_without_right_hand_reviews")
+        ),
+    )
+
+    result = machine_without_rhr.on_answer(card_did_pass=True)
+    assert result == machine_without_rhr
 
 
 def test_multikill_flow_should_work():

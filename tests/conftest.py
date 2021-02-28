@@ -18,7 +18,7 @@ from anki_killstreaks.persistence import DbSettings, migrate_database, Achieveme
 
 @pytest.yield_fixture()
 def test_support_dir():
-    test_support_dir = Path('tests', 'support').absolute()
+    test_support_dir = Path('support').absolute() if os.getcwd().endswith('tests') else Path('tests', 'support').absolute()
     test_support_dir.mkdir(exist_ok=True)
 
     yield test_support_dir

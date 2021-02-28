@@ -1,16 +1,15 @@
 import sqlite3
 from datetime import datetime, timedelta, timezone, time
-from pathlib import Path
 from uuid import uuid4
 
 from ._vendor import attr
 from ._vendor.yoyo import get_backend
 from ._vendor.yoyo import read_migrations
 from ._vendor.yoyo.exceptions import LockTimeout
+from .addons import THIS_ADDON_PATH
 from .streaks import get_all_displayable_medals
 from .toolz import join
 
-this_addon_path = Path(__file__).parent.absolute()
 min_datetime = datetime(
     year=2019, month=12, day=25
 )  # day I started making the addon :-)
@@ -23,7 +22,7 @@ class DbSettings:
 
     @classmethod
     def from_profile_folder_path(
-        cls, profile_folder_path, addon_path=this_addon_path
+        cls, profile_folder_path, addon_path=THIS_ADDON_PATH
     ):
         return cls(
             db_path=profile_folder_path / "anki_killstreaks.db",
