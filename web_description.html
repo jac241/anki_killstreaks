@@ -18,14 +18,13 @@ In 2.0.0, I got jealous of the <a href="https://ankiweb.net/shared/info/41708974
 <img src="https://user-images.githubusercontent.com/3792672/87225074-40356180-c358-11ea-84fd-b43936c0c33a.png" alt="Chase mode demo">
 
 <b>Features:</b>
-<ul>
-  <li>Your favorite Halo3, Call of Duty: MW2, and Halo 5 kill streaks: Double Kill, Triple Kill, Overkill, Chopper Gunner, Tactical Nuke, etc.</li>
-  <li>See the medals you earned today for each game on the Deck Browser screen</li>
-  <li>See the medals earned today for a given deck in the Deck Overview screen</li>
-  <li>Browse all the medals you've earned within the Stats window</li>
-  <li>Leaderboards @ <a href="https://AnkiAchievements.com" rel="nofollow">AnkiAchievements.com</a>.</li>
-  <li>Chase mode</li>
-</ul>
+Your favorite Halo3, Call of Duty: MW2, and Halo 5 kill streaks: Double Kill, Triple Kill, Overkill, Chopper Gunner, Tactical Nuke, etc.
+See the medals you earned today for each game on the Deck Browser screen
+See the medals earned today for a given deck in the Deck Overview screen
+Browse all the medals you've earned within the Stats window
+Leaderboards @ <a href="https://AnkiAchievements.com" rel="nofollow">AnkiAchievements.com</a>.
+Chase mode
+
 
 <b>Reporting Issues</b>
 Please report issues through <a href="https://github.com/jac241/anki_killstreaks/issues" rel="nofollow">Github</a>. Include a detailed description, screenshot if possible, and the error message shown in Anki.
@@ -53,6 +52,8 @@ Anki Killstreaks is free and open-source software. The add-on code that runs wit
 Distributed WITHOUT ANY WARRANTY.
 
 <b>Change log</b>
+2.2.1 - Fixes behavior where pressing 2, 3, or 4 would earn you medals on the question shown screen, unless Right Hand Reviews is installed.
+2.1.1 - Fixes bug where migration lock stops add-on from launching
 2.1.0 - Makes chase mode update in real time as you earn medals.
 2.0.1 - Improves UX of the Profile Settings dialog box.
 2.0.0 - Adds support for leaderboards @ <a href="https://AnkiAchievements.com" rel="nofollow">AnkiAchievements.com</a> and chase mode within Anki reviewer.
@@ -60,9 +61,8 @@ Distributed WITHOUT ANY WARRANTY.
 
 <b>Known Issues</b>
 <ul>
-  <li><b>Undoing and redoing a card will add to the streak</b> - The fix for this is outlined in the relevant python file. I just don't have time to implement it (Step 1 is looming)</li>
-  <li><b>Pressing 2, 3, or 4 on question side of a card will add to the streak</b> - This happens due to support for the right hand reviews add-on, which adds ability to advance cards without showing the answer. If this one bugs you, you're free to submit a pull-request and I will merge it in. </li>
-  <li><b>Medals don't sync between computers</b> - Not going to happen unless someone pays me lots of $$$
-  </li><li>I chose the killstreaks for MW2, so if you really wanted Counter-UAV you're out of luck. You can change it and submit a pull request with an interface to choose them if you want.</li>
-<li>DOES NOT SUPPORT SPECIAL CHARACTERS IN PROFILE NAMES (#, $, ^, etc.)</li>
+  <b>Undoing and redoing a card will add to the streak</b> - The fix for this is outlined in the relevant python file. I just don't have time to implement it (Step 1 is looming)
+  <b>Medals don't sync between computers</b> - Not going to happen unless someone pays me lots of $$$
+  I chose the killstreaks for MW2, so if you really wanted Counter-UAV you're out of luck. You can change it and submit a pull request with an interface to choose them if you want.
+  <b>DOES NOT SUPPORT SPECIAL CHARACTERS IN PROFILE NAMES (#, $, ^, etc.)</b>
 </ul>
