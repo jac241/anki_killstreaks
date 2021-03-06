@@ -13,9 +13,8 @@ import os
 import io
 
 
-if not (os.environ.get("KILLSTREAKS_ENV", "production") == "test"):
-    from aqt import mw
-    from anki.utils import json
+from aqt import mw
+from anki.utils import json
 
 from .consts import *
 

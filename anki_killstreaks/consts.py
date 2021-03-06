@@ -14,9 +14,8 @@ import os
 
 anki21 = True
 
-if not (os.environ.get("KILLSTREAKS_ENV", "production") == "test"):
-    from anki import version
-    anki21 = version.startswith("2.1.")
+from anki import version
+anki21 = version.startswith("2.1.")
 
 sys_encoding = sys.getfilesystemencoding()
 
