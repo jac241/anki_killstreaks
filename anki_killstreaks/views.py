@@ -105,9 +105,11 @@ _templates_dir = Path(__file__).parent / "templates"
 
 
 def MedalsOverview(
-    medal_types, current_game_id, header_text="Medals earned this session:",
+    medal_types,
+    current_game_id,
+    header_text="Medals earned this session:",
 ):
-    with open(_templates_dir /"medals_overview.html", 'r') as f:
+    with open(_templates_dir / "medals_overview.html", "r") as f:
         template = Template(f.read())
 
     return template.render(
@@ -119,6 +121,7 @@ def MedalsOverview(
             halo_3="Halo 3",
             mw2="Call of Duty: Modern Warfare 2",
             halo_5="Halo 5",
+            halo_infinite="Halo Infinite",
         ),
         selected_game_id=current_game_id,
     )

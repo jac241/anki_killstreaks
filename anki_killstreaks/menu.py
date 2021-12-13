@@ -59,6 +59,16 @@ def connect_menu(main_window, profile_controller, network_thread):
             on_game_changed=profile_controller.change_game,
         )
     )
+    halo_infinite_action = game_menu.addAction("Halo Infinite")
+    halo_infinite_action.setCheckable(True)
+    halo_infinite_action.triggered.connect(
+        partial(
+            set_current_game_id,
+            game_id="halo_infinite",
+            get_settings_repo=profile_controller.get_settings_repo,
+            on_game_changed=profile_controller.change_game,
+        )
+    )
 
     top_menu.addMenu(game_menu)
 
@@ -66,7 +76,10 @@ def connect_menu(main_window, profile_controller, network_thread):
         partial(
             check_correct_game_in_menu,
             menu_actions_by_game_id=dict(
-                halo_3=halo_3_action, mw2=mw2_action, halo_5=halo_5_action,
+                halo_3=halo_3_action,
+                mw2=mw2_action,
+                halo_5=halo_5_action,
+                halo_infinite=halo_infinite_action,
             ),
             load_current_game_id=partial(
                 load_current_game_id,
@@ -102,7 +115,12 @@ def connect_menu(main_window, profile_controller, network_thread):
 
     profile_settings_action = top_menu.addAction("&Profile settings...")
     profile_settings_action.triggered.connect(
-        lambda: profile_settings.show_dialog(main_window, network_thread, profile_controller.get_user_repo(), profile_controller.get_achievements_repo())
+        lambda: profile_settings.show_dialog(
+            main_window,
+            network_thread,
+            profile_controller.get_user_repo(),
+            profile_controller.get_achievements_repo(),
+        )
     )
 
     chase_mode_action = top_menu.addAction("&Chase mode")
@@ -118,7 +136,7 @@ def connect_menu(main_window, profile_controller, network_thread):
         partial(
             set_check_for_show_chase_mode,
             action=chase_mode_action,
-            get_settings_repo=profile_controller.get_settings_repo
+            get_settings_repo=profile_controller.get_settings_repo,
         )
     )
 

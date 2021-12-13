@@ -13,7 +13,7 @@ from . import addons
 from ._vendor import attr
 
 DEFAULT_GAME_ID = "halo_3"
-all_game_ids = ["halo_3", "mw2", "halo_5"]
+all_game_ids = ["halo_3", "mw2", "halo_5", "halo_infinite"]
 
 
 class MultikillMixin:
@@ -810,6 +810,189 @@ HALO_5_KILLING_SPREE_STATES = [
 ]
 
 
+HALO_INFINITE_MULTIKILL_STATES = [
+    MultikillStartingState(),
+    MultikillFirstAnswerState(),
+    MultikillMedalState(
+        id_="halo_infinite_double_kill",
+        medal_image=image_path("halo_infinite/double-kill.png"),
+        name="Double Kill",
+        game_id="halo_infinite",
+        rank=2,
+    ),
+    MultikillMedalState(
+        id_="halo_infinite_triple_kill",
+        medal_image=image_path("halo_infinite/triple-kill.png"),
+        name="Triple Kill",
+        game_id="halo_infinite",
+        rank=3,
+    ),
+    MultikillMedalState(
+        id_="halo_infinite_overkill",
+        medal_image=image_path("halo_infinite/overkill.png"),
+        name="Overkill",
+        game_id="halo_infinite",
+        rank=4,
+    ),
+    MultikillMedalState(
+        id_="halo_infinite_killtacular",
+        medal_image=image_path("halo_infinite/killtacular.png"),
+        name="Killtacular",
+        game_id="halo_infinite",
+        rank=5,
+    ),
+    MultikillMedalState(
+        id_="halo_infinite_killtrocity",
+        medal_image=image_path("halo_infinite/killtrocity.png"),
+        name="Killtrocity",
+        game_id="halo_infinite",
+        rank=6,
+    ),
+    MultikillMedalState(
+        id_="halo_infinite_killamanjaro",
+        medal_image=image_path("halo_infinite/killamanjaro.png"),
+        name="Killamanjaro",
+        game_id="halo_infinite",
+        rank=7,
+    ),
+    MultikillMedalState(
+        id_="halo_infinite_killtastrophe",
+        medal_image=image_path("halo_infinite/killtastrophe.png"),
+        name="Killtastrophe",
+        game_id="halo_infinite",
+        rank=8,
+    ),
+    MultikillMedalState(
+        id_="halo_infinite_killpocalypse",
+        medal_image=image_path("halo_infinite/killpocalypse.png"),
+        name="Killpocalypse",
+        game_id="halo_infinite",
+        rank=9,
+    ),
+    EndState(
+        medal_state=MultikillMedalState(
+            id_="halo_infinite_killionaire",
+            medal_image=image_path("halo_infinite/killionaire.png"),
+            name="Killionaire",
+            game_id="halo_infinite",
+            rank=10,
+        ),
+        index_to_return_to=2
+    ),
+]
+
+
+HALO_INFINITE_KILLING_SPREE_STATES = [
+    KillingSpreeNoMedalState(rank=0),
+    KillingSpreeNoMedalState(rank=1),
+    KillingSpreeNoMedalState(rank=2),
+    KillingSpreeNoMedalState(rank=3),
+    KillingSpreeNoMedalState(rank=4),
+    KillingSpreeMedalState(
+        id_="halo_infinite_killing_spree",
+        medal_image=image_path("halo_infinite/killing-spree.png"),
+        name="Killing Spree",
+        game_id="halo_infinite",
+        rank=5,
+    ),
+    KillingSpreeNoMedalState(rank=6),
+    KillingSpreeNoMedalState(rank=7),
+    KillingSpreeNoMedalState(rank=8),
+    KillingSpreeNoMedalState(rank=9),
+    KillingSpreeMedalState(
+        id_="halo_infinite_killing_frenzy",
+        medal_image=image_path("halo_infinite/killing-frenzy.png"),
+        name="Killing Frenzy",
+        game_id="halo_infinite",
+        rank=10,
+    ),
+    KillingSpreeNoMedalState(rank=11),
+    KillingSpreeNoMedalState(rank=12),
+    KillingSpreeNoMedalState(rank=13),
+    KillingSpreeNoMedalState(rank=14),
+    KillingSpreeMedalState(
+        id_="halo_infinite_running_riot",
+        medal_image=image_path("halo_infinite/running-riot.png"),
+        name="Running Riot",
+        game_id="halo_infinite",
+        rank=15,
+    ),
+    KillingSpreeNoMedalState(rank=16),
+    KillingSpreeNoMedalState(rank=17),
+    KillingSpreeNoMedalState(rank=18),
+    KillingSpreeNoMedalState(rank=19),
+    KillingSpreeMedalState(
+        id_="halo_infinite_rampage",
+        medal_image=image_path("halo_infinite/rampage.png"),
+        name="Rampage",
+        game_id="halo_infinite",
+        rank=20,
+    ),
+    KillingSpreeNoMedalState(rank=21),
+    KillingSpreeNoMedalState(rank=22),
+    KillingSpreeNoMedalState(rank=23),
+    KillingSpreeNoMedalState(rank=24),
+    KillingSpreeMedalState(
+        id_="halo_infinite_nightmare",
+        medal_image=image_path("halo_infinite/nightmare.png"),
+        name="Nightmare",
+        game_id="halo_infinite",
+        rank=25,
+    ),
+    KillingSpreeNoMedalState(rank=26),
+    KillingSpreeNoMedalState(rank=27),
+    KillingSpreeNoMedalState(rank=28),
+    KillingSpreeNoMedalState(rank=29),
+    KillingSpreeMedalState(
+        id_="halo_infinite_boogeyman",
+        medal_image=image_path("halo_infinite/boogeyman.png"),
+        name="Boogeyman",
+        game_id="halo_infinite",
+        rank=30,
+    ),
+    KillingSpreeNoMedalState(rank=31),
+    KillingSpreeNoMedalState(rank=32),
+    KillingSpreeNoMedalState(rank=33),
+    KillingSpreeNoMedalState(rank=34),
+    KillingSpreeMedalState(
+        id_="halo_infinite_grim_reaper",
+        medal_image=image_path("halo_infinite/grim-reaper.png"),
+        name="Grim Reaper",
+        game_id="halo_infinite",
+        rank=35,
+    ),
+    KillingSpreeNoMedalState(rank=36),
+    KillingSpreeNoMedalState(rank=37),
+    KillingSpreeNoMedalState(rank=38),
+    KillingSpreeNoMedalState(rank=39),
+    KillingSpreeMedalState(
+        id_="halo_infinite_demon",
+        medal_image=image_path("halo_infinite/demon.png"),
+        name="Demon",
+        game_id="halo_infinite",
+        rank=40,
+    ),
+    KillingSpreeNoMedalState(rank=41),
+    KillingSpreeNoMedalState(rank=42),
+    KillingSpreeNoMedalState(rank=43),
+    KillingSpreeNoMedalState(rank=44),
+    KillingSpreeNoMedalState(rank=45),
+    KillingSpreeNoMedalState(rank=46),
+    KillingSpreeNoMedalState(rank=47),
+    KillingSpreeNoMedalState(rank=48),
+    KillingSpreeNoMedalState(rank=49),
+    EndState(
+        medal_state=KillingSpreeMedalState(
+            id_="halo_infinite_perfection",
+            medal_image=image_path("halo_infinite/perfection.png"),
+            name="Perfection",
+            game_id="halo_infinite",
+            rank=50,
+        ),
+        index_to_return_to=1
+    ),
+]
+
 def get_all_displayable_medals():
     all_medals = itertools.chain(
         HALO_MULTIKILL_STATES,
@@ -817,6 +1000,8 @@ def get_all_displayable_medals():
         MW2_KILLSTREAK_STATES,
         HALO_5_MULTIKILL_STATES,
         HALO_5_KILLING_SPREE_STATES,
+        HALO_INFINITE_MULTIKILL_STATES,
+        HALO_INFINITE_KILLING_SPREE_STATES,
     )
     return filter(lambda m: m.is_displayable_medal, all_medals)
 
@@ -855,6 +1040,18 @@ def get_stores_by_game_id(config):
                 ),
             ]
         ),
+        halo_infinite=Store(
+            state_machines=[
+                InitialStreakState(
+                    states=HALO_INFINITE_MULTIKILL_STATES,
+                    interval_s=config["killing_spree_interval_s"]
+                ),
+                InitialStreakState(
+                    states=HALO_INFINITE_KILLING_SPREE_STATES,
+                    interval_s=config["killing_spree_interval_s"],
+                ),
+            ]
+        )
     )
 
 

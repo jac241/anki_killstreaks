@@ -16,7 +16,8 @@ from .networking import (
     StatusListeningHttpClient,
     TokenAuthHttpClient,
     sra_base_url,
-    show_logged_out_tooltip, RequeuingJob,
+    show_logged_out_tooltip,
+    RequeuingJob,
 )
 from .views import html_content
 
@@ -45,8 +46,8 @@ class ChaseModeContext:
     @property
     def should_show_chase_mode(self):
         return (
-            self._profile_controller.get_settings_repo().should_show_chase_mode and
-            self.reviewer_is_being_show
+            self._profile_controller.get_settings_repo().should_show_chase_mode
+            and self.reviewer_is_being_show
         )
 
     @property
@@ -62,7 +63,9 @@ def setup_hooks(main_window, gui_hooks, Reviewer, profile_controller):
     def initialize_chase_mode_js(web_content, context=None):
         if isinstance(context, Reviewer):
             addon_package = main_window.addonManager.addonFromModule(__name__)
-            web_content.css.append(f"/_addons/{addon_package}/web/chase_mode.css")
+            web_content.css.append(
+                f"/_addons/{addon_package}/web/chase_mode.css"
+            )
             web_content.css.append(f"/_addons/{addon_package}/web/spinner.css")
             web_content.js.append(f"/_addons/{addon_package}/web/chase_mode.js")
             web_content.body += html_content("chase_mode/initialize.html")
@@ -88,7 +91,10 @@ def setup_hooks(main_window, gui_hooks, Reviewer, profile_controller):
             return (True, None)
         else:
             return handled
-    gui_hooks.webview_did_receive_js_message.append(listen_for_chase_mode_loaded)
+
+    gui_hooks.webview_did_receive_js_message.append(
+        listen_for_chase_mode_loaded
+    )
 
 
 def toggle_chase_mode(profile_controller, main_window):
@@ -197,7 +203,9 @@ _connection_error_message_shown = False
 def _fetch_and_display_chase_mode(http_client, chase_mode_context, reraise):
     global _connection_error_message_shown
     try:
-        response = http_client.get(url=_rivalry_url_for(chase_mode_context.current_game_id))
+        response = http_client.get(
+            url=_rivalry_url_for(chase_mode_context.current_game_id)
+        )
         response.raise_for_status()
         _connection_error_message_shown = False
         render(chase_mode_context.webview, response.text)
@@ -210,16 +218,22 @@ def _fetch_and_display_chase_mode(http_client, chase_mode_context, reraise):
 
 
 def _rivalry_url_for(current_game_id):
-    return urljoin(sra_base_url, f"api/v2/rivalries/{_game_slug(current_game_id)}")
+    return urljoin(
+        sra_base_url, f"api/v2/rivalries/{_game_slug(current_game_id)}"
+    )
+
 
 _slugs_by_id = {
     "halo_3": "halo-3",
     "halo_5": "halo-5",
     "mw2": "call-of-duty-modern-warfare-2",
+    "halo_infinite": "halo-infinite",
 }
+
 
 def _game_slug(current_game_id):
     return _slugs_by_id[current_game_id]
+
 
 def render(webview, text):
     webview.eval(fr"setChaseModeHTML(String.raw`{text}`)")
@@ -229,7 +243,10 @@ def _show_conn_err_tooltip_if_first_time():
     global _connection_error_message_shown
 
     if not _connection_error_message_shown:
-        tooltips.showToolTip(html=html_content("chase_mode/_connection_error_tooltip.html"), period=8000)
+        tooltips.showToolTip(
+            html=html_content("chase_mode/_connection_error_tooltip.html"),
+            period=8000,
+        )
         _connection_error_message_shown = True
 
 
