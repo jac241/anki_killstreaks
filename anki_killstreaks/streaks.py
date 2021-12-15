@@ -67,8 +67,6 @@ class MultikillNoMedalState(MultikillMixin):
 
 @attr.s(frozen=True)
 class MultikillMedalState(MultikillMixin):
-    is_displayable_medal = True
-    is_earnable_medal = True
 
     id_ = attr.ib()
     name = attr.ib()
@@ -76,6 +74,8 @@ class MultikillMedalState(MultikillMixin):
     rank = attr.ib()
     game_id = attr.ib()
     _call = attr.ib(default=None)
+    is_earnable_medal = attr.ib(default=True)
+    is_displayable_medal = attr.ib(default=True)
 
     @property
     def call(self):
@@ -83,7 +83,6 @@ class MultikillMedalState(MultikillMixin):
 
     def next_streak_index(self, current_streak_index):
         return current_streak_index + 1
-
 
 class EndState(MultikillMixin):
     def __init__(self, medal_state, index_to_return_to):
@@ -110,15 +109,15 @@ class KillingSpreeNoMedalState(KillingSpreeMixin):
 
 @attr.s(frozen=True)
 class KillingSpreeMedalState(KillingSpreeMixin):
-    is_displayable_medal = True
-    is_earnable_medal = True
-
     id_ = attr.ib()
     name = attr.ib()
     medal_image = attr.ib()
     rank = attr.ib()
     game_id = attr.ib()
     _call = attr.ib(default=None)
+    is_displayable_medal = attr.ib(default=True)
+    is_earnable_medal = attr.ib(default=True)
+
 
     @property
     def call(self):
@@ -1162,6 +1161,260 @@ VANGUARD_KILLSTREAK_STATES = [
 ]
 
 
+MWR_MULTIKILL_STATES = [
+    MultikillStartingState(),
+    MultikillNoMedalState(rank=1),
+    MultikillMedalState(
+        id_="mwr_double_kill",
+        medal_image=image_path("mwr/double-kill.png"),
+        name="Double Kill",
+        game_id="mwr",
+        rank=2,
+    ),
+    MultikillMedalState(
+        id_="mwr_triple_kill",
+        medal_image=image_path("mwr/triple-kill.png"),
+        name="Triple Kill",
+        game_id="mwr",
+        rank=3,
+    ),
+    MultikillMedalState(
+        id_="mwr_fury_kill",
+        medal_image=image_path("mwr/fury-kill.png"),
+        name="Fury Kill",
+        game_id="mwr",
+        rank=4,
+    ),
+    MultikillMedalState(
+        id_="mwr_frenzy_kill",
+        medal_image=image_path("mwr/frenzy-kill.png"),
+        name="Frenzy Kill",
+        game_id="mwr",
+        rank=5,
+    ),
+    MultikillMedalState(
+        id_="mwr_super_kill",
+        medal_image=image_path("mwr/super-kill.png"),
+        name="Super Kill",
+        game_id="mwr",
+        rank=6,
+    ),
+    MultikillMedalState(
+        id_="mwr_mega_kill",
+        medal_image=image_path("mwr/mega-kill.png"),
+        name="Mega Kill",
+        game_id="mwr",
+        rank=7,
+    ),
+    MultikillMedalState(
+        id_="mwr_ultra_kill",
+        medal_image=image_path("mwr/ultra-kill.png"),
+        name="Ultra Kill",
+        game_id="mwr",
+        rank=8,
+    ),
+    MultikillMedalState(
+        id_="mwr_kill_chain",
+        medal_image=image_path("mwr/kill-chain.png"),
+        name="Kill Chain",
+        call="Kill Chain (shows every 5th earned)",
+        game_id="mwr",
+        rank=9,
+    ),
+    MultikillMedalState(
+        id_="mwr_kill_chain",
+        medal_image=image_path("mwr/kill-chain.png"),
+        name="Kill Chain",
+        call="Kill Chain (shows every 5th earned)",
+        game_id="mwr",
+        is_displayable_medal=False,
+        rank=10,
+    ),
+    MultikillMedalState(
+        id_="mwr_kill_chain",
+        medal_image=image_path("mwr/kill-chain.png"),
+        name="Kill Chain",
+        call="Kill Chain (shows every 5th earned)",
+        game_id="mwr",
+        is_displayable_medal=False,
+        rank=11,
+    ),
+    MultikillMedalState(
+        id_="mwr_kill_chain",
+        medal_image=image_path("mwr/kill-chain.png"),
+        name="Kill Chain",
+        call="Kill Chain (shows every 5th earned)",
+        game_id="mwr",
+        is_displayable_medal=False,
+        rank=12,
+    ),
+    EndState(
+        MultikillMedalState(
+            id_="mwr_kill_chain",
+            medal_image=image_path("mwr/kill-chain.png"),
+            name="Kill Chain",
+            call="Kill Chain (shows every 5th earned)",
+            game_id="mwr",
+            is_displayable_medal=False,
+            rank=13,
+        ),
+        index_to_return_to=9
+    ),
+]
+
+
+MWR_KILLING_SPREE_STATES = [
+    KillingSpreeNoMedalState(rank=0),
+    KillingSpreeNoMedalState(rank=1),
+    KillingSpreeNoMedalState(rank=2),
+    KillingSpreeNoMedalState(rank=3),
+    KillingSpreeNoMedalState(rank=4),
+    KillingSpreeMedalState(
+        id_="mwr_bloodthirsty",
+        medal_image=image_path("mwr/bloodthirsty.png"),
+        name="Bloodthirsty",
+        game_id="mwr",
+        rank=5,
+    ),
+    KillingSpreeNoMedalState(rank=6),
+    KillingSpreeNoMedalState(rank=7),
+    KillingSpreeNoMedalState(rank=8),
+    KillingSpreeNoMedalState(rank=9),
+    KillingSpreeMedalState(
+        id_="mwr_merciless",
+        medal_image=image_path("mwr/merciless.png"),
+        name="Merciless",
+        game_id="mwr",
+        rank=10,
+    ),
+    KillingSpreeNoMedalState(rank=11),
+    KillingSpreeNoMedalState(rank=12),
+    KillingSpreeNoMedalState(rank=13),
+    KillingSpreeNoMedalState(rank=14),
+    KillingSpreeMedalState(
+        id_="mwr_ruthless",
+        medal_image=image_path("mwr/ruthless.png"),
+        name="Ruthless",
+        game_id="mwr",
+        rank=15,
+    ),
+    KillingSpreeNoMedalState(rank=16),
+    KillingSpreeNoMedalState(rank=17),
+    KillingSpreeNoMedalState(rank=18),
+    KillingSpreeNoMedalState(rank=19),
+    KillingSpreeMedalState(
+        id_="mwr_relentless",
+        medal_image=image_path("mwr/relentless.png"),
+        name="Relentless",
+        game_id="mwr",
+        rank=20,
+    ),
+    KillingSpreeNoMedalState(rank=21),
+    KillingSpreeNoMedalState(rank=22),
+    KillingSpreeNoMedalState(rank=23),
+    KillingSpreeNoMedalState(rank=24),
+    KillingSpreeMedalState(
+        id_="mwr_brutal",
+        medal_image=image_path("mwr/brutal.png"),
+        name="Brutal",
+        game_id="mwr",
+        rank=25,
+    ),
+    KillingSpreeNoMedalState(rank=26),
+    KillingSpreeNoMedalState(rank=27),
+    KillingSpreeNoMedalState(rank=28),
+    KillingSpreeNoMedalState(rank=29),
+    KillingSpreeMedalState(
+        id_="mwr_vicious",
+        medal_image=image_path("mwr/vicious.png"),
+        name="Vicious",
+        game_id="mwr",
+        rank=30,
+    ),
+    KillingSpreeMedalState(
+        id_="mwr_unstoppable",
+        medal_image=image_path("mwr/unstoppable.png"),
+        name="Unstoppable",
+        call="Unstoppable (shows every 5th earned)",
+        game_id="mwr",
+        rank=31,
+    ),
+    KillingSpreeMedalState(
+        id_="mwr_unstoppable",
+        medal_image=image_path("mwr/unstoppable.png"),
+        name="Unstoppable",
+        call="Unstoppable (shows every 5th earned)",
+        game_id="mwr",
+        is_displayable_medal=False,
+        rank=32,
+    ),
+    KillingSpreeMedalState(
+        id_="mwr_unstoppable",
+        medal_image=image_path("mwr/unstoppable.png"),
+        name="Unstoppable",
+        call="Unstoppable (shows every 5th earned)",
+        game_id="mwr",
+        is_displayable_medal=False,
+        rank=33,
+    ),
+    KillingSpreeMedalState(
+        id_="mwr_unstoppable",
+        medal_image=image_path("mwr/unstoppable.png"),
+        name="Unstoppable",
+        call="Unstoppable (shows every 5th earned)",
+        game_id="mwr",
+        is_displayable_medal=False,
+        rank=34,
+    ),
+    EndState(
+        KillingSpreeMedalState(
+            id_="mwr_unstoppable",
+            medal_image=image_path("mwr/unstoppable.png"),
+            name="Unstoppable",
+            call="Unstoppable (shows every 5th earned)",
+            game_id="mwr",
+            is_displayable_medal=False,
+            rank=35,
+        ),
+        index_to_return_to=31,
+    )
+]
+
+
+MWR_KILLSTREAK_STATES = [
+    KillingSpreeNoMedalState(rank=0),
+    KillingSpreeNoMedalState(rank=1),
+    KillingSpreeNoMedalState(rank=2),
+    KillingSpreeMedalState(
+        id_="mwr_radar",
+        medal_image=image_path("mwr/radar.png"),
+        name="Radar",
+        game_id="mwr",
+        rank=3,
+    ),
+    KillingSpreeNoMedalState(rank=4),
+    KillingSpreeMedalState(
+        id_="mwr_airstrike",
+        medal_image=image_path("mwr/airstrike.png"),
+        name="Airstrike",
+        game_id="mwr",
+        rank=5,
+    ),
+    KillingSpreeNoMedalState(rank=6),
+    EndState(
+        KillingSpreeMedalState(
+            id_="mwr_helicopter",
+            medal_image=image_path("mwr/helicopter.png"),
+            name="Helicopter",
+            game_id="mwr",
+            rank=7,
+        ),
+        index_to_return_to=1,
+    ),
+]
+
+
+@lru_cache
 def get_all_displayable_medals():
     all_medals = itertools.chain(
         HALO_MULTIKILL_STATES,
@@ -1174,8 +1427,11 @@ def get_all_displayable_medals():
         VANGUARD_MULTIKILL_STATES,
         VANGUARD_KILLING_SPREE_STATES,
         VANGUARD_KILLSTREAK_STATES,
+        MWR_MULTIKILL_STATES,
+        MWR_KILLING_SPREE_STATES,
+        MWR_KILLSTREAK_STATES,
     )
-    return filter(lambda m: m.is_displayable_medal, all_medals)
+    return list(filter(lambda m: m.is_displayable_medal, all_medals))
 
 
 def get_stores_by_game_id(config):
@@ -1236,6 +1492,22 @@ def get_stores_by_game_id(config):
                 ),
                 InitialStreakState(
                     states=VANGUARD_KILLSTREAK_STATES,
+                    interval_s=config["killing_spree_interval_s"],
+                ),
+            ]
+        ),
+        mwr=Store(
+            state_machines=[
+                InitialStreakState(
+                    states=MWR_MULTIKILL_STATES,
+                    interval_s=config["killing_spree_interval_s"]
+                ),
+                InitialStreakState(
+                    states=MWR_KILLING_SPREE_STATES,
+                    interval_s=config["killing_spree_interval_s"],
+                ),
+                InitialStreakState(
+                    states=MWR_KILLSTREAK_STATES,
                     interval_s=config["killing_spree_interval_s"],
                 ),
             ]

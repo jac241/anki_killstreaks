@@ -123,6 +123,7 @@ def MedalsOverview(
             halo_5="Halo 5",
             halo_infinite="Halo Infinite",
             vanguard="Call of Duty: Vanguard",
+            mwr="Call of Duty: Modern Warfare Remastered",
         ),
         selected_game_id=current_game_id,
     )
