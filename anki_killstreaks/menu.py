@@ -70,6 +70,17 @@ def connect_menu(main_window, profile_controller, network_thread):
         )
     )
 
+    vanguard_action = game_menu.addAction("Call of Duty: Vanguard")
+    vanguard_action.setCheckable(True)
+    vanguard_action.triggered.connect(
+        partial(
+            set_current_game_id,
+            game_id="vanguard",
+            get_settings_repo=profile_controller.get_settings_repo,
+            on_game_changed=profile_controller.change_game,
+        )
+    )
+
     top_menu.addMenu(game_menu)
 
     game_menu.aboutToShow.connect(
@@ -80,6 +91,7 @@ def connect_menu(main_window, profile_controller, network_thread):
                 mw2=mw2_action,
                 halo_5=halo_5_action,
                 halo_infinite=halo_infinite_action,
+                vanguard=vanguard_action,
             ),
             load_current_game_id=partial(
                 load_current_game_id,

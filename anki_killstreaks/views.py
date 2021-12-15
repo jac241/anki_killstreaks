@@ -122,6 +122,7 @@ def MedalsOverview(
             mw2="Call of Duty: Modern Warfare 2",
             halo_5="Halo 5",
             halo_infinite="Halo Infinite",
+            vanguard="Call of Duty: Vanguard",
         ),
         selected_game_id=current_game_id,
     )

@@ -1,11 +1,12 @@
 """
 Anki Killstreaks add-on
 
-Copyright: (c) jac241 2019-2020 <https://github.com/jac241>
+Copyright: (c) jac241 2019-2021 <https://github.com/jac241>
 License: GNU AGPLv3 or later <https://www.gnu.org/licenses/agpl.html>
 """
 
 from datetime import datetime, timedelta
+from functools import lru_cache
 import itertools
 from os.path import join, dirname
 
@@ -13,7 +14,7 @@ from . import addons
 from ._vendor import attr
 
 DEFAULT_GAME_ID = "halo_3"
-all_game_ids = ["halo_3", "mw2", "halo_5", "halo_infinite"]
+all_game_ids = ["halo_3", "mw2", "halo_5", "halo_infinite", "vanguard"]
 
 
 class MultikillMixin:
@@ -53,9 +54,10 @@ class MultikillStartingState(KillingSpreeMixin):
         return current_streak_index + 1
 
 
-class MultikillFirstAnswerState(MultikillMixin):
+@attr.s(frozen=True)
+class MultikillNoMedalState(MultikillMixin):
     is_displayable_medal = False
-    rank = 1
+    rank = attr.ib(default=1)
 
     def next_streak_index(self, current_streak_index):
         return current_streak_index + 1
@@ -363,7 +365,7 @@ class NewAchievement:
 
 HALO_MULTIKILL_STATES = [
     MultikillStartingState(),
-    MultikillFirstAnswerState(),
+    MultikillNoMedalState(),
     MultikillMedalState(
         id_="Double Kill",
         medal_image=image_path("Doublekill_Medal.webp.png"),
@@ -635,7 +637,7 @@ MW2_KILLSTREAK_STATES = [
 
 HALO_5_MULTIKILL_STATES = [
     MultikillStartingState(),
-    MultikillFirstAnswerState(),
+    MultikillNoMedalState(),
     MultikillMedalState(
         id_="halo_5_double_kill",
         medal_image=image_path("halo_5/double_kill.png"),
@@ -812,7 +814,7 @@ HALO_5_KILLING_SPREE_STATES = [
 
 HALO_INFINITE_MULTIKILL_STATES = [
     MultikillStartingState(),
-    MultikillFirstAnswerState(),
+    MultikillNoMedalState(),
     MultikillMedalState(
         id_="halo_infinite_double_kill",
         medal_image=image_path("halo_infinite/double-kill.png"),
@@ -993,6 +995,170 @@ HALO_INFINITE_KILLING_SPREE_STATES = [
     ),
 ]
 
+
+VANGUARD_MULTIKILL_STATES = [
+    MultikillStartingState(),
+    MultikillNoMedalState(rank=1),
+    MultikillNoMedalState(rank=2),
+    MultikillMedalState(
+        id_="v_triple_kill",
+        medal_image=image_path("vanguard/triple-kill.png"),
+        name="Triple Kill",
+        game_id="vanguard",
+        rank=3,
+    ),
+    MultikillMedalState(
+        id_="v_fury_kill",
+        medal_image=image_path("vanguard/fury-kill.png"),
+        name="Fury Kill",
+        game_id="vanguard",
+        rank=4,
+    ),
+    MultikillMedalState(
+        id_="v_mega_kill",
+        medal_image=image_path("vanguard/mega-kill.png"),
+        name="Mega Kill",
+        game_id="vanguard",
+        rank=5,
+    ),
+    EndState(
+        medal_state=MultikillMedalState(
+            id_="v_super_kill",
+            medal_image=image_path("vanguard/super-kill.png"),
+            name="Super Kill",
+            game_id="vanguard",
+            rank=6,
+        ),
+        index_to_return_to=3
+    ),
+]
+
+
+VANGUARD_KILLING_SPREE_STATES = [
+    KillingSpreeNoMedalState(rank=0),
+    KillingSpreeNoMedalState(rank=1),
+    KillingSpreeNoMedalState(rank=2),
+    KillingSpreeNoMedalState(rank=3),
+    KillingSpreeNoMedalState(rank=4),
+    KillingSpreeNoMedalState(rank=5),
+    KillingSpreeNoMedalState(rank=6),
+    KillingSpreeNoMedalState(rank=7),
+    KillingSpreeNoMedalState(rank=8),
+    KillingSpreeNoMedalState(rank=9),
+    KillingSpreeNoMedalState(rank=10),
+    KillingSpreeNoMedalState(rank=11),
+    KillingSpreeNoMedalState(rank=12),
+    KillingSpreeNoMedalState(rank=13),
+    KillingSpreeNoMedalState(rank=14),
+    KillingSpreeMedalState(
+        id_="v_ruthless",
+        medal_image=image_path("vanguard/ruthless.png"),
+        name="Ruthless",
+        game_id="vanguard",
+        rank=15,
+    ),
+    KillingSpreeNoMedalState(rank=16),
+    KillingSpreeNoMedalState(rank=17),
+    KillingSpreeNoMedalState(rank=18),
+    KillingSpreeNoMedalState(rank=19),
+    KillingSpreeMedalState(
+        id_="v_brutal",
+        medal_image=image_path("vanguard/brutal.png"),
+        name="Brutal",
+        game_id="vanguard",
+        rank=20,
+    ),
+    KillingSpreeNoMedalState(rank=21),
+    KillingSpreeNoMedalState(rank=22),
+    KillingSpreeNoMedalState(rank=23),
+    KillingSpreeNoMedalState(rank=24),
+    EndState(
+        medal_state=KillingSpreeMedalState(
+            id_="v_atomic",
+            medal_image=image_path("vanguard/atomic.png"),
+            name="Atomic",
+            game_id="vanguard",
+            rank=25,
+        ),
+        index_to_return_to=1
+    ),
+]
+
+
+VANGUARD_KILLSTREAK_STATES = [
+    KillingSpreeNoMedalState(rank=0),
+    KillingSpreeNoMedalState(rank=1),
+    KillingSpreeNoMedalState(rank=2),
+    KillingSpreeMedalState(
+        id_="v_intel",
+        medal_image=image_path("vanguard/intel.png"),
+        name="Intel",
+        game_id="vanguard",
+        rank=3,
+    ),
+    KillingSpreeMedalState(
+        id_="v_care_package",
+        medal_image=image_path("vanguard/care-package.png"),
+        name="Care Package",
+        game_id="vanguard",
+        rank=4,
+    ),
+    KillingSpreeMedalState(
+        id_="v_mortar_barrage",
+        medal_image=image_path("vanguard/mortar-barrage.png"),
+        name="Mortar Barrage",
+        game_id="vanguard",
+        rank=5,
+    ),
+    KillingSpreeMedalState(
+        id_="v_guard_dog",
+        medal_image=image_path("vanguard/guard-dog.png"),
+        name="Guard Dog",
+        game_id="vanguard",
+        rank=6,
+    ),
+    KillingSpreeMedalState(
+        id_="v_bombing_run",
+        medal_image=image_path("vanguard/bombing-run.png"),
+        name="Bombing Run",
+        game_id="vanguard",
+        rank=7,
+    ),
+    KillingSpreeMedalState(
+        id_="v_emergency_airdrop",
+        medal_image=image_path("vanguard/emergency-airdrop.png"),
+        name="Emergency Airdrop",
+        game_id="vanguard",
+        rank=8,
+    ),
+    KillingSpreeMedalState(
+        id_="v_flamenaut",
+        medal_image=image_path("vanguard/flamenaut.png"),
+        name="Flamenaut",
+        game_id="vanguard",
+        rank=9,
+    ),
+    KillingSpreeMedalState(
+        id_="v_attack_dogs",
+        medal_image=image_path("vanguard/attack-dogs.png"),
+        name="Attack Dogs",
+        game_id="vanguard",
+        rank=10,
+    ),
+    KillingSpreeNoMedalState(rank=11),
+    EndState(
+        medal_state=KillingSpreeMedalState(
+            id_="v_local_informants",
+            medal_image=image_path("vanguard/local-informants.png"),
+            name="Local Informants",
+            game_id="vanguard",
+            rank=12,
+        ),
+        index_to_return_to=1,
+    ),
+]
+
+
 def get_all_displayable_medals():
     all_medals = itertools.chain(
         HALO_MULTIKILL_STATES,
@@ -1002,6 +1168,9 @@ def get_all_displayable_medals():
         HALO_5_KILLING_SPREE_STATES,
         HALO_INFINITE_MULTIKILL_STATES,
         HALO_INFINITE_KILLING_SPREE_STATES,
+        VANGUARD_MULTIKILL_STATES,
+        VANGUARD_KILLING_SPREE_STATES,
+        VANGUARD_KILLSTREAK_STATES,
     )
     return filter(lambda m: m.is_displayable_medal, all_medals)
 
@@ -1048,6 +1217,22 @@ def get_stores_by_game_id(config):
                 ),
                 InitialStreakState(
                     states=HALO_INFINITE_KILLING_SPREE_STATES,
+                    interval_s=config["killing_spree_interval_s"],
+                ),
+            ]
+        ),
+        vanguard=Store(
+            state_machines=[
+                InitialStreakState(
+                    states=VANGUARD_MULTIKILL_STATES,
+                    interval_s=config["killing_spree_interval_s"]
+                ),
+                InitialStreakState(
+                    states=VANGUARD_KILLING_SPREE_STATES,
+                    interval_s=config["killing_spree_interval_s"],
+                ),
+                InitialStreakState(
+                    states=VANGUARD_KILLSTREAK_STATES,
                     interval_s=config["killing_spree_interval_s"],
                 ),
             ]

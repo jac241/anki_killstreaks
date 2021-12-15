@@ -228,6 +228,7 @@ _slugs_by_id = {
     "halo_5": "halo-5",
     "mw2": "call-of-duty-modern-warfare-2",
     "halo_infinite": "halo-infinite",
+    "vanguard": "call-of-duty-vanguard",
 }
 
 

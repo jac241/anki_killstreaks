@@ -57,7 +57,7 @@ def answer_shown_state():
 def test_states_requirements_met_should_return_true_if_within_interval():
     states = [
         MultikillStartingState(),
-        MultikillFirstAnswerState(),
+        MultikillNoMedalState(),
         EndState(
             medal_state=MultikillMedalState(
                 id_="t", name="test", medal_image=None, rank=2, game_id="tg"
@@ -104,7 +104,7 @@ def test_QuestionShownState_on_answer_should_advance():
     """
     states = [
         MultikillStartingState(),
-        MultikillFirstAnswerState(),
+        MultikillNoMedalState(),
         EndState(
             medal_state=MultikillMedalState(
                 id_="t", name="test", medal_image=None, rank=2, game_id="tg"
@@ -129,7 +129,7 @@ def test_QuestionShownState_on_answer_should_only_advance_if_right_hand_reviews_
 ):
     states = [
         MultikillStartingState(),
-        MultikillFirstAnswerState(),
+        MultikillNoMedalState(),
         EndState(
             medal_state=MultikillMedalState(
                 id_="t", name="test", medal_image=None, rank=2, game_id="tg"
@@ -173,7 +173,7 @@ def test_QuestionShownState_on_answer_should_only_advance_if_right_hand_reviews_
 def test_multikill_flow_should_work():
     states = [
         MultikillStartingState(),
-        MultikillFirstAnswerState(),
+        MultikillNoMedalState(),
         MultikillMedalState(
             id_="test",
             name="test",
@@ -200,7 +200,7 @@ def test_multikill_flow_should_work():
 def test_multikill_should_restart_streak_automatically_if_all_medals_achieved():
     states = [
         MultikillStartingState(),
-        MultikillFirstAnswerState(),
+        MultikillNoMedalState(),
         MultikillMedalState(
             id_="test1",
             name="test1",
@@ -289,7 +289,7 @@ def test_AnswerShownState_should_go_to_index_1_if_answer_was_correct_but_out_of_
     """This answer should still be eligible for a double kill"""
     states = [
         MultikillStartingState(),
-        MultikillFirstAnswerState(),
+        MultikillNoMedalState(),
         MultikillMedalState(
             id_="test",
             name="test",
@@ -314,7 +314,7 @@ def test_AnswerShownState_should_go_to_index_1_if_answer_was_correct_but_out_of_
 def test_AnswerShownState_should_just_repeat_if_on_answer_shown_called():
     states = [
         MultikillStartingState(),
-        MultikillFirstAnswerState(),
+        MultikillNoMedalState(),
         MultikillMedalState(
             id_="test",
             name="test",
