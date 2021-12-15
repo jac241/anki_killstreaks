@@ -27,7 +27,16 @@ def question_shown_state():
                 rank=1,
                 game_id="halo_3",
             ),
-            KillingSpreeEndState(rank=2),
+            EndState(
+                medal_state=MultikillMedalState(
+                    id_="Triple Kill",
+                    name="Triple Kill",
+                    medal_image=None,
+                    rank=2,
+                    game_id="halo_3",
+                ),
+                index_to_return_to=0,
+            ),
         ],
         question_shown_at=datetime.now(),
     )
@@ -45,7 +54,16 @@ def answer_shown_state():
                 rank=1,
                 game_id="halo_3",
             ),
-            KillingSpreeEndState(rank=2),
+            EndState(
+                medal_state=MultikillMedalState(
+                    id_="Triple Kill",
+                    name="Triple Kill",
+                    medal_image=None,
+                    rank=2,
+                    game_id="halo_3",
+                ),
+                index_to_return_to=0,
+            ),
         ],
         question_shown_at=datetime.now(),
         answer_shown_at=datetime.now() + timedelta(seconds=1),

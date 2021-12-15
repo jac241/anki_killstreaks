@@ -88,7 +88,7 @@ class ProfileController:
         http_client = StatusListeningHttpClient(
             http_client=TokenAuthHttpClient(user_repo),
             status=401,
-            on_status=show_logged_out_tooltip
+            on_status=show_logged_out_tooltip,
         )
         self._achievements_repo = RemoteAchievementsRepository(
             local_repo=AchievementsRepository(get_db_for_profile),
@@ -201,7 +201,8 @@ class ProfileController:
 
 
 def call_method_on_object_from_factory_function(
-    method, factory_function,
+    method,
+    factory_function,
 ):
     """
     This function takes a factory method, and then calls the passed method
@@ -237,7 +238,7 @@ class ReviewingController:
         self.achievements_repo.create_all(
             [
                 NewAchievement(medal=medal, deck_id=deck_id)
-                for medal in self.store.current_displayable_medals
+                for medal in self.store.current_earnable_medals
             ]
         )
 

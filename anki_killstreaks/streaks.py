@@ -48,6 +48,7 @@ class KillingSpreeMixin:
 # first just needs to be after minimum time
 class MultikillStartingState(KillingSpreeMixin):
     is_displayable_medal = False
+    is_earnable_medal = False
     rank = 0
 
     def next_streak_index(self, current_streak_index):
@@ -57,6 +58,7 @@ class MultikillStartingState(KillingSpreeMixin):
 @attr.s(frozen=True)
 class MultikillNoMedalState(MultikillMixin):
     is_displayable_medal = False
+    is_earnable_medal = False
     rank = attr.ib(default=1)
 
     def next_streak_index(self, current_streak_index):
@@ -66,6 +68,7 @@ class MultikillNoMedalState(MultikillMixin):
 @attr.s(frozen=True)
 class MultikillMedalState(MultikillMixin):
     is_displayable_medal = True
+    is_earnable_medal = True
 
     id_ = attr.ib()
     name = attr.ib()
@@ -96,6 +99,7 @@ class EndState(MultikillMixin):
 
 class KillingSpreeNoMedalState(KillingSpreeMixin):
     is_displayable_medal = False
+    is_earnable_medal = False
 
     def __init__(self, rank):
         self.rank = rank
@@ -107,6 +111,7 @@ class KillingSpreeNoMedalState(KillingSpreeMixin):
 @attr.s(frozen=True)
 class KillingSpreeMedalState(KillingSpreeMixin):
     is_displayable_medal = True
+    is_earnable_medal = True
 
     id_ = attr.ib()
     name = attr.ib()
@@ -121,16 +126,6 @@ class KillingSpreeMedalState(KillingSpreeMixin):
 
     def next_streak_index(self, current_streak_index):
         return current_streak_index + 1
-
-
-class KillingSpreeEndState(KillingSpreeMixin):
-    is_displayable_medal = False
-
-    def __init__(self, rank):
-        self.rank = rank
-
-    def next_streak_index(self, current_streak_index):
-        return 0
 
 
 class InitialStreakState:
@@ -200,6 +195,14 @@ class Store:
                 for m in self.state_machines
             ]
         )
+
+    @property
+    def current_earnable_medals(self):
+        return [
+            m.current_medal_state
+            for m in self.state_machines
+            if m.current_medal_state.is_earnable_medal
+        ]
 
     @property
     def current_displayable_medals(self):
